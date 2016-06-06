@@ -30,4 +30,7 @@ public class Role {
 
     public static final String ADMIN = "admin";
 
+    private Role() {
+    }
+
 }
