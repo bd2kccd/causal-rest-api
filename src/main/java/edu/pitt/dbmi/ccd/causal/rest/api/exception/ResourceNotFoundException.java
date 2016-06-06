@@ -16,39 +16,27 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301  USA
  */
-package edu.pitt.dbmi.ccd.causal.rest.api.error;
+package edu.pitt.dbmi.ccd.causal.rest.api.exception;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.ResponseStatus;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Response;
 
 /**
  *
- * Jun 3, 2016 5:26:24 PM
+ * Jun 5, 2016 10:24:27 PM
  *
  * @author Kevin V. Bui (kvb2@pitt.edu)
  */
-@ResponseStatus(value = HttpStatus.NOT_FOUND)
-public class ResourceNotFoundException extends RuntimeException {
+public class ResourceNotFoundException extends WebApplicationException {
 
-    private static final long serialVersionUID = -4861092601653641980L;
+    private static final long serialVersionUID = 2866404024557445862L;
 
     public ResourceNotFoundException() {
+        super("Resource not found.", Response.Status.NOT_FOUND);
     }
 
     public ResourceNotFoundException(String message) {
-        super(message);
-    }
-
-    public ResourceNotFoundException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
-    public ResourceNotFoundException(Throwable cause) {
-        super(cause);
-    }
-
-    public ResourceNotFoundException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
-        super(message, cause, enableSuppression, writableStackTrace);
+        super(message, Response.Status.NOT_FOUND);
     }
 
 }

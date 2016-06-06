@@ -16,9 +16,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301  USA
  */
-package edu.pitt.dbmi.ccd.causal.rest.api.dto.data;
+package edu.pitt.dbmi.ccd.causal.rest.api.dto;
 
-import java.util.Date;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -26,70 +25,74 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  *
- * Jun 3, 2016 4:23:25 PM
+ * Jun 5, 2016 10:08:42 PM
  *
  * @author Kevin V. Bui (kvb2@pitt.edu)
  */
-@XmlRootElement(name = "dataFile")
+@XmlRootElement(name = "errorResponse")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class DataFileDTO {
+public class ErrorResponse {
 
     @XmlElement
-    private Long id;
+    private long timestamp;
 
     @XmlElement
-    private String name;
+    private int status;
 
     @XmlElement
-    private Date creationTime;
+    private String error;
 
     @XmlElement
-    private Date lastModifiedTime;
+    private String message;
 
     @XmlElement
-    private long fileSize;
+    private String path;
 
-    public DataFileDTO() {
+    public ErrorResponse() {
     }
 
-    public Long getId() {
-        return id;
+    public ErrorResponse(String message) {
+        this.message = message;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public long getTimestamp() {
+        return timestamp;
     }
 
-    public String getName() {
-        return name;
+    public void setTimestamp(long timestamp) {
+        this.timestamp = timestamp;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public int getStatus() {
+        return status;
     }
 
-    public Date getCreationTime() {
-        return creationTime;
+    public void setStatus(int status) {
+        this.status = status;
     }
 
-    public void setCreationTime(Date creationTime) {
-        this.creationTime = creationTime;
+    public String getError() {
+        return error;
     }
 
-    public Date getLastModifiedTime() {
-        return lastModifiedTime;
+    public void setError(String error) {
+        this.error = error;
     }
 
-    public void setLastModifiedTime(Date lastModifiedTime) {
-        this.lastModifiedTime = lastModifiedTime;
+    public String getMessage() {
+        return message;
     }
 
-    public long getFileSize() {
-        return fileSize;
+    public void setMessage(String message) {
+        this.message = message;
     }
 
-    public void setFileSize(long fileSize) {
-        this.fileSize = fileSize;
+    public String getPath() {
+        return path;
+    }
+
+    public void setPath(String path) {
+        this.path = path;
     }
 
 }
