@@ -43,6 +43,18 @@ This `GET` request to the endpoint `http://localhost:9000/causal/api/v1.0/usr/zh
 ]
 ````
 
+If the Authorization header is not provided, the response will look like this:
+
+````
+{
+  "timestamp": 1465414501443,
+  "status": 401,
+  "error": "Unauthorized",
+  "message": "User credentials are required.",
+  "path": "/usr/zhy19/data"
+}
+````
+
 You can also specify the response format to XML in your request
 
 ````
