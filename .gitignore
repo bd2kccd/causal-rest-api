@@ -1,0 +1,2 @@
+## Ignore the target directory created by Maven
+target
