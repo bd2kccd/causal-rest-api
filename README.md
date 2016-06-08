@@ -8,6 +8,8 @@ You'll need to download [ccd-db-0.6.1](https://github.com/bd2kccd/ccd-db) branch
 
 # Usage Examples
 
+## Example 1
+
 ````
 GET /causal/api/v1.0/usr/zhy19/data HTTP/1.1
 Host: localhost:9000
@@ -93,3 +95,24 @@ And the response will look like this:
 </dataFileDTOes>
 ````
 
+## Example 2
+
+You can also query the data file info for a given id
+
+````
+GET /causal/api/v1.0/usr/zhy19/data/id/88 HTTP/1.1
+Host: localhost:9000
+Authorization: Basic emh5MTk6MTIzNDU2
+````
+
+And the resulting response looks like this:
+
+````
+{
+  "id": 88,
+  "name": "121_2016-5-24.csv",
+  "creationTime": 1464115438000,
+  "lastModifiedTime": 1464115438000,
+  "fileSize": 35843
+}
+````
