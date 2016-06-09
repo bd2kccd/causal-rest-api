@@ -1,12 +1,14 @@
 # Causal-Web REST API
 
-This RESTful API is designed for causal web.
+This RESTful API is designed for causal web. And it implements the [JAX-RS](https://en.wikipedia.org/wiki/Java_API_for_RESTful_Web_Services) specifications using Jersey.
 
 # Dependencies
 
 You'll need to download [ccd-db-0.6.1](https://github.com/bd2kccd/ccd-db) branch and run `mvn clean install` before building the `causal-rest-api`.
 
 # Usage Examples
+
+Since this API is developed with Jersey, which supports [WADL](https://en.wikipedia.org/wiki/Web_Application_Description_Language). So you can view the generated WADL by going to `http://localhost:9000/causal/api/v1.0/application.wadl?detail=true and see all resource available in the application.
 
 ## Example 1
 
