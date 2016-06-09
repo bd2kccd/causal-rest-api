@@ -8,7 +8,7 @@ You'll need to download [ccd-db-0.6.1](https://github.com/bd2kccd/ccd-db) branch
 
 # Usage Examples
 
-Since this API is developed with Jersey, which supports [WADL](https://en.wikipedia.org/wiki/Web_Application_Description_Language). So you can view the generated WADL by going to `http://localhost:9000/causal/api/v1.0/application.wadl?detail=true and see all resource available in the application.
+Since this API is developed with Jersey, which supports [WADL](https://en.wikipedia.org/wiki/Web_Application_Description_Language). So you can view the generated WADL by going to `http://localhost:9000/causal/api/v1.0/application.wadl?detail=true` and see all resource available in the application.
 
 ## Example 1
 
