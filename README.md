@@ -8,7 +8,9 @@ You'll need to download [ccd-db-0.6.1](https://github.com/bd2kccd/ccd-db) branch
 
 # Usage Examples
 
-Since this API is developed with Jersey, which supports [WADL](https://en.wikipedia.org/wiki/Web_Application_Description_Language). So you can view the generated WADL by going to `http://localhost:9000/causal/api/v1.0/application.wadl?detail=true` and see all resource available in the application.
+This API requires user to be authenticated. Before using this API, the user will need to go to [Causal-Web App](https://dxcvm26.psc.edu/ccd/login) and create an account. After that, the username and password can be used to authenticate against the REST API via HTTP Basic Auth. The username will need to be specified in the requesting URI and password provided in the HTTP request `Authorization` header.
+
+Since this API is developed with Jersey, which supports [WADL](https://en.wikipedia.org/wiki/Web_Application_Description_Language). So you can view the generated WADL by going to `http://localhost:9000/causal/api/v1.0/application.wadl?detail=true` and see all resource available in the application. And below are some examples.
 
 ## Example 1
 
