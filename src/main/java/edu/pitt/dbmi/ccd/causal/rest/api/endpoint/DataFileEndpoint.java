@@ -24,6 +24,7 @@ import edu.pitt.dbmi.ccd.causal.rest.api.service.DataFileEndpointService;
 import java.util.List;
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -60,6 +61,17 @@ public class DataFileEndpoint {
     public Response findById(@PathParam("username") String username, @PathParam("id") Long id) {
         DataFileDTO dataFileDTO = dataFileEndpointService.findById(id, username);
 
+        return Response.ok(dataFileDTO).build();
+    }
+
+    @DELETE
+    @Path("/id/{id}")
+    @Produces({APPLICATION_JSON, APPLICATION_XML})
+    @RolesAllowed(Role.USER)
+    public Response deleteById(@PathParam("username") String username, @PathParam("id") Long id) {
+        DataFileDTO dataFileDTO = dataFileEndpointService.deleteByIdAndUserAccounts(id, username);
+
+        // 200 (OK). 404 (Not Found), if ID not found or not associated to this user.
         return Response.ok(dataFileDTO).build();
     }
 

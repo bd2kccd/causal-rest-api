@@ -71,6 +71,27 @@ public class DataFileEndpointService {
         return dataFileDTO;
     }
 
+    public DataFileDTO deleteByIdAndUserAccounts(Long id, String username) {
+        UserAccount userAccount = userAccountRestRepository.findByUsername(username);
+        if (userAccount == null) {
+            throw new UserNotFoundException(username);
+        }
+
+        DataFile dataFile = dataFileRestRepository.findByIdAndUserAccounts(id, Collections.singleton(userAccount));
+        if (dataFile == null) {
+            throw new NotFoundByIdException(id);
+        }
+
+        DataFileDTO dataFileDTO = new DataFileDTO();
+        dataFileDTO.setCreationTime(dataFile.getCreationTime());
+        dataFileDTO.setFileSize(dataFile.getFileSize());
+        dataFileDTO.setId(dataFile.getId());
+        dataFileDTO.setLastModifiedTime(dataFile.getLastModifiedTime());
+        dataFileDTO.setName(dataFile.getName());
+
+        return dataFileDTO;
+    }
+
     public List<DataFileDTO> listDataFiles(String username) {
         List<DataFileDTO> dataFileDTOs = new LinkedList<>();
 
