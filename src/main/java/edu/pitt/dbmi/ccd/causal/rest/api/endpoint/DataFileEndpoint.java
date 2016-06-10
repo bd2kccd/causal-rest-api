@@ -69,9 +69,8 @@ public class DataFileEndpoint {
     @Produces({APPLICATION_JSON, APPLICATION_XML})
     @RolesAllowed(Role.USER)
     public Response deleteById(@PathParam("username") String username, @PathParam("id") Long id) {
-        DataFileDTO dataFileDTO = dataFileEndpointService.deleteByIdAndUserAccounts(id, username);
+        DataFileDTO dataFileDTO = dataFileEndpointService.findById(id, username);
 
-        // 200 (OK). 404 (Not Found), if ID not found or not associated to this user.
         return Response.ok(dataFileDTO).build();
     }
 

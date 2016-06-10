@@ -38,12 +38,4 @@ public interface DataFileRestRepository extends JpaRepository<DataFile, Long> {
 
     public DataFile findByIdAndUserAccounts(Long id, Set<UserAccount> userAccounts);
 
-    /**
-     *
-     * @param id
-     * @param userAccounts
-     * @return
-     */
-    public DataFile deleteByIdAndUserAccounts(Long id, Set<UserAccount> userAccounts);
-
 }
