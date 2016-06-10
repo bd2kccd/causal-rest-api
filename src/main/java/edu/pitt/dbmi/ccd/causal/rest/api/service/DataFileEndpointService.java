@@ -25,12 +25,17 @@ import edu.pitt.dbmi.ccd.causal.rest.api.exception.UserNotFoundException;
 import edu.pitt.dbmi.ccd.causal.rest.api.prop.CausalRestProperties;
 import edu.pitt.dbmi.ccd.causal.rest.api.service.db.DataFileRestService;
 import edu.pitt.dbmi.ccd.causal.rest.api.service.db.UserAccountRestService;
+import edu.pitt.dbmi.ccd.commons.file.info.FileInfos;
 import edu.pitt.dbmi.ccd.db.entity.DataFile;
 import edu.pitt.dbmi.ccd.db.entity.UserAccount;
+import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -123,6 +128,28 @@ public class DataFileEndpointService {
         });
 
         return dataFileDTOs;
+    }
+
+    private void synchronizeDataFiles(UserAccount userAccount) {
+        // get all the user's dataset from the database
+        List<DataFile> dataFiles = dataFileRestService.findByUserAccount(userAccount);
+        Map<String, DataFile> dbDataFile = new HashMap<>();
+        dataFiles.forEach(file -> {
+            dbDataFile.put(file.getName(), file);
+        });
+
+        String workspaceDir = causalRestProperties.getWorkspaceDir();
+        String dataFolder = causalRestProperties.getDataFolder();
+        Path dataDir = Paths.get(workspaceDir, userAccount.getUsername(), dataFolder);
+
+        Map<String, DataFile> saveFiles = new HashMap<>();
+        try {
+            List<Path> localFiles = FileInfos.listDirectory(dataDir, false);
+            localFiles.forEach(localFile -> {
+            });
+        } catch (IOException exception) {
+            LOGGER.error(exception.getMessage());
+        }
     }
 
 }

@@ -50,6 +50,11 @@
             <artifactId>ccd-db</artifactId>
             <version>0.6.1</version>
         </dependency>
+        <dependency>
+            <groupId>edu.pitt.dbmi</groupId>
+            <artifactId>ccd-commons</artifactId>
+            <version>0.3.0</version>
+        </dependency>
 
         <dependency>
             <groupId>org.apache.shiro</groupId>
