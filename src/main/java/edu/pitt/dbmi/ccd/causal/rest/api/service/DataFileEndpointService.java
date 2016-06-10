@@ -22,6 +22,7 @@ import edu.pitt.dbmi.ccd.causal.rest.api.dto.DataFileDTO;
 import edu.pitt.dbmi.ccd.causal.rest.api.exception.InternalErrorException;
 import edu.pitt.dbmi.ccd.causal.rest.api.exception.NotFoundByIdException;
 import edu.pitt.dbmi.ccd.causal.rest.api.exception.UserNotFoundException;
+import edu.pitt.dbmi.ccd.causal.rest.api.prop.CausalRestProperties;
 import edu.pitt.dbmi.ccd.causal.rest.api.service.db.DataFileRestService;
 import edu.pitt.dbmi.ccd.causal.rest.api.service.db.UserAccountRestService;
 import edu.pitt.dbmi.ccd.db.entity.DataFile;
@@ -46,12 +47,15 @@ public class DataFileEndpointService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DataFileEndpointService.class);
 
+    private final CausalRestProperties causalRestProperties;
+
     private final UserAccountRestService userAccountRestService;
 
     private final DataFileRestService dataFileRestService;
 
     @Autowired
-    public DataFileEndpointService(UserAccountRestService userAccountRestService, DataFileRestService dataFileRestService) {
+    public DataFileEndpointService(CausalRestProperties causalRestProperties, UserAccountRestService userAccountRestService, DataFileRestService dataFileRestService) {
+        this.causalRestProperties = causalRestProperties;
         this.userAccountRestService = userAccountRestService;
         this.dataFileRestService = dataFileRestService;
     }
