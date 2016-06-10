@@ -18,19 +18,17 @@
  */
 package edu.pitt.dbmi.ccd.causal.rest.api.repository;
 
-import edu.pitt.dbmi.ccd.db.entity.UserAccount;
+import edu.pitt.dbmi.ccd.db.entity.DataFileInfo;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 /**
  *
- * Jun 5, 2016 9:45:38 PM
+ * Jun 10, 2016 4:32:58 PM
  *
  * @author Kevin V. Bui (kvb2@pitt.edu)
  */
 @Repository
-public interface UserAccountRestRepository extends JpaRepository<UserAccount, Long> {
-
-    public UserAccount findByUsername(String username);
+public interface DataFileInfoRestRepository extends JpaRepository<DataFileInfo, Long> {
 
 }

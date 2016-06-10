@@ -16,21 +16,26 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301  USA
  */
-package edu.pitt.dbmi.ccd.causal.rest.api.repository;
+package edu.pitt.dbmi.ccd.causal.rest.api.exception;
 
-import edu.pitt.dbmi.ccd.db.entity.UserAccount;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Response;
 
 /**
  *
- * Jun 5, 2016 9:45:38 PM
+ * Jun 10, 2016 4:17:16 PM
  *
  * @author Kevin V. Bui (kvb2@pitt.edu)
  */
-@Repository
-public interface UserAccountRestRepository extends JpaRepository<UserAccount, Long> {
+public class InternalErrorException extends WebApplicationException {
 
-    public UserAccount findByUsername(String username);
+    private static final long serialVersionUID = 4206999110807572726L;
+
+    public InternalErrorException() {
+    }
+
+    public InternalErrorException(String message) {
+        super(message, Response.Status.INTERNAL_SERVER_ERROR);
+    }
 
 }
