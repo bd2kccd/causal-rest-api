@@ -16,21 +16,31 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301  USA
  */
-package edu.pitt.dbmi.ccd.causal.rest.api.repository;
+package edu.pitt.dbmi.ccd.causal.rest.api.service.db;
 
+import edu.pitt.dbmi.ccd.causal.rest.api.repository.UserAccountRestRepository;
 import edu.pitt.dbmi.ccd.db.entity.UserAccount;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 /**
  *
- * Jun 5, 2016 9:45:38 PM
+ * Jun 10, 2016 3:02:32 PM
  *
  * @author Kevin V. Bui (kvb2@pitt.edu)
  */
-@Repository
-public interface UserAccountRestRepository extends JpaRepository<UserAccount, Long> {
+@Service
+public class UserAccountRestService {
 
-    public UserAccount findByUsername(String username);
+    private final UserAccountRestRepository userAccountRepository;
+
+    @Autowired
+    public UserAccountRestService(UserAccountRestRepository userAccountRepository) {
+        this.userAccountRepository = userAccountRepository;
+    }
+
+    public UserAccount findByUsername(String username) {
+        return userAccountRepository.findByUsername(username);
+    }
 
 }

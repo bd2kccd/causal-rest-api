@@ -54,12 +54,21 @@ public class DataFileEndpoint {
         this.dataFileEndpointService = dataFileEndpointService;
     }
 
+    @DELETE
+    @Path("/id/{id}")
+    @RolesAllowed(Role.USER)
+    public Response deleteById(@PathParam("username") String username, @PathParam("id") Long id) {
+        dataFileEndpointService.deleteByIdAndUsername(id, username);
+
+        return Response.noContent().build();
+    }
+
     @GET
     @Path("/id/{id}")
     @Produces({APPLICATION_JSON, APPLICATION_XML})
     @RolesAllowed(Role.USER)
     public Response findById(@PathParam("username") String username, @PathParam("id") Long id) {
-        DataFileDTO dataFileDTO = dataFileEndpointService.findById(id, username);
+        DataFileDTO dataFileDTO = dataFileEndpointService.findByIdAndUsername(id, username);
 
         return Response.ok(dataFileDTO).build();
     }

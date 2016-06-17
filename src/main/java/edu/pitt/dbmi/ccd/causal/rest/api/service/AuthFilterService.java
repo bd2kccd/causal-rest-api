@@ -21,7 +21,7 @@ package edu.pitt.dbmi.ccd.causal.rest.api.service;
 import edu.pitt.dbmi.ccd.causal.rest.api.Role;
 import edu.pitt.dbmi.ccd.causal.rest.api.exception.AccessDeniedException;
 import edu.pitt.dbmi.ccd.causal.rest.api.exception.AccessForbiddenException;
-import edu.pitt.dbmi.ccd.causal.rest.api.repository.UserAccountRestRepository;
+import edu.pitt.dbmi.ccd.causal.rest.api.service.db.UserAccountRestService;
 import edu.pitt.dbmi.ccd.db.entity.UserAccount;
 import edu.pitt.dbmi.ccd.db.entity.UserRole;
 import java.security.Principal;
@@ -56,13 +56,13 @@ public class AuthFilterService {
     private static final AccessDeniedException INVALID_USER_CREDENTIALS = new AccessDeniedException("Invalid username and/or password.");
     private static final AccessForbiddenException FORBIDDEN_ACCESS = new AccessForbiddenException("You cannot access this resource.");
 
-    private final UserAccountRestRepository userAccountRestRepository;
+    private final UserAccountRestService userAccountRestService;
     private final DefaultPasswordService defaultPasswordService;
 
     @Autowired
-    public AuthFilterService(UserAccountRestRepository userAccountRestRepository) {
-        this.userAccountRestRepository = userAccountRestRepository;
-        this.defaultPasswordService = new DefaultPasswordService();
+    public AuthFilterService(UserAccountRestService userAccountRestService, DefaultPasswordService defaultPasswordService) {
+        this.userAccountRestService = userAccountRestService;
+        this.defaultPasswordService = defaultPasswordService;
     }
 
     public void doBasicAuth(ContainerRequestContext requestContext) {
@@ -116,7 +116,7 @@ public class AuthFilterService {
         String username = tokenizer.nextToken();
         String password = tokenizer.nextToken();
 
-        UserAccount userAccount = userAccountRestRepository.findByUsername(username);
+        UserAccount userAccount = userAccountRestService.findByUsername(username);
         if (userAccount != null) {
             String hashedPassword = userAccount.getPassword();
             if (!defaultPasswordService.passwordsMatch(password, hashedPassword)) {
