@@ -73,16 +73,6 @@ public class DataFileEndpoint {
         return Response.ok(dataFileDTO).build();
     }
 
-    @DELETE
-    @Path("/id/{id}")
-    @Produces({APPLICATION_JSON, APPLICATION_XML})
-    @RolesAllowed(Role.USER)
-    public Response deleteById(@PathParam("username") String username, @PathParam("id") Long id) {
-        DataFileDTO dataFileDTO = dataFileEndpointService.findById(id, username);
-
-        return Response.ok(dataFileDTO).build();
-    }
-
     @GET
     @Produces({APPLICATION_JSON, APPLICATION_XML})
     @RolesAllowed(Role.USER)
