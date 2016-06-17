@@ -4,7 +4,31 @@ This RESTful API is designed for causal web. And it implements the [JAX-RS](http
 
 # Dependencies
 
-You'll need to download [ccd-db-0.6.1](https://github.com/bd2kccd/ccd-db) branch and run `mvn clean install` before building the `causal-rest-api`.
+You'll need the released version of [ccd-commons-0.3.0](https://github.com/bd2kccd/ccd-commons/releases/tag/v0.3.0) by going to the repo and checkout this specific release version:
+
+````
+git clone https://github.com/bd2kccd/ccd-commons.git
+cd ccd-commons
+git checkout tags/v0.3.0
+mvn clean install
+````
+
+You'll need to download [ccd-db-0.6.1](https://github.com/bd2kccd/ccd-db) branch:
+
+````
+git clone https://github.com/bd2kccd/ccd-db.git
+cd ccd-db
+git checkout v0.6.1
+mvn clean install
+````
+
+Then you can go get and install `causal-rest-api`:
+
+````
+git clone https://github.com/bd2kccd/causal-rest-api.git
+cd causal-rest-api
+mvn clean package
+````
 
 # Usage Examples
 
