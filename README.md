@@ -4,7 +4,9 @@ This RESTful API is designed for causal web. And it implements the [JAX-RS](http
 
 # Dependencies
 
-You'll need the released version of [ccd-commons-0.3.0](https://github.com/bd2kccd/ccd-commons/releases/tag/v0.3.0) by going to the repo and checkout this specific release version:
+If you want to run this API server and expose the API to your users, you'll first need to have the [Causal Web Application](https://github.com/bd2kccd/causal-web) installed and running. Your API users will use this web app to create their user accounts before they can consume the API.
+
+In order to build the API server, you'll need the released version of [ccd-commons-0.3.0](https://github.com/bd2kccd/ccd-commons/releases/tag/v0.3.0) by going to the repo and checkout this specific release version:
 
 ````
 git clone https://github.com/bd2kccd/ccd-commons.git
@@ -13,7 +15,7 @@ git checkout tags/v0.3.0
 mvn clean install
 ````
 
-You'll need to download [ccd-db-0.6.1](https://github.com/bd2kccd/ccd-db) branch:
+You'll also need to download [ccd-db-0.6.1](https://github.com/bd2kccd/ccd-db) branch:
 
 ````
 git clone https://github.com/bd2kccd/ccd-db.git
@@ -29,6 +31,23 @@ git clone https://github.com/bd2kccd/causal-rest-api.git
 cd causal-rest-api
 mvn clean package
 ````
+
+# Configuration
+
+There are 4 configuration files to configure located at `causal-rest-api/src/main/resources`:
+- **application-hsqldb.properties**: HSQLDB database configurations (for testing only).
+- **application-mysql.properties**: MySQL database configurations
+- **application.properties**: Spring Boot application settings
+- **causal.properties**: Data file directory path and folder settings
+
+# Start the API Server
+
+Once you have all the settings configured, go to `causal-rest-api/target` and you will find the jar file named `causal-rest-api.jar`. Then simply run 
+
+```java
+java -jar causal-rest-api.jar
+```
+This will start the API server, and you'll be able to access the API endpoints via the URL of `http://localhost:[port]/causal/api/`
 
 # Usage Examples
 
