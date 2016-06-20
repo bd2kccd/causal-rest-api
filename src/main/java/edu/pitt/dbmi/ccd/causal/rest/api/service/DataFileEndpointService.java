@@ -77,7 +77,9 @@ public class DataFileEndpointService {
         }
 
         try {
+            // Delete records from data_file_info table and data_file table
             dataFileRestService.delete(dataFile);
+            // Delete the physical file from workspace folder
             Files.deleteIfExists(Paths.get(dataFile.getAbsolutePath(), dataFile.getName()));
         } catch (Exception exception) {
             String errMsg = String.format("Unable to delete data file id=%d.", id);

@@ -58,13 +58,13 @@ Since this API is developed with Jersey, which supports [WADL](https://en.wikipe
 ## Example 1
 
 ````
-GET /causal/api/v1.0/usr/zhy19/data HTTP/1.1
+GET /causal/api/usr/zhy19/data HTTP/1.1
 Host: localhost:9000
 Authorization: Basic emh5MTk6MTIzNDU2
 Accept: application/json
 ````
 
-This `GET` request to the endpoint `http://localhost:9000/causal/api/v1.0/usr/zhy19/data` with `Basic Auth` will return a `JSON` formatted list of all the input data files that are associated with user `zhy19`
+This `GET` request to the endpoint `http://localhost:9000/causal/api/usr/zhy19/data` with `Basic Auth` will return a `JSON` formatted list of all the input data files that are associated with user `zhy19`
 
 ````
 [
@@ -107,7 +107,7 @@ If the Authorization header is not provided, the response will look like this:
 You can also specify the response format to XML in your request
 
 ````
-GET /causal/api/v1.0/usr/zhy19/data HTTP/1.1
+GET /causal/api/usr/zhy19/data HTTP/1.1
 Host: localhost:9000
 Authorization: Basic emh5MTk6MTIzNDU2
 Accept: application/xml
@@ -144,10 +144,10 @@ And the response will look like this:
 
 ## Example 2
 
-You can also query the data file info for a given id
+You can also query the data file info for a given file id
 
 ````
-GET /causal/api/v1.0/usr/zhy19/data/id/88 HTTP/1.1
+GET /causal/api/usr/zhy19/data/id/88 HTTP/1.1
 Host: localhost:9000
 Authorization: Basic emh5MTk6MTIzNDU2
 ````
@@ -163,3 +163,16 @@ And the resulting response looks like this:
   "fileSize": 35843
 }
 ````
+
+
+## Example 3
+
+Delete physical data file and all records from database for a given file id
+
+````
+DELETE /causal/api/usr/zhy19/data/id/88 HTTP/1.1
+Host: localhost:9000
+Authorization: Basic emh5MTk6MTIzNDU2
+````
+
+And this will result a HTTP 204 No Content status in response on success, which means the server successfully processed the deletion request but there's no content to response.

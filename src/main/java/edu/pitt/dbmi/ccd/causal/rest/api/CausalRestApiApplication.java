@@ -19,6 +19,7 @@
 package edu.pitt.dbmi.ccd.causal.rest.api;
 
 import edu.pitt.dbmi.ccd.db.CCDDatabaseApplication;
+
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Import;

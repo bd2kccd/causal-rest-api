@@ -60,9 +60,11 @@ public class DataFileRestService {
     public void delete(DataFile dataFile) {
         DataFileInfo dataFileInfo = dataFile.getDataFileInfo();
         if (dataFileInfo != null) {
+            // Delete record from data_file_info table
             dataFileInfoRestRepository.delete(dataFileInfo);
         }
 
+        // Delete record from data_file table
         dataFileRestRepository.delete(dataFile);
     }
 
