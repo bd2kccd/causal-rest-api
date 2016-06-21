@@ -1,2 +1,6 @@
 ## Ignore the target directory created by Maven
 target
+
+## Ignore files for Netbeans
+causal-rest-api-license.txt
+nb-configuration.xml
