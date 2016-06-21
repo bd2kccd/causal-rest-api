@@ -1,11 +1,26 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * Copyright (C) 2016 University of Pittsburgh.
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+ * MA 02110-1301  USA
  */
 package edu.pitt.dbmi.ccd.causal.rest.api.service;
 
+import edu.pitt.dbmi.ccd.causal.rest.api.dto.AlgorithmResultDTO;
 import edu.pitt.dbmi.ccd.causal.rest.api.prop.CausalRestProperties;
+import edu.pitt.dbmi.ccd.commons.file.info.BasicFileInfo;
 import edu.pitt.dbmi.ccd.commons.file.info.FileInfos;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -13,10 +28,11 @@ import java.nio.file.Paths;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import java.util.LinkedList;
 
 /**
  *
- * @author zhy19
+ * @author Zhou Yuan (zhy19@pitt.edu)
  */
 @Service
 public class AlgorithmResultEndpointService {
@@ -27,16 +43,34 @@ public class AlgorithmResultEndpointService {
     public AlgorithmResultEndpointService(CausalRestProperties causalRestProperties) {
         this.causalRestProperties = causalRestProperties;
     }
-    
-    public List<Path> listAlgorithmResults(String username) throws IOException {
+
+    public List<AlgorithmResultDTO> listAlgorithmResults(String username) throws IOException {
         String workspaceDir = causalRestProperties.getWorkspaceDir();
         String resultsFolder = causalRestProperties.getResultsFolder();
         String algorithmFolder = causalRestProperties.getAlgorithmFolder();
         Path algorithmDir = Paths.get(workspaceDir, username, resultsFolder, algorithmFolder);
+        
+        List<AlgorithmResultDTO> algorithmResultDTOs = new LinkedList<>();
 
-        // Call listDirectory() from ccd/commons/file/info/FileInfos.java
-        List<Path> files = FileInfos.listDirectory(algorithmDir, false);
-        //System.out.println(files);
-        return files;
+        List<Path> algorithmResultFiles = FileInfos.listDirectory(algorithmDir, false);
+        
+        for (Path algorithmResultFile : algorithmResultFiles) {
+            // Create DTO for each file
+            AlgorithmResultDTO algorithmResultDTO = new AlgorithmResultDTO();
+            // Get file information of each path
+            BasicFileInfo fileInfo = FileInfos.basicPathInfo(algorithmResultFile);
+            
+            // In ccd-commons, BasicFileInfo.getCreationTime() and BasicFileInfo.getLastModifiedTime()
+            // return long type instead of Date, that's why we defined creationTime and lastModifiedTime as long
+            // in AlgorithmResultDTO.java
+            algorithmResultDTO.setCreationTime(fileInfo.getCreationTime());
+            algorithmResultDTO.setFileSize(fileInfo.getSize());
+            algorithmResultDTO.setLastModifiedTime(fileInfo.getLastModifiedTime());
+            algorithmResultDTO.setName(fileInfo.getFilename());
+
+            algorithmResultDTOs.add(algorithmResultDTO);
+        }
+
+        return algorithmResultDTOs;
     }
 }
