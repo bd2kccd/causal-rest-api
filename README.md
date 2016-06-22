@@ -207,3 +207,36 @@ The response to this request will look like this:
 ````
 
 From the result file name, we can also see which algorithm was used on the corresponding input data file.
+
+## Example 5
+
+Upload new data file 
+
+````
+POST /causal/api/usr/zhy19/data/upload HTTP/1.1
+Host: localhost:9000
+Authorization: Basic emh5MTk6MTIzNDU2
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+
+----WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="file"; filename=""
+Content-Type: 
+
+
+----WebKitFormBoundary7MA4YWxkTrZu0gW
+````
+
+This POST request will upload the data file to the target server location and add corresponding records into database. And the response will contain the following pieces:
+
+````
+{
+  "id": 6,
+  "name": "Lung-tetrad_hv.txt",
+  "creationTime": 1466622267000,
+  "lastModifiedTime": 1466622267000,
+  "fileSize": 3309465
+}
+````
+
+
+
