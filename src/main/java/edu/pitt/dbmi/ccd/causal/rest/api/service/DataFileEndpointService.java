@@ -25,17 +25,25 @@ import edu.pitt.dbmi.ccd.causal.rest.api.exception.UserNotFoundException;
 import edu.pitt.dbmi.ccd.causal.rest.api.prop.CausalRestProperties;
 import edu.pitt.dbmi.ccd.causal.rest.api.service.db.DataFileRestService;
 import edu.pitt.dbmi.ccd.causal.rest.api.service.db.UserAccountRestService;
+import edu.pitt.dbmi.ccd.commons.file.info.BasicFileInfo;
 import edu.pitt.dbmi.ccd.commons.file.info.FileInfos;
 import edu.pitt.dbmi.ccd.db.entity.DataFile;
 import edu.pitt.dbmi.ccd.db.entity.UserAccount;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -132,6 +140,40 @@ public class DataFileEndpointService {
         return dataFileDTOs;
     }
 
+    public DataFileDTO upload(String username, InputStream inputStream, FormDataContentDisposition fileDetail) throws FileNotFoundException, IOException {
+        String workspaceDir = causalRestProperties.getWorkspaceDir();
+        String dataFolder = causalRestProperties.getDataFolder();
+ 
+        Path uploadedFile = Paths.get(workspaceDir, username, dataFolder, fileDetail.getFileName());
+
+        System.out.println(uploadedFile);
+
+        // Actual upload
+        int read = 0;
+        byte[] bytes = new byte[1024];
+
+        OutputStream out = new FileOutputStream(new File(uploadedFile.toString()));
+        while ((read = inputStream.read(bytes)) != -1) {
+            out.write(bytes, 0, read);
+        }
+        out.flush();
+
+        // Create DTO for this uploaded file
+        DataFileDTO dataFileDTO = new DataFileDTO();
+        // Get file information
+        BasicFileInfo fileInfo = FileInfos.basicPathInfo(uploadedFile);
+
+        // In ccd-commons, BasicFileInfo.getCreationTime() and BasicFileInfo.getLastModifiedTime()
+        // return long type instead of Date, that's why we defined creationTime and lastModifiedTime as long
+        // in AlgorithmResultDTO.java
+        dataFileDTO.setCreationTime(new Date(fileInfo.getCreationTime()));
+        dataFileDTO.setFileSize(fileInfo.getSize());
+        dataFileDTO.setLastModifiedTime(new Date(fileInfo.getLastModifiedTime()));
+        dataFileDTO.setName(fileInfo.getFilename());
+
+        return dataFileDTO;
+    }
+    
     private void synchronizeDataFiles(UserAccount userAccount) {
         // get all the user's dataset from the database
         List<DataFile> dataFiles = dataFileRestService.findByUserAccount(userAccount);

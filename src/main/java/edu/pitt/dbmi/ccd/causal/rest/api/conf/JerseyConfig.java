@@ -18,6 +18,7 @@
  */
 package edu.pitt.dbmi.ccd.causal.rest.api.conf;
 
+import org.glassfish.jersey.media.multipart.MultiPartFeature;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.server.filter.RolesAllowedDynamicFeature;
 import org.springframework.stereotype.Component;
@@ -39,6 +40,9 @@ public class JerseyConfig extends ResourceConfig {
         );
 
         register(RolesAllowedDynamicFeature.class);
+        
+        // http://stackoverflow.com/questions/30653012/multipart-form-data-no-injection-source-found-for-a-parameter-of-type-public-ja
+        register(MultiPartFeature.class);
     }
 
 }

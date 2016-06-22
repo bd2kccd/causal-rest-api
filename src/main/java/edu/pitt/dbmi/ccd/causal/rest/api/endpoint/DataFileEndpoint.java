@@ -21,6 +21,7 @@ package edu.pitt.dbmi.ccd.causal.rest.api.endpoint;
 import edu.pitt.dbmi.ccd.causal.rest.api.Role;
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.DataFileDTO;
 import edu.pitt.dbmi.ccd.causal.rest.api.service.DataFileEndpointService;
+import java.io.InputStream;
 import java.util.List;
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
@@ -32,9 +33,16 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.GenericEntity;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static javax.ws.rs.core.MediaType.APPLICATION_XML;
+import static javax.ws.rs.core.MediaType.MULTIPART_FORM_DATA;
 import javax.ws.rs.core.Response;
+import edu.pitt.dbmi.ccd.causal.rest.api.prop.CausalRestProperties;
+import java.io.IOException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.POST;
+import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
+import org.glassfish.jersey.media.multipart.FormDataParam;
 
 /**
  *
@@ -49,9 +57,12 @@ public class DataFileEndpoint {
 
     private final DataFileEndpointService dataFileEndpointService;
 
+    private final CausalRestProperties causalRestProperties;
+    
     @Autowired
-    public DataFileEndpoint(DataFileEndpointService dataFileEndpointService) {
+    public DataFileEndpoint(DataFileEndpointService dataFileEndpointService, CausalRestProperties causalRestProperties) {
         this.dataFileEndpointService = dataFileEndpointService;
+        this.causalRestProperties = causalRestProperties;
     }
 
     @DELETE
@@ -84,5 +95,19 @@ public class DataFileEndpoint {
 
         return Response.ok(entity).build();
     }
-
+    
+    @POST
+    @Path("/upload")
+    @Consumes(MULTIPART_FORM_DATA)
+    @RolesAllowed(Role.USER)
+    public Response upload(
+        @PathParam("username") String username,
+        @FormDataParam("file") InputStream inputStream,
+        @FormDataParam("file") FormDataContentDisposition fileDetail) throws IOException {
+ 
+        DataFileDTO dataFileDTO = dataFileEndpointService.upload(username, inputStream, fileDetail);
+        
+        return Response.ok(dataFileDTO).build();
+    }
+ 
 }
