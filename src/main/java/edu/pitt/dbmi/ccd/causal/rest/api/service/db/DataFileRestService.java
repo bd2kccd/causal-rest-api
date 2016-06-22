@@ -60,12 +60,25 @@ public class DataFileRestService {
     public void delete(DataFile dataFile) {
         DataFileInfo dataFileInfo = dataFile.getDataFileInfo();
         if (dataFileInfo != null) {
-            // Delete record from data_file_info table
+            // Delete record from `data_file_info` table
             dataFileInfoRestRepository.delete(dataFileInfo);
         }
 
-        // Delete record from data_file table
+        // Delete record from `data_file` table
         dataFileRestRepository.delete(dataFile);
+    }
+    
+    public DataFile findByAbsolutePathAndName(String absolutePath, String name) {
+        return dataFileRestRepository.findByAbsolutePathAndName(absolutePath, name);
+    }
+    
+    public DataFile saveDataFile(DataFile dataFile) {
+        DataFileInfo dataFileInfo = dataFile.getDataFileInfo();
+        if (dataFileInfo != null) {
+            dataFileInfoRestRepository.save(dataFileInfo);
+        }
+
+        return dataFileRestRepository.save(dataFile);
     }
 
 }

@@ -25,9 +25,12 @@ import edu.pitt.dbmi.ccd.causal.rest.api.exception.UserNotFoundException;
 import edu.pitt.dbmi.ccd.causal.rest.api.prop.CausalRestProperties;
 import edu.pitt.dbmi.ccd.causal.rest.api.service.db.DataFileRestService;
 import edu.pitt.dbmi.ccd.causal.rest.api.service.db.UserAccountRestService;
+import edu.pitt.dbmi.ccd.commons.file.MessageDigestHash;
 import edu.pitt.dbmi.ccd.commons.file.info.BasicFileInfo;
 import edu.pitt.dbmi.ccd.commons.file.info.FileInfos;
 import edu.pitt.dbmi.ccd.db.entity.DataFile;
+import edu.pitt.dbmi.ccd.db.entity.DataFileInfo;
+
 import edu.pitt.dbmi.ccd.db.entity.UserAccount;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -38,11 +41,12 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
+
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
+
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -143,12 +147,12 @@ public class DataFileEndpointService {
     public DataFileDTO upload(String username, InputStream inputStream, FormDataContentDisposition fileDetail) throws FileNotFoundException, IOException {
         String workspaceDir = causalRestProperties.getWorkspaceDir();
         String dataFolder = causalRestProperties.getDataFolder();
- 
-        Path uploadedFile = Paths.get(workspaceDir, username, dataFolder, fileDetail.getFileName());
+        String fileName = fileDetail.getFileName();
+        
+        Path uploadedFile = Paths.get(workspaceDir, username, dataFolder, fileName);
 
-        System.out.println(uploadedFile);
-
-        // Actual upload
+        // Actual file upload, will make it resumeble by uploading chunk by chunk
+        // Also need to use md5checksum to make sure the file is complete
         int read = 0;
         byte[] bytes = new byte[1024];
 
@@ -158,22 +162,75 @@ public class DataFileEndpointService {
         }
         out.flush();
 
-        // Create DTO for this uploaded file
-        DataFileDTO dataFileDTO = new DataFileDTO();
-        // Get file information
+        // Now if everything worked fine, the new file should have been uploaded
+        // Then we'll also need to insert the data file info into three database tables: 
+        // `data_file_info`, `data_file`, and `user_account_data_file_rel`
+ 
+        // First we'll need to know who uploaded this file
+        UserAccount userAccount = userAccountRestService.findByUsername(username);
+        
+        // Get file information with FileInfos of ccd-commons
         BasicFileInfo fileInfo = FileInfos.basicPathInfo(uploadedFile);
 
-        // In ccd-commons, BasicFileInfo.getCreationTime() and BasicFileInfo.getLastModifiedTime()
-        // return long type instead of Date, that's why we defined creationTime and lastModifiedTime as long
-        // in AlgorithmResultDTO.java
-        dataFileDTO.setCreationTime(new Date(fileInfo.getCreationTime()));
-        dataFileDTO.setFileSize(fileInfo.getSize());
-        dataFileDTO.setLastModifiedTime(new Date(fileInfo.getLastModifiedTime()));
-        dataFileDTO.setName(fileInfo.getFilename());
+        // By now these info are solely based on the file system
+        String directory = fileInfo.getAbsolutePath().toString();
+        long size = fileInfo.getSize();
+        long creationTime = fileInfo.getCreationTime();
+        long lastModifiedTime = fileInfo.getLastModifiedTime();
+        
+        // Let's check if a file with the same fileName has already been there
+        DataFile dataFile = dataFileRestService.findByAbsolutePathAndName(directory, fileName);
+        
+        if (dataFile == null) {
+            dataFile = new DataFile();
+            dataFile.setUserAccounts(Collections.singleton(userAccount));
+        }
+        
+        dataFile.setName(fileName);
+        dataFile.setAbsolutePath(directory);
+        dataFile.setCreationTime(new Date(creationTime));
+        dataFile.setFileSize(size);
+        dataFile.setLastModifiedTime(new Date(lastModifiedTime));
 
-        return dataFileDTO;
+        // Generate md5 checksum
+        String md5checkSum = MessageDigestHash.computeMD5Hash(uploadedFile);
+
+        DataFileInfo dataFileInfo = dataFile.getDataFileInfo();
+        
+        if (dataFileInfo == null) {
+            dataFileInfo = new DataFileInfo();
+        }
+        
+        dataFileInfo.setFileDelimiter(null);
+        dataFileInfo.setMd5checkSum(md5checkSum);
+        dataFileInfo.setMissingValue(null);
+        dataFileInfo.setNumOfColumns(null);
+        dataFileInfo.setNumOfRows(null);
+        dataFileInfo.setVariableType(null);
+
+        // Now add new records into database
+        dataFile.setDataFileInfo(dataFileInfo);
+        dataFileRestService.saveDataFile(dataFile);
+        
+        
+        // Create DTO to be used for HTTP response
+        DataFileDTO dataFileDTO = new DataFileDTO();
+        
+        // We should get the data from database since the new record has an ID
+        // that can be used for later API calls
+        // All other info can be obtained solely based on the file system but no ID
+        DataFile newDataFile = dataFileRestService.findByAbsolutePathAndName(directory, fileName);
+        
+        dataFileDTO.setId(newDataFile.getId());
+        dataFileDTO.setName(newDataFile.getName());
+        dataFileDTO.setCreationTime(newDataFile.getCreationTime());
+        dataFileDTO.setFileSize(newDataFile.getFileSize());
+        dataFileDTO.setLastModifiedTime(newDataFile.getLastModifiedTime());
+        
+        return dataFileDTO; 
     }
     
+    /*
     private void synchronizeDataFiles(UserAccount userAccount) {
         // get all the user's dataset from the database
         List<DataFile> dataFiles = dataFileRestService.findByUserAccount(userAccount);
@@ -195,5 +252,6 @@ public class DataFileEndpointService {
             LOGGER.error(exception.getMessage());
         }
     }
+*/
 
 }
