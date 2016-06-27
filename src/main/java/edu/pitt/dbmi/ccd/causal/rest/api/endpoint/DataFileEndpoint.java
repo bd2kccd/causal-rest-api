@@ -116,32 +116,13 @@ public class DataFileEndpoint {
     }
  
     /*
-    * For resumeable big file upload, chunk by chunk
+    * For resumeable big file upload, chunk by chunk upload,
+    * needs resumable client (either resumable.js via the HTML5 File API or resumable upload java client)
     * based on https://github.com/bd2kccd/ccd-ws
     */
-    @POST
-    @Path("/chunkUpload")
-    @RolesAllowed(Role.USER)
-    public Response processChunkUpload(@PathParam("username") String username, ResumableChunk chunk) throws IOException {
-        String fileName = chunk.getResumableFilename();
-        String md5 = null;
-        
-        try {
-            dataFileEndpointService.storeChunk(chunk, username);
-            if (dataFileEndpointService.allChunksUploaded(chunk, username)) {
-                md5 = dataFileEndpointService.mergeDeleteSave(chunk, username);
-            }
-        } catch (IOException exception) {
-            String errorMsg = String.format("Unable to upload chunk %s.", fileName);
-            LOGGER.error(errorMsg, exception);
-            throw exception;
-        }
-
-        return Response.ok(md5).build();
-    }
     
     /* 
-    * Check to see if the file has any chunks already uploaded
+    * Check to see if the file chunk has already been uploaded
     */
     @GET
     @Path("/chunkUpload")
@@ -149,10 +130,37 @@ public class DataFileEndpoint {
     public Response checkChunkExistence(@PathParam("username") String username, ResumableChunk chunk) throws IOException {
         if (dataFileEndpointService.chunkExists(chunk, username)) {
             // No need to re-upload the same chunk
+            // This is used by the resumable clinet internally
             return Response.ok().build();
         } else {
             // Let's upload this chunk
             return Response.status(Status.NOT_FOUND).build();
         }
     }
+    
+    /* 
+    * Upload the chunk and returns the md5checkSum string
+    */
+    @POST
+    @Path("/chunkUpload")
+    @RolesAllowed(Role.USER)
+    public Response processChunkUpload(@PathParam("username") String username, ResumableChunk chunk) throws IOException {
+        String fileName = chunk.getResumableFilename();
+        String md5checkSum = null;
+        
+        try {
+            dataFileEndpointService.storeChunk(chunk, username);
+            if (dataFileEndpointService.allChunksUploaded(chunk, username)) {
+                md5checkSum = dataFileEndpointService.mergeDeleteSave(chunk, username);
+            }
+        } catch (IOException exception) {
+            String errorMsg = String.format("Unable to upload chunk %s.", fileName);
+            LOGGER.error(errorMsg, exception);
+            throw exception;
+        }
+
+        return Response.ok(md5checkSum).build();
+    }
+    
+    
 }

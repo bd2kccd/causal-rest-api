@@ -259,7 +259,7 @@ public class DataFileEndpointService {
     }
 
     /*
-    * Chunk upload, save chunk data
+    * Chunk upload, upload chunk data to the data folder
     */
     public void storeChunk(ResumableChunk chunk, String username) throws IOException {
         String identifier = chunk.getResumableIdentifier();
@@ -341,7 +341,7 @@ public class DataFileEndpointService {
     }
 
     /*
-    * Chunk upload, delete temp chunks
+    * Chunk upload, delete tmp chunks from data folder
     */
     public String mergeDeleteSave(ResumableChunk chunk, String username) throws IOException {
         String fileName = chunk.getResumableFilename();
@@ -372,7 +372,7 @@ public class DataFileEndpointService {
     }
     
     /*
-    * Chunk upload, delete tmp dir?
+    * Chunk upload, recursively delete subdirectories
     */
     private void deleteNonEmptyDir(Path path) throws IOException {
         Files.walkFileTree(path, new SimpleFileVisitor<Path>() {

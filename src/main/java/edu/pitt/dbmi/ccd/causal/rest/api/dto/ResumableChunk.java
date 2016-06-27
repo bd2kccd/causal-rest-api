@@ -22,7 +22,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 /**
  *
- * @author Zhou Yuan (zhy19@pitt.edu)
+ * Sep 10, 2015 10:33:03 AM
+ *
+ * @author Kevin V. Bui (kvb2@pitt.edu)
  */
 public class ResumableChunk {
     private long resumableChunkSize;
