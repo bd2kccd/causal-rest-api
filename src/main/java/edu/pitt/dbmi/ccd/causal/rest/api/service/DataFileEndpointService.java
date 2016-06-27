@@ -250,6 +250,7 @@ public class DataFileEndpointService {
         String dataFolder = causalRestProperties.getDataFolder();
         
         Path chunkFile = Paths.get(workspaceDir, username, dataFolder, identifier, Integer.toString(chunkNumber));
+        
         if (Files.exists(chunkFile)) {
             long size = (Long) Files.getAttribute(chunkFile, "basic:size");
             return (size == chunk.getResumableChunkSize());
@@ -269,6 +270,9 @@ public class DataFileEndpointService {
         String dataFolder = causalRestProperties.getDataFolder();
         
         Path chunkFile = Paths.get(workspaceDir, username, dataFolder, identifier, Integer.toString(chunkNumber));
+        
+        System.out.println(chunkFile);
+        
         if (Files.notExists(chunkFile)) {
             try {
                 Files.createDirectories(chunkFile);

@@ -22,12 +22,16 @@ import edu.pitt.dbmi.ccd.causal.rest.api.Role;
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.DataFileDTO;
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.ResumableChunk;
 import edu.pitt.dbmi.ccd.causal.rest.api.service.DataFileEndpointService;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
+import javax.ws.rs.BeanParam;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -36,16 +40,13 @@ import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static javax.ws.rs.core.MediaType.APPLICATION_XML;
 import static javax.ws.rs.core.MediaType.MULTIPART_FORM_DATA;
 import javax.ws.rs.core.Response;
-import java.io.IOException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.POST;
 import javax.ws.rs.core.Response.Status;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  *
@@ -59,9 +60,9 @@ import org.slf4j.LoggerFactory;
 public class DataFileEndpoint {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DataFileEndpoint.class);
-    
+
     private final DataFileEndpointService dataFileEndpointService;
-    
+
     @Autowired
     public DataFileEndpoint(DataFileEndpointService dataFileEndpointService) {
         this.dataFileEndpointService = dataFileEndpointService;
@@ -75,7 +76,6 @@ public class DataFileEndpoint {
 
         return Response.noContent().build();
     }
-
 
     @GET
     @Path("/id/{id}")
@@ -97,70 +97,74 @@ public class DataFileEndpoint {
 
         return Response.ok(entity).build();
     }
-    
+
     /*
     * For small file upload
-    */
+     */
     @POST
     @Path("/upload")
     @Consumes(MULTIPART_FORM_DATA)
     @RolesAllowed(Role.USER)
     public Response upload(
-        @PathParam("username") String username,
-        @FormDataParam("file") InputStream inputStream,
-        @FormDataParam("file") FormDataContentDisposition fileDetail) throws IOException {
- 
+            @PathParam("username") String username,
+            @FormDataParam("file") InputStream inputStream,
+            @FormDataParam("file") FormDataContentDisposition fileDetail) throws IOException {
+
         DataFileDTO dataFileDTO = dataFileEndpointService.upload(username, inputStream, fileDetail);
-        
+
         return Response.ok(dataFileDTO).build();
     }
- 
+
     /*
     * For resumeable big file upload, chunk by chunk upload,
     * needs resumable client (either resumable.js via the HTML5 File API or resumable upload java client)
     * based on https://github.com/bd2kccd/ccd-ws
-    */
-    
-    /* 
+     */
+ /*
     * Check to see if the file chunk has already been uploaded
-    */
+     */
     @GET
     @Path("/chunkUpload")
-    @RolesAllowed(Role.USER)
-    public Response checkChunkExistence(@PathParam("username") String username, ResumableChunk chunk) throws IOException {
+//    @RolesAllowed(Role.USER)
+    public Response checkChunkExistence(@PathParam("username") String username, @BeanParam ResumableChunk chunk) throws IOException {
         if (dataFileEndpointService.chunkExists(chunk, username)) {
             // No need to re-upload the same chunk
             // This is used by the resumable clinet internally
-            return Response.ok().build();
+            return Response.status(Status.OK).build();
         } else {
             // Let's upload this chunk
             return Response.status(Status.NOT_FOUND).build();
         }
     }
-    
-    /* 
+
+    /*
     * Upload the chunk and returns the md5checkSum string
-    */
+     */
     @POST
     @Path("/chunkUpload")
-    @RolesAllowed(Role.USER)
-    public Response processChunkUpload(@PathParam("username") String username, ResumableChunk chunk) throws IOException {
-        String fileName = chunk.getResumableFilename();
+    @Consumes(MULTIPART_FORM_DATA)
+//    @RolesAllowed(Role.USER)
+    public Response processChunkUpload(@PathParam("username") String username, @BeanParam ResumableChunk chunk) throws IOException {
+//        String fileName = chunk.getResumableFilename();
         String md5checkSum = null;
-        
-        try {
-            dataFileEndpointService.storeChunk(chunk, username);
-            if (dataFileEndpointService.allChunksUploaded(chunk, username)) {
-                md5checkSum = dataFileEndpointService.mergeDeleteSave(chunk, username);
-            }
-        } catch (IOException exception) {
-            String errorMsg = String.format("Unable to upload chunk %s.", fileName);
-            LOGGER.error(errorMsg, exception);
-            throw exception;
-        }
+//
+//        try {
+//            dataFileEndpointService.storeChunk(chunk, username);
+//            if (dataFileEndpointService.allChunksUploaded(chunk, username)) {
+//                md5checkSum = dataFileEndpointService.mergeDeleteSave(chunk, username);
+//            }
+//        } catch (IOException exception) {
+//            String errorMsg = String.format("Unable to upload chunk %s.", fileName);
+//            LOGGER.error(errorMsg, exception);
+//            throw exception;
+//        }
+
+        System.out.println("=================================================");
+        System.out.println(chunk.getResumableFilename());
+        System.out.println(chunk.getFile());
+        System.out.println("=================================================");
 
         return Response.ok(md5checkSum).build();
     }
-    
-    
+
 }

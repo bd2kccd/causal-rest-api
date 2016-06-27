@@ -46,13 +46,13 @@ public class AuthFilter implements ContainerRequestFilter {
 
     @Override
     public void filter(ContainerRequestContext requestContext) throws IOException {
-        String method = requestContext.getMethod();
-        String path = requestContext.getUriInfo().getPath(true);
-        if (method.equals("GET") && path.equals("application.wadl")) {
-            return;
-        }
-
-        authFilterService.doBasicAuth(requestContext);
+//        String method = requestContext.getMethod();
+//        String path = requestContext.getUriInfo().getPath(true);
+//        if (method.equals("GET") && path.equals("application.wadl")) {
+//            return;
+//        }
+//
+//        authFilterService.doBasicAuth(requestContext);
     }
 
 }
