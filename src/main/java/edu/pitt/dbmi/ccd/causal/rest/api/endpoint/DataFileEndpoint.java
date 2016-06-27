@@ -20,6 +20,7 @@ package edu.pitt.dbmi.ccd.causal.rest.api.endpoint;
 
 import edu.pitt.dbmi.ccd.causal.rest.api.Role;
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.DataFileDTO;
+import edu.pitt.dbmi.ccd.causal.rest.api.dto.ResumableChunk;
 import edu.pitt.dbmi.ccd.causal.rest.api.service.DataFileEndpointService;
 import java.io.InputStream;
 import java.util.List;
@@ -35,7 +36,6 @@ import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static javax.ws.rs.core.MediaType.APPLICATION_XML;
 import static javax.ws.rs.core.MediaType.MULTIPART_FORM_DATA;
 import javax.ws.rs.core.Response;
-import edu.pitt.dbmi.ccd.causal.rest.api.prop.CausalRestProperties;
 import java.io.IOException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -43,6 +43,8 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -55,14 +57,13 @@ import org.glassfish.jersey.media.multipart.FormDataParam;
 @Path("/usr/{username}/data")
 public class DataFileEndpoint {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(DataFileEndpoint.class);
+    
     private final DataFileEndpointService dataFileEndpointService;
-
-    private final CausalRestProperties causalRestProperties;
     
     @Autowired
-    public DataFileEndpoint(DataFileEndpointService dataFileEndpointService, CausalRestProperties causalRestProperties) {
+    public DataFileEndpoint(DataFileEndpointService dataFileEndpointService) {
         this.dataFileEndpointService = dataFileEndpointService;
-        this.causalRestProperties = causalRestProperties;
     }
 
     @DELETE
@@ -96,6 +97,9 @@ public class DataFileEndpoint {
         return Response.ok(entity).build();
     }
     
+    /*
+    * For small file upload
+    */
     @POST
     @Path("/upload")
     @Consumes(MULTIPART_FORM_DATA)
@@ -110,4 +114,44 @@ public class DataFileEndpoint {
         return Response.ok(dataFileDTO).build();
     }
  
+    /*
+    * For resumeable big file upload, chunk by chunk
+    * based on https://github.com/bd2kccd/ccd-ws
+    */
+    @POST
+    @Path("/chunkUpload")
+    @RolesAllowed(Role.USER)
+    public Response processChunkUpload(@PathParam("username") String username, ResumableChunk chunk) throws IOException {
+        String fileName = chunk.getResumableFilename();
+        String md5 = null;
+        
+        try {
+            dataFileEndpointService.storeChunk(chunk, username);
+            if (dataFileEndpointService.allChunksUploaded(chunk, username)) {
+                md5 = dataFileEndpointService.mergeDeleteSave(chunk, username);
+            }
+        } catch (IOException exception) {
+            String errorMsg = String.format("Unable to upload chunk %s.", fileName);
+            LOGGER.error(errorMsg, exception);
+            throw exception;
+        }
+
+        return Response.ok(md5).build();
+    }
+    
+    /* 
+    * Check to see if the file has any chunks already uploaded
+    */
+    @GET
+    @Path("/chunkUpload")
+    @RolesAllowed(Role.USER)
+    public Response checkChunkExistence(@PathParam("username") String username, ResumableChunk chunk) throws IOException {
+        if (dataFileEndpointService.chunkExists(chunk, username)) {
+            // No need to re-upload the same chunk
+            return Response.ok().build();
+        } else {
+            // Let's upload this chunk
+            return Response.status(404).build();
+        }
+    }
 }

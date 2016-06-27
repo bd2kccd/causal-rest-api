@@ -19,6 +19,7 @@
 package edu.pitt.dbmi.ccd.causal.rest.api.service;
 
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.DataFileDTO;
+import edu.pitt.dbmi.ccd.causal.rest.api.dto.ResumableChunk;
 import edu.pitt.dbmi.ccd.causal.rest.api.exception.InternalErrorException;
 import edu.pitt.dbmi.ccd.causal.rest.api.exception.NotFoundByIdException;
 import edu.pitt.dbmi.ccd.causal.rest.api.exception.UserNotFoundException;
@@ -32,15 +33,20 @@ import edu.pitt.dbmi.ccd.db.entity.DataFile;
 import edu.pitt.dbmi.ccd.db.entity.DataFileInfo;
 
 import edu.pitt.dbmi.ccd.db.entity.UserAccount;
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.StandardCopyOption;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Collections;
 import java.util.Date;
 
@@ -229,6 +235,144 @@ public class DataFileEndpointService {
         
         return dataFileDTO; 
     }
+
+    public boolean chunkExists(ResumableChunk chunk, String username) throws IOException {
+        String identifier = chunk.getResumableIdentifier();
+        int chunkNumber = chunk.getResumableChunkNumber();
+
+        String workspaceDir = causalRestProperties.getWorkspaceDir();
+        String dataFolder = causalRestProperties.getDataFolder();
+        
+        Path chunkFile = Paths.get(workspaceDir, username, dataFolder, identifier, Integer.toString(chunkNumber));
+        if (Files.exists(chunkFile)) {
+            long size = (Long) Files.getAttribute(chunkFile, "basic:size");
+            return (size == chunk.getResumableChunkSize());
+        }
+
+        return false;
+    }
+
+    public void storeChunk(ResumableChunk chunk, String username) throws IOException {
+        String identifier = chunk.getResumableIdentifier();
+        int chunkNumber = chunk.getResumableChunkNumber();
+
+        String workspaceDir = causalRestProperties.getWorkspaceDir();
+        String dataFolder = causalRestProperties.getDataFolder();
+        
+        Path chunkFile = Paths.get(workspaceDir, username, dataFolder, identifier, Integer.toString(chunkNumber));
+        if (Files.notExists(chunkFile)) {
+            try {
+                Files.createDirectories(chunkFile);
+            } catch (IOException exception) {
+                LOGGER.error(exception.getMessage());
+            }
+        }
+        Files.copy(chunk.getFile().getInputStream(), chunkFile, StandardCopyOption.REPLACE_EXISTING);
+    }
+
+    public boolean allChunksUploaded(ResumableChunk chunk, String username) throws IOException {
+        String identifier = chunk.getResumableIdentifier();
+        int numOfChunks = chunk.getResumableTotalChunks();
+
+        String workspaceDir = causalRestProperties.getWorkspaceDir();
+        String dataFolder = causalRestProperties.getDataFolder();
+        
+        for (int chunkNo = 1; chunkNo <= numOfChunks; chunkNo++) {
+            if (!Files.exists(Paths.get(workspaceDir, username, dataFolder, identifier, Integer.toString(chunkNo)))) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private String saveDataFile(Path file, String username) throws IOException {
+        UserAccount userAccount = userAccountRestService.findByUsername(username);
+
+        BasicFileInfo fileInfo = FileInfos.basicPathInfo(file);
+        String directory = fileInfo.getAbsolutePath().toString();
+        String fileName = fileInfo.getFilename();
+        long size = fileInfo.getSize();
+        long creationTime = fileInfo.getCreationTime();
+        long lastModifiedTime = fileInfo.getLastModifiedTime();
+
+        DataFile dataFile = dataFileRestService.findByAbsolutePathAndName(directory, fileName);
+        if (dataFile == null) {
+            dataFile = new DataFile();
+            dataFile.setUserAccounts(Collections.singleton(userAccount));
+        }
+        dataFile.setName(fileName);
+        dataFile.setAbsolutePath(directory);
+        dataFile.setCreationTime(new Date(creationTime));
+        dataFile.setFileSize(size);
+        dataFile.setLastModifiedTime(new Date(lastModifiedTime));
+
+        String md5checkSum = MessageDigestHash.computeMD5Hash(file);
+        DataFileInfo dataFileInfo = dataFile.getDataFileInfo();
+        if (dataFileInfo == null) {
+            dataFileInfo = new DataFileInfo();
+        }
+        dataFileInfo.setFileDelimiter(null);
+        dataFileInfo.setMd5checkSum(md5checkSum);
+        dataFileInfo.setMissingValue(null);
+        dataFileInfo.setNumOfColumns(null);
+        dataFileInfo.setNumOfRows(null);
+        dataFileInfo.setVariableType(null);
+
+        dataFile.setDataFileInfo(dataFileInfo);
+        dataFileRestService.saveDataFile(dataFile);
+
+        return md5checkSum;
+    }
+
+    public String mergeDeleteSave(ResumableChunk chunk, String username) throws IOException {
+        String fileName = chunk.getResumableFilename();
+        int numOfChunks = chunk.getResumableTotalChunks();
+        String identifier = chunk.getResumableIdentifier();
+
+        String workspaceDir = causalRestProperties.getWorkspaceDir();
+        String dataFolder = causalRestProperties.getDataFolder();
+        
+        Path newFile = Paths.get(workspaceDir, username, dataFolder, fileName);
+        Files.deleteIfExists(newFile); // delete the existing file
+        try (BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(newFile.toFile(), false))) {
+            for (int chunkNumber = 1; chunkNumber <= numOfChunks; chunkNumber++) {
+                Path chunkPath = Paths.get(workspaceDir, username, dataFolder, identifier, Integer.toString(chunkNumber));
+                Files.copy(chunkPath, bos);
+            }
+        }
+
+        String md5checkSum = saveDataFile(newFile, username);
+        try {
+            deleteNonEmptyDir(Paths.get(workspaceDir, username, dataFolder, identifier));
+        } catch (IOException exception) {
+            LOGGER.error(exception.getMessage());
+        }
+
+        return md5checkSum;
+
+    }
+    
+    private void deleteNonEmptyDir(Path path) throws IOException {
+        Files.walkFileTree(path, new SimpleFileVisitor<Path>() {
+            @Override
+            public FileVisitResult postVisitDirectory(Path dir, IOException exception) throws IOException {
+                if (exception == null) {
+                    Files.deleteIfExists(dir);
+                    return FileVisitResult.CONTINUE;
+                } else {
+                    throw exception;
+                }
+            }
+
+            @Override
+            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+                Files.deleteIfExists(file);
+                return FileVisitResult.CONTINUE;
+            }
+        });
+    }
+    
     
     /*
     private void synchronizeDataFiles(UserAccount userAccount) {
