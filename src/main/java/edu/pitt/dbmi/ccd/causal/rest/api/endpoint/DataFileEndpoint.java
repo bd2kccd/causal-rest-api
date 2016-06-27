@@ -41,6 +41,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
+import javax.ws.rs.core.Response.Status;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.slf4j.Logger;
@@ -151,7 +152,7 @@ public class DataFileEndpoint {
             return Response.ok().build();
         } else {
             // Let's upload this chunk
-            return Response.status(404).build();
+            return Response.status(Status.NOT_FOUND).build();
         }
     }
 }

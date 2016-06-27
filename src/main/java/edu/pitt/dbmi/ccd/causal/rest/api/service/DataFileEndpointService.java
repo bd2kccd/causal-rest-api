@@ -150,6 +150,9 @@ public class DataFileEndpointService {
         return dataFileDTOs;
     }
 
+    /*
+    * Small file upload, not resumable
+    */
     public DataFileDTO upload(String username, InputStream inputStream, FormDataContentDisposition fileDetail) throws FileNotFoundException, IOException {
         String workspaceDir = causalRestProperties.getWorkspaceDir();
         String dataFolder = causalRestProperties.getDataFolder();
@@ -236,6 +239,9 @@ public class DataFileEndpointService {
         return dataFileDTO; 
     }
 
+    /*
+    * Chunk upload, check chunk existence
+    */
     public boolean chunkExists(ResumableChunk chunk, String username) throws IOException {
         String identifier = chunk.getResumableIdentifier();
         int chunkNumber = chunk.getResumableChunkNumber();
@@ -252,6 +258,9 @@ public class DataFileEndpointService {
         return false;
     }
 
+    /*
+    * Chunk upload, save chunk data
+    */
     public void storeChunk(ResumableChunk chunk, String username) throws IOException {
         String identifier = chunk.getResumableIdentifier();
         int chunkNumber = chunk.getResumableChunkNumber();
@@ -270,6 +279,9 @@ public class DataFileEndpointService {
         Files.copy(chunk.getFile().getInputStream(), chunkFile, StandardCopyOption.REPLACE_EXISTING);
     }
 
+    /*
+    * Chunk upload, check if all chunks are uploaded
+    */
     public boolean allChunksUploaded(ResumableChunk chunk, String username) throws IOException {
         String identifier = chunk.getResumableIdentifier();
         int numOfChunks = chunk.getResumableTotalChunks();
@@ -286,6 +298,9 @@ public class DataFileEndpointService {
         return true;
     }
 
+    /*
+    * Chunk upload, save data information to database
+    */
     private String saveDataFile(Path file, String username) throws IOException {
         UserAccount userAccount = userAccountRestService.findByUsername(username);
 
@@ -325,6 +340,9 @@ public class DataFileEndpointService {
         return md5checkSum;
     }
 
+    /*
+    * Chunk upload, delete temp chunks
+    */
     public String mergeDeleteSave(ResumableChunk chunk, String username) throws IOException {
         String fileName = chunk.getResumableFilename();
         int numOfChunks = chunk.getResumableTotalChunks();
@@ -353,6 +371,9 @@ public class DataFileEndpointService {
 
     }
     
+    /*
+    * Chunk upload, delete tmp dir?
+    */
     private void deleteNonEmptyDir(Path path) throws IOException {
         Files.walkFileTree(path, new SimpleFileVisitor<Path>() {
             @Override
