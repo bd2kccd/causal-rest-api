@@ -139,7 +139,7 @@ public class DataFileEndpoint {
     }
 
     /*
-    * Upload the chunk and returns the md5checkSum string
+    * Upload each chunk via multipart post and returns the md5checkSum string
      */
     @POST
     @Path("/chunkUpload")
@@ -159,11 +159,6 @@ public class DataFileEndpoint {
             LOGGER.error(errorMsg, exception);
             throw exception;
         }
-
-        System.out.println("=================================================");
-        System.out.println(chunkViaPost.getResumableFilename());
-        System.out.println(chunkViaPost.getFile());
-        System.out.println("=================================================");
 
         return Response.ok(md5checkSum).build();
     }

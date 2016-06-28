@@ -267,8 +267,6 @@ public class DataFileEndpointService {
 
         Path chunkFile = Paths.get(workspaceDir, username, dataFolder, identifier, Integer.toString(chunkNumber));
 
-        System.out.println(chunkFile);
-
         if (Files.notExists(chunkFile)) {
             try {
                 Files.createDirectories(chunkFile);

@@ -22,11 +22,14 @@ import java.io.InputStream;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 
 /**
+ * All form data (metadata and input stream) found in the multipart post
  *
  * @author Zhou Yuan (zhy19@pitt.edu)
  */
 public class ResumableChunkViaPost {
 
+    // We have to use @FormDataParam rather than @FormParam
+    // since this is multipart post
     @FormDataParam("resumableChunkSize")
     private long resumableChunkSize;
 

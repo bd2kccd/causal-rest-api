@@ -21,6 +21,7 @@ package edu.pitt.dbmi.ccd.causal.rest.api.dto;
 import javax.ws.rs.QueryParam;
 
 /**
+ * All query parameters found in GET request URL, no actual file data stream
  *
  * @author Zhou Yuan (zhy19@pitt.edu)
  */
