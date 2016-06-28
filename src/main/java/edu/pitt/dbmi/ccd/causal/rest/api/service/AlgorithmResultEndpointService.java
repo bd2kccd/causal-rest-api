@@ -22,13 +22,14 @@ import edu.pitt.dbmi.ccd.causal.rest.api.dto.AlgorithmResultDTO;
 import edu.pitt.dbmi.ccd.causal.rest.api.prop.CausalRestProperties;
 import edu.pitt.dbmi.ccd.commons.file.info.BasicFileInfo;
 import edu.pitt.dbmi.ccd.commons.file.info.FileInfos;
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.LinkedList;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import java.util.LinkedList;
 
 /**
  *
@@ -38,7 +39,7 @@ import java.util.LinkedList;
 public class AlgorithmResultEndpointService {
 
     private final CausalRestProperties causalRestProperties;
-    
+
     @Autowired
     public AlgorithmResultEndpointService(CausalRestProperties causalRestProperties) {
         this.causalRestProperties = causalRestProperties;
@@ -49,17 +50,17 @@ public class AlgorithmResultEndpointService {
         String resultsFolder = causalRestProperties.getResultsFolder();
         String algorithmFolder = causalRestProperties.getAlgorithmFolder();
         Path algorithmDir = Paths.get(workspaceDir, username, resultsFolder, algorithmFolder);
-        
+
         List<AlgorithmResultDTO> algorithmResultDTOs = new LinkedList<>();
 
         List<Path> algorithmResultFiles = FileInfos.listDirectory(algorithmDir, false);
-        
+
         for (Path algorithmResultFile : algorithmResultFiles) {
             // Create DTO for each file
             AlgorithmResultDTO algorithmResultDTO = new AlgorithmResultDTO();
             // Get file information of each path
             BasicFileInfo fileInfo = FileInfos.basicPathInfo(algorithmResultFile);
-            
+
             // In ccd-commons, BasicFileInfo.getCreationTime() and BasicFileInfo.getLastModifiedTime()
             // return long type instead of Date, that's why we defined creationTime and lastModifiedTime as long
             // in AlgorithmResultDTO.java
@@ -72,5 +73,16 @@ public class AlgorithmResultEndpointService {
         }
 
         return algorithmResultDTOs;
+    }
+
+    public File downloadAlgorithmResult(String username, String fileName) throws IOException {
+        String workspaceDir = causalRestProperties.getWorkspaceDir();
+        String resultsFolder = causalRestProperties.getResultsFolder();
+        String algorithmFolder = causalRestProperties.getAlgorithmFolder();
+        Path resultFile = Paths.get(workspaceDir, username, resultsFolder, algorithmFolder, fileName);
+
+        File file = new File(resultFile.toString());
+
+        return file;
     }
 }
