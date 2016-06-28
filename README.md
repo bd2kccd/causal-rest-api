@@ -69,25 +69,28 @@ This `GET` request to the endpoint `http://localhost:9000/causal/api/usr/zhy19/d
 ````
 [
   {
-    "id": 88,
-    "name": "121_2016-5-24.csv",
-    "creationTime": 1464115438000,
-    "lastModifiedTime": 1464115438000,
-    "fileSize": 35843
+    "id": 8,
+    "name": "data_small.txt",
+    "creationTime": 1467132449000,
+    "lastModifiedTime": 1467132449000,
+    "fileSize": 278428,
+    "md5checkSum": "ed5f27a2cf94fe3735a5d9ed9191c382"
   },
   {
-    "id": 89,
-    "name": "123_2016-5-26.csv",
-    "creationTime": 1464269440000,
-    "lastModifiedTime": 1464269440000,
-    "fileSize": 33697
+    "id": 10,
+    "name": "large-data.txt",
+    "creationTime": 1467134048000,
+    "lastModifiedTime": 1467134048000,
+    "fileSize": 3309465,
+    "md5checkSum": "b1db7511ee293d297e3055d9a7b46c5e"
   },
   {
-    "id": 90,
-    "name": "124_2016-5-26.json",
-    "creationTime": 1464270215000,
-    "lastModifiedTime": 1464270215000,
-    "fileSize": 298285
+    "id": 11,
+    "name": "Lung-tetrad_hv (copy).txt",
+    "creationTime": 1467140415000,
+    "lastModifiedTime": 1467140415000,
+    "fileSize": 3309465,
+    "md5checkSum": "b1db7511ee293d297e3055d9a7b46c5e"
   }
 ]
 ````
@@ -119,25 +122,28 @@ And the response will look like this:
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <dataFileDTOes>
     <dataFile>
-        <id>88</id>
-        <name>121_2016-5-24.csv</name>
-        <creationTime>2016-05-24T14:43:58-04:00</creationTime>
-        <lastModifiedTime>2016-05-24T14:43:58-04:00</lastModifiedTime>
-        <fileSize>35843</fileSize>
+        <id>8</id>
+        <name>data_small.txt</name>
+        <creationTime>2016-06-28T12:47:29-04:00</creationTime>
+        <lastModifiedTime>2016-06-28T12:47:29-04:00</lastModifiedTime>
+        <fileSize>278428</fileSize>
+        <md5checkSum>ed5f27a2cf94fe3735a5d9ed9191c382</md5checkSum>
     </dataFile>
     <dataFile>
-        <id>89</id>
-        <name>123_2016-5-26.csv</name>
-        <creationTime>2016-05-26T09:30:40-04:00</creationTime>
-        <lastModifiedTime>2016-05-26T09:30:40-04:00</lastModifiedTime>
-        <fileSize>33697</fileSize>
+        <id>10</id>
+        <name>large-data.txt</name>
+        <creationTime>2016-06-28T13:14:08-04:00</creationTime>
+        <lastModifiedTime>2016-06-28T13:14:08-04:00</lastModifiedTime>
+        <fileSize>3309465</fileSize>
+        <md5checkSum>b1db7511ee293d297e3055d9a7b46c5e</md5checkSum>
     </dataFile>
     <dataFile>
-        <id>90</id>
-        <name>124_2016-5-26.json</name>
-        <creationTime>2016-05-26T09:43:35-04:00</creationTime>
-        <lastModifiedTime>2016-05-26T09:43:35-04:00</lastModifiedTime>
-        <fileSize>298285</fileSize>
+        <id>11</id>
+        <name>Lung-tetrad_hv (copy).txt</name>
+        <creationTime>2016-06-28T15:00:15-04:00</creationTime>
+        <lastModifiedTime>2016-06-28T15:00:15-04:00</lastModifiedTime>
+        <fileSize>3309465</fileSize>
+        <md5checkSum>b1db7511ee293d297e3055d9a7b46c5e</md5checkSum>
     </dataFile>
 </dataFileDTOes>
 ````
@@ -147,7 +153,7 @@ And the response will look like this:
 You can also query the data file info for a given file id
 
 ````
-GET /causal/api/usr/zhy19/data/id/88 HTTP/1.1
+GET /causal/api/usr/zhy19/data/id/8 HTTP/1.1
 Host: localhost:9000
 Authorization: Basic emh5MTk6MTIzNDU2
 ````
@@ -156,11 +162,12 @@ And the resulting response looks like this:
 
 ````
 {
-  "id": 88,
-  "name": "121_2016-5-24.csv",
-  "creationTime": 1464115438000,
-  "lastModifiedTime": 1464115438000,
-  "fileSize": 35843
+  "id": 8,
+  "name": "data_small.txt",
+  "creationTime": 1467132449000,
+  "lastModifiedTime": 1467132449000,
+  "fileSize": 278428,
+  "md5checkSum": "ed5f27a2cf94fe3735a5d9ed9191c382"
 }
 ````
 
@@ -169,7 +176,7 @@ And the resulting response looks like this:
 
 
 ````
-DELETE /causal/api/usr/zhy19/data/id/88 HTTP/1.1
+DELETE /causal/api/usr/zhy19/data/id/8 HTTP/1.1
 Host: localhost:9000
 Authorization: Basic emh5MTk6MTIzNDU2
 ````
@@ -230,7 +237,8 @@ This POST request will upload the data file to the target server location and ad
   "name": "Lung-tetrad_hv.txt",
   "creationTime": 1466622267000,
   "lastModifiedTime": 1466622267000,
-  "fileSize": 3309465
+  "fileSize": 3309465,
+  "md5checkSum": "b1db7511ee293d297e3055d9a7b46c5e"
 }
 ````
 
