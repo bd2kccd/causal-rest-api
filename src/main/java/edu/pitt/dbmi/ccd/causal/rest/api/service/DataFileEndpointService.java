@@ -116,11 +116,13 @@ public class DataFileEndpointService {
         }
 
         DataFileDTO dataFileDTO = new DataFileDTO();
+
         dataFileDTO.setCreationTime(dataFile.getCreationTime());
         dataFileDTO.setFileSize(dataFile.getFileSize());
         dataFileDTO.setId(dataFile.getId());
         dataFileDTO.setLastModifiedTime(dataFile.getLastModifiedTime());
         dataFileDTO.setName(dataFile.getName());
+        dataFileDTO.setMd5checkSum(dataFile.getDataFileInfo().getMd5checkSum());
 
         return dataFileDTO;
     }
@@ -136,11 +138,13 @@ public class DataFileEndpointService {
         List<DataFile> dataFiles = dataFileRestService.findByUserAccount(userAccount);
         dataFiles.forEach(dataFile -> {
             DataFileDTO dataFileDTO = new DataFileDTO();
+
             dataFileDTO.setCreationTime(dataFile.getCreationTime());
             dataFileDTO.setFileSize(dataFile.getFileSize());
             dataFileDTO.setId(dataFile.getId());
             dataFileDTO.setLastModifiedTime(dataFile.getLastModifiedTime());
             dataFileDTO.setName(dataFile.getName());
+            dataFileDTO.setMd5checkSum(dataFile.getDataFileInfo().getMd5checkSum());
 
             dataFileDTOs.add(dataFileDTO);
         });
@@ -198,7 +202,7 @@ public class DataFileEndpointService {
         dataFile.setFileSize(size);
         dataFile.setLastModifiedTime(new Date(lastModifiedTime));
 
-        // Generate md5 checksum
+        // Generate md5 checksum based on the file path
         String md5checkSum = MessageDigestHash.computeMD5Hash(uploadedFile);
 
         DataFileInfo dataFileInfo = dataFile.getDataFileInfo();
@@ -231,6 +235,7 @@ public class DataFileEndpointService {
         dataFileDTO.setCreationTime(newDataFile.getCreationTime());
         dataFileDTO.setFileSize(newDataFile.getFileSize());
         dataFileDTO.setLastModifiedTime(newDataFile.getLastModifiedTime());
+        dataFileDTO.setMd5checkSum(newDataFile.getDataFileInfo().getMd5checkSum());
 
         return dataFileDTO;
     }
