@@ -126,7 +126,7 @@ public class DataFileEndpoint {
      */
     @GET
     @Path("/chunkUpload")
-//    @RolesAllowed(Role.USER)
+    @RolesAllowed(Role.USER)
     public Response checkChunkExistence(@PathParam("username") String username, @BeanParam ResumableChunkViaGet chunkViaGet) throws IOException {
         if (dataFileEndpointService.chunkExists(chunkViaGet, username)) {
             // No need to re-upload the same chunk
@@ -144,7 +144,7 @@ public class DataFileEndpoint {
     @POST
     @Path("/chunkUpload")
     @Consumes(MULTIPART_FORM_DATA)
-//    @RolesAllowed(Role.USER)
+    @RolesAllowed(Role.USER)
     public Response processChunkUpload(@PathParam("username") String username, @BeanParam ResumableChunkViaPost chunkViaPost) throws IOException {
         String fileName = chunkViaPost.getResumableFilename();
         String md5checkSum = null;
