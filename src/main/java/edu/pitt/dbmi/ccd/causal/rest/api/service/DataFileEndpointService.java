@@ -19,7 +19,8 @@
 package edu.pitt.dbmi.ccd.causal.rest.api.service;
 
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.DataFileDTO;
-import edu.pitt.dbmi.ccd.causal.rest.api.dto.ResumableChunk;
+import edu.pitt.dbmi.ccd.causal.rest.api.dto.ResumableChunkViaGet;
+import edu.pitt.dbmi.ccd.causal.rest.api.dto.ResumableChunkViaPost;
 import edu.pitt.dbmi.ccd.causal.rest.api.exception.InternalErrorException;
 import edu.pitt.dbmi.ccd.causal.rest.api.exception.NotFoundByIdException;
 import edu.pitt.dbmi.ccd.causal.rest.api.exception.UserNotFoundException;
@@ -31,7 +32,6 @@ import edu.pitt.dbmi.ccd.commons.file.info.BasicFileInfo;
 import edu.pitt.dbmi.ccd.commons.file.info.FileInfos;
 import edu.pitt.dbmi.ccd.db.entity.DataFile;
 import edu.pitt.dbmi.ccd.db.entity.DataFileInfo;
-
 import edu.pitt.dbmi.ccd.db.entity.UserAccount;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -49,10 +49,8 @@ import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Collections;
 import java.util.Date;
-
 import java.util.LinkedList;
 import java.util.List;
-
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -152,12 +150,12 @@ public class DataFileEndpointService {
 
     /*
     * Small file upload, not resumable
-    */
+     */
     public DataFileDTO upload(String username, InputStream inputStream, FormDataContentDisposition fileDetail) throws FileNotFoundException, IOException {
         String workspaceDir = causalRestProperties.getWorkspaceDir();
         String dataFolder = causalRestProperties.getDataFolder();
         String fileName = fileDetail.getFileName();
-        
+
         Path uploadedFile = Paths.get(workspaceDir, username, dataFolder, fileName);
 
         // Actual file upload, will make it resumeble by uploading chunk by chunk
@@ -172,12 +170,11 @@ public class DataFileEndpointService {
         out.flush();
 
         // Now if everything worked fine, the new file should have been uploaded
-        // Then we'll also need to insert the data file info into three database tables: 
+        // Then we'll also need to insert the data file info into three database tables:
         // `data_file_info`, `data_file`, and `user_account_data_file_rel`
- 
         // First we'll need to know who uploaded this file
         UserAccount userAccount = userAccountRestService.findByUsername(username);
-        
+
         // Get file information with FileInfos of ccd-commons
         BasicFileInfo fileInfo = FileInfos.basicPathInfo(uploadedFile);
 
@@ -186,15 +183,15 @@ public class DataFileEndpointService {
         long size = fileInfo.getSize();
         long creationTime = fileInfo.getCreationTime();
         long lastModifiedTime = fileInfo.getLastModifiedTime();
-        
+
         // Let's check if a file with the same fileName has already been there
         DataFile dataFile = dataFileRestService.findByAbsolutePathAndName(directory, fileName);
-        
+
         if (dataFile == null) {
             dataFile = new DataFile();
             dataFile.setUserAccounts(Collections.singleton(userAccount));
         }
-        
+
         dataFile.setName(fileName);
         dataFile.setAbsolutePath(directory);
         dataFile.setCreationTime(new Date(creationTime));
@@ -205,11 +202,11 @@ public class DataFileEndpointService {
         String md5checkSum = MessageDigestHash.computeMD5Hash(uploadedFile);
 
         DataFileInfo dataFileInfo = dataFile.getDataFileInfo();
-        
+
         if (dataFileInfo == null) {
             dataFileInfo = new DataFileInfo();
         }
-        
+
         dataFileInfo.setFileDelimiter(null);
         dataFileInfo.setMd5checkSum(md5checkSum);
         dataFileInfo.setMissingValue(null);
@@ -220,37 +217,36 @@ public class DataFileEndpointService {
         // Now add new records into database
         dataFile.setDataFileInfo(dataFileInfo);
         dataFileRestService.saveDataFile(dataFile);
-        
-        
+
         // Create DTO to be used for HTTP response
         DataFileDTO dataFileDTO = new DataFileDTO();
-        
+
         // We should get the data from database since the new record has an ID
         // that can be used for later API calls
         // All other info can be obtained solely based on the file system but no ID
         DataFile newDataFile = dataFileRestService.findByAbsolutePathAndName(directory, fileName);
-        
+
         dataFileDTO.setId(newDataFile.getId());
         dataFileDTO.setName(newDataFile.getName());
         dataFileDTO.setCreationTime(newDataFile.getCreationTime());
         dataFileDTO.setFileSize(newDataFile.getFileSize());
         dataFileDTO.setLastModifiedTime(newDataFile.getLastModifiedTime());
-        
-        return dataFileDTO; 
+
+        return dataFileDTO;
     }
 
     /*
     * Chunk upload, check chunk existence
-    */
-    public boolean chunkExists(ResumableChunk chunk, String username) throws IOException {
+     */
+    public boolean chunkExists(ResumableChunkViaGet chunk, String username) throws IOException {
         String identifier = chunk.getResumableIdentifier();
         int chunkNumber = chunk.getResumableChunkNumber();
 
         String workspaceDir = causalRestProperties.getWorkspaceDir();
         String dataFolder = causalRestProperties.getDataFolder();
-        
+
         Path chunkFile = Paths.get(workspaceDir, username, dataFolder, identifier, Integer.toString(chunkNumber));
-        
+
         if (Files.exists(chunkFile)) {
             long size = (Long) Files.getAttribute(chunkFile, "basic:size");
             return (size == chunk.getResumableChunkSize());
@@ -261,18 +257,18 @@ public class DataFileEndpointService {
 
     /*
     * Chunk upload, upload chunk data to the data folder
-    */
-    public void storeChunk(ResumableChunk chunk, String username) throws IOException {
+     */
+    public void storeChunk(ResumableChunkViaPost chunk, String username) throws IOException {
         String identifier = chunk.getResumableIdentifier();
         int chunkNumber = chunk.getResumableChunkNumber();
 
         String workspaceDir = causalRestProperties.getWorkspaceDir();
         String dataFolder = causalRestProperties.getDataFolder();
-        
+
         Path chunkFile = Paths.get(workspaceDir, username, dataFolder, identifier, Integer.toString(chunkNumber));
-        
+
         System.out.println(chunkFile);
-        
+
         if (Files.notExists(chunkFile)) {
             try {
                 Files.createDirectories(chunkFile);
@@ -280,19 +276,19 @@ public class DataFileEndpointService {
                 LOGGER.error(exception.getMessage());
             }
         }
-        Files.copy(chunk.getFile().getInputStream(), chunkFile, StandardCopyOption.REPLACE_EXISTING);
+        Files.copy(chunk.getFile(), chunkFile, StandardCopyOption.REPLACE_EXISTING);
     }
 
     /*
     * Chunk upload, check if all chunks are uploaded
-    */
-    public boolean allChunksUploaded(ResumableChunk chunk, String username) throws IOException {
+     */
+    public boolean allChunksUploaded(ResumableChunkViaPost chunk, String username) throws IOException {
         String identifier = chunk.getResumableIdentifier();
         int numOfChunks = chunk.getResumableTotalChunks();
 
         String workspaceDir = causalRestProperties.getWorkspaceDir();
         String dataFolder = causalRestProperties.getDataFolder();
-        
+
         for (int chunkNo = 1; chunkNo <= numOfChunks; chunkNo++) {
             if (!Files.exists(Paths.get(workspaceDir, username, dataFolder, identifier, Integer.toString(chunkNo)))) {
                 return false;
@@ -304,7 +300,7 @@ public class DataFileEndpointService {
 
     /*
     * Chunk upload, save data information to database
-    */
+     */
     private String saveDataFile(Path file, String username) throws IOException {
         UserAccount userAccount = userAccountRestService.findByUsername(username);
 
@@ -346,15 +342,15 @@ public class DataFileEndpointService {
 
     /*
     * Chunk upload, delete tmp chunks from data folder
-    */
-    public String mergeDeleteSave(ResumableChunk chunk, String username) throws IOException {
+     */
+    public String mergeDeleteSave(ResumableChunkViaPost chunk, String username) throws IOException {
         String fileName = chunk.getResumableFilename();
         int numOfChunks = chunk.getResumableTotalChunks();
         String identifier = chunk.getResumableIdentifier();
 
         String workspaceDir = causalRestProperties.getWorkspaceDir();
         String dataFolder = causalRestProperties.getDataFolder();
-        
+
         Path newFile = Paths.get(workspaceDir, username, dataFolder, fileName);
         Files.deleteIfExists(newFile); // delete the existing file
         try (BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(newFile.toFile(), false))) {
@@ -374,10 +370,10 @@ public class DataFileEndpointService {
         return md5checkSum;
 
     }
-    
+
     /*
     * Chunk upload, recursively delete subdirectories
-    */
+     */
     private void deleteNonEmptyDir(Path path) throws IOException {
         Files.walkFileTree(path, new SimpleFileVisitor<Path>() {
             @Override
@@ -397,8 +393,7 @@ public class DataFileEndpointService {
             }
         });
     }
-    
-    
+
     /*
     private void synchronizeDataFiles(UserAccount userAccount) {
         // get all the user's dataset from the database
@@ -421,6 +416,5 @@ public class DataFileEndpointService {
             LOGGER.error(exception.getMessage());
         }
     }
-*/
-
+     */
 }

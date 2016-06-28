@@ -19,13 +19,12 @@
 package edu.pitt.dbmi.ccd.causal.rest.api.dto;
 
 import javax.ws.rs.QueryParam;
-import org.springframework.web.multipart.MultipartFile;
 
 /**
  *
  * @author Zhou Yuan (zhy19@pitt.edu)
  */
-public class ResumableChunk {
+public class ResumableChunkViaGet {
 
     @QueryParam("resumableChunkSize")
     private long resumableChunkSize;
@@ -54,9 +53,7 @@ public class ResumableChunk {
     @QueryParam("resumableType")
     private String resumableType;
 
-    private MultipartFile file;
-
-    public ResumableChunk() {
+    public ResumableChunkViaGet() {
     }
 
     public long getResumableChunkSize() {
@@ -125,17 +122,5 @@ public class ResumableChunk {
 
     public String getResumableType() {
         return resumableType;
-    }
-
-    public void setResumableType(String resumableType) {
-        this.resumableType = resumableType;
-    }
-
-    public MultipartFile getFile() {
-        return file;
-    }
-
-    public void setFile(MultipartFile file) {
-        this.file = file;
     }
 }

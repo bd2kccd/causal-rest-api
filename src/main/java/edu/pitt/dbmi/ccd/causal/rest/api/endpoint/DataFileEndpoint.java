@@ -20,7 +20,8 @@ package edu.pitt.dbmi.ccd.causal.rest.api.endpoint;
 
 import edu.pitt.dbmi.ccd.causal.rest.api.Role;
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.DataFileDTO;
-import edu.pitt.dbmi.ccd.causal.rest.api.dto.ResumableChunk;
+import edu.pitt.dbmi.ccd.causal.rest.api.dto.ResumableChunkViaGet;
+import edu.pitt.dbmi.ccd.causal.rest.api.dto.ResumableChunkViaPost;
 import edu.pitt.dbmi.ccd.causal.rest.api.service.DataFileEndpointService;
 import java.io.IOException;
 import java.io.InputStream;
@@ -126,8 +127,8 @@ public class DataFileEndpoint {
     @GET
     @Path("/chunkUpload")
 //    @RolesAllowed(Role.USER)
-    public Response checkChunkExistence(@PathParam("username") String username, @BeanParam ResumableChunk chunk) throws IOException {
-        if (dataFileEndpointService.chunkExists(chunk, username)) {
+    public Response checkChunkExistence(@PathParam("username") String username, @BeanParam ResumableChunkViaGet chunkViaGet) throws IOException {
+        if (dataFileEndpointService.chunkExists(chunkViaGet, username)) {
             // No need to re-upload the same chunk
             // This is used by the resumable clinet internally
             return Response.status(Status.OK).build();
@@ -144,24 +145,24 @@ public class DataFileEndpoint {
     @Path("/chunkUpload")
     @Consumes(MULTIPART_FORM_DATA)
 //    @RolesAllowed(Role.USER)
-    public Response processChunkUpload(@PathParam("username") String username, @BeanParam ResumableChunk chunk) throws IOException {
-//        String fileName = chunk.getResumableFilename();
+    public Response processChunkUpload(@PathParam("username") String username, @BeanParam ResumableChunkViaPost chunkViaPost) throws IOException {
+        String fileName = chunkViaPost.getResumableFilename();
         String md5checkSum = null;
-//
-//        try {
-//            dataFileEndpointService.storeChunk(chunk, username);
-//            if (dataFileEndpointService.allChunksUploaded(chunk, username)) {
-//                md5checkSum = dataFileEndpointService.mergeDeleteSave(chunk, username);
-//            }
-//        } catch (IOException exception) {
-//            String errorMsg = String.format("Unable to upload chunk %s.", fileName);
-//            LOGGER.error(errorMsg, exception);
-//            throw exception;
-//        }
+
+        try {
+            dataFileEndpointService.storeChunk(chunkViaPost, username);
+            if (dataFileEndpointService.allChunksUploaded(chunkViaPost, username)) {
+                md5checkSum = dataFileEndpointService.mergeDeleteSave(chunkViaPost, username);
+            }
+        } catch (IOException exception) {
+            String errorMsg = String.format("Unable to upload chunk %s.", fileName);
+            LOGGER.error(errorMsg, exception);
+            throw exception;
+        }
 
         System.out.println("=================================================");
-        System.out.println(chunk.getResumableFilename());
-        System.out.println(chunk.getFile());
+        System.out.println(chunkViaPost.getResumableFilename());
+        System.out.println(chunkViaPost.getFile());
         System.out.println("=================================================");
 
         return Response.ok(md5checkSum).build();
