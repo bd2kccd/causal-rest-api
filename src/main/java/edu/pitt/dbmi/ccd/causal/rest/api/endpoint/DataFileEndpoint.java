@@ -120,8 +120,7 @@ public class DataFileEndpoint {
     * For resumeable big file upload, chunk by chunk upload,
     * needs resumable client (either resumable.js via the HTML5 File API or resumable upload java client)
     * based on https://github.com/bd2kccd/ccd-ws
-     */
- /*
+    *
     * Check to see if the file chunk has already been uploaded
      */
     @GET
@@ -139,27 +138,16 @@ public class DataFileEndpoint {
     }
 
     /*
-    * Upload each chunk via multipart post and returns the md5checkSum string
+    * Upload each chunk via multipart post and returns the md5checkSum string on the last one
      */
     @POST
     @Path("/chunkUpload")
     @Consumes(MULTIPART_FORM_DATA)
     @RolesAllowed(Role.USER)
     public Response processChunkUpload(@PathParam("username") String username, @BeanParam ResumableChunkViaPost chunkViaPost) throws IOException {
-        String fileName = chunkViaPost.getResumableFilename();
-        String md5checkSum = null;
-
-        try {
-            dataFileEndpointService.storeChunk(chunkViaPost, username);
-            if (dataFileEndpointService.allChunksUploaded(chunkViaPost, username)) {
-                md5checkSum = dataFileEndpointService.mergeDeleteSave(chunkViaPost, username);
-            }
-        } catch (IOException exception) {
-            String errorMsg = String.format("Unable to upload chunk %s.", fileName);
-            LOGGER.error(errorMsg, exception);
-            throw exception;
-        }
-
+        String md5checkSum = dataFileEndpointService.uploadChunk(chunkViaPost, username);
+        // Only the last POST request will get a md5checksum on the completion of whole file
+        // all requests before the last chunk will only get a 200 status code without response body
         return Response.ok(md5checkSum).build();
     }
 

@@ -256,7 +256,28 @@ public class DataFileEndpointService {
     }
 
     /*
-    * Chunk upload, upload chunk data to the data folder
+    * Chunk upload, upload each chunk data and generate md5checksum on completion of the whole file
+     */
+    public String uploadChunk(ResumableChunkViaPost chunk, String username) throws IOException {
+        String fileName = chunk.getResumableFilename();
+        String md5checkSum = null;
+
+        try {
+            storeChunk(chunk, username);
+            if (allChunksUploaded(chunk, username)) {
+                md5checkSum = mergeDeleteSave(chunk, username);
+            }
+        } catch (IOException exception) {
+            String errorMsg = String.format("Unable to upload chunk %s.", fileName);
+            LOGGER.error(errorMsg, exception);
+            throw exception;
+        }
+
+        return md5checkSum;
+    }
+
+    /*
+    * Chunk upload, store chunk data to the data folder
      */
     public void storeChunk(ResumableChunkViaPost chunk, String username) throws IOException {
         String identifier = chunk.getResumableIdentifier();
@@ -358,7 +379,9 @@ public class DataFileEndpointService {
             }
         }
 
+        // Save data info into database tables
         String md5checkSum = saveDataFile(newFile, username);
+
         try {
             deleteNonEmptyDir(Paths.get(workspaceDir, username, dataFolder, identifier));
         } catch (IOException exception) {
@@ -366,7 +389,6 @@ public class DataFileEndpointService {
         }
 
         return md5checkSum;
-
     }
 
     /*
