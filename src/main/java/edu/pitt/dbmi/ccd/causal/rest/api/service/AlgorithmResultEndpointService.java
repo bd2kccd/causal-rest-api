@@ -19,6 +19,7 @@
 package edu.pitt.dbmi.ccd.causal.rest.api.service;
 
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.AlgorithmResultDTO;
+import edu.pitt.dbmi.ccd.causal.rest.api.exception.ResourceNotFoundException;
 import edu.pitt.dbmi.ccd.causal.rest.api.prop.CausalRestProperties;
 import edu.pitt.dbmi.ccd.commons.file.info.BasicFileInfo;
 import edu.pitt.dbmi.ccd.commons.file.info.FileInfos;
@@ -75,7 +76,7 @@ public class AlgorithmResultEndpointService {
         return algorithmResultDTOs;
     }
 
-    public File downloadAlgorithmResult(String username, String fileName) throws IOException {
+    public File getAlgorithmResultFile(String username, String fileName) {
         String workspaceDir = causalRestProperties.getWorkspaceDir();
         String resultsFolder = causalRestProperties.getResultsFolder();
         String algorithmFolder = causalRestProperties.getAlgorithmFolder();
@@ -83,6 +84,10 @@ public class AlgorithmResultEndpointService {
 
         File file = new File(resultFile.toString());
 
-        return file;
+        if (file.exists() && !file.isDirectory()) {
+            return file;
+        } else {
+            throw new ResourceNotFoundException();
+        }
     }
 }

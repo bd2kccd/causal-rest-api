@@ -33,9 +33,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.GenericEntity;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static javax.ws.rs.core.MediaType.APPLICATION_XML;
-import static javax.ws.rs.core.MediaType.TEXT_PLAIN;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.ResponseBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -68,12 +66,12 @@ public class AlgorithmResultEndpoint {
 
     @GET
     @Path("/{fileName}")
-    @Produces(TEXT_PLAIN)
     @RolesAllowed(Role.USER)
     public Response downloadAlgorithmResultFile(@PathParam("username") String username, @PathParam("fileName") String fileName) throws IOException {
-        File file = algorithmResultEndpointService.downloadAlgorithmResult(username, fileName);
-        ResponseBuilder response = Response.ok(file);
-        response.header("Content-Disposition", "attachment; filename=" + fileName);
-        return response.build();
+        File file = algorithmResultEndpointService.getAlgorithmResultFile(username, fileName);
+
+        return Response.ok(file)
+                .header("Content-Disposition", "attachment; filename=" + fileName)
+                .build();
     }
 }
