@@ -18,9 +18,6 @@
  */
 package edu.pitt.dbmi.ccd.causal.rest.api.dto;
 
-import edu.pitt.dbmi.ccd.db.entity.FileDelimiter;
-import edu.pitt.dbmi.ccd.db.entity.VariableType;
-
 /**
  *
  * @author Zhou Yuan (zhy19@pitt.edu)
@@ -31,9 +28,9 @@ public class DataFileSummaryDTO {
 
     private String fileName;
 
-    private VariableType variableType;
+    private String variableType;
 
-    private FileDelimiter fileDelimiter;
+    private String fileDelimiter;
 
     public DataFileSummaryDTO() {
     }
@@ -54,19 +51,19 @@ public class DataFileSummaryDTO {
         this.fileName = fileName;
     }
 
-    public VariableType getVariableType() {
+    public String getVariableType() {
         return variableType;
     }
 
-    public void setVariableType(VariableType variableType) {
+    public void setVariableType(String variableType) {
         this.variableType = variableType;
     }
 
-    public FileDelimiter getFileDelimiter() {
+    public String getFileDelimiter() {
         return fileDelimiter;
     }
 
-    public void setFileDelimiter(FileDelimiter fileDelimiter) {
+    public void setFileDelimiter(String fileDelimiter) {
         this.fileDelimiter = fileDelimiter;
     }
 }

@@ -334,3 +334,33 @@ And finally the md5checkSum string of the reassemabled file will be returned onc
 ````
 b1db7511ee293d297e3055d9a7b46c5e
 ````
+
+## Example 8: Summarize data file
+
+Before we can go ahead to run the desired algorithm with the newly uploaded data file, we'll need to summarize the data by specifing the variable type and file delimiter.
+
+| Required Fields | Description |
+| --- | --- |
+| id | The data file ID |
+| variableType | discrete or continuous |
+| fileDelimiter | tab or comma |
+
+````
+POST /causal/api/usr/zhy19/data/summarize HTTP/1.1
+Host: localhost:9000
+Authorization: Basic emh5MTk6MTIzNDU2
+Content-Type: application/x-www-form-urlencoded
+
+id=8&variableType=continuous&fileDelimiter=tab
+````
+
+This POST request will summarize the data file and generate a response (JSON or XML) like below:
+
+````
+{
+  "id": 8,
+  "fileName": "data_small.txt",
+  "variableType": "continuous",
+  "fileDelimiter": "tab"
+}
+````

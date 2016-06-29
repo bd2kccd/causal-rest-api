@@ -34,7 +34,11 @@ import edu.pitt.dbmi.ccd.commons.file.info.BasicFileInfo;
 import edu.pitt.dbmi.ccd.commons.file.info.FileInfos;
 import edu.pitt.dbmi.ccd.db.entity.DataFile;
 import edu.pitt.dbmi.ccd.db.entity.DataFileInfo;
+import edu.pitt.dbmi.ccd.db.entity.FileDelimiter;
 import edu.pitt.dbmi.ccd.db.entity.UserAccount;
+import edu.pitt.dbmi.ccd.db.entity.VariableType;
+import edu.pitt.dbmi.ccd.db.service.FileDelimiterService;
+import edu.pitt.dbmi.ccd.db.service.VariableTypeService;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -76,11 +80,17 @@ public class DataFileEndpointService {
 
     private final DataFileRestService dataFileRestService;
 
+    private final VariableTypeService variableTypeService;
+
+    private final FileDelimiterService fileDelimiterService;
+
     @Autowired
-    public DataFileEndpointService(CausalRestProperties causalRestProperties, UserAccountRestService userAccountRestService, DataFileRestService dataFileRestService) {
+    public DataFileEndpointService(CausalRestProperties causalRestProperties, UserAccountRestService userAccountRestService, DataFileRestService dataFileRestService, VariableTypeService variableTypeService, FileDelimiterService fileDelimiterService) {
         this.causalRestProperties = causalRestProperties;
         this.userAccountRestService = userAccountRestService;
         this.dataFileRestService = dataFileRestService;
+        this.variableTypeService = variableTypeService;
+        this.fileDelimiterService = fileDelimiterService;
     }
 
     public void deleteByIdAndUsername(Long id, String username) {
@@ -422,9 +432,9 @@ public class DataFileEndpointService {
     }
 
     /*
-    * Summarize data file
+    * Summarize data file by adding fileDelimiter, variableType, numOfRows, numOfColumns, and missingValue
      */
-    public DataFileSummaryDTO summarizeDataFile(String username, DataFileSummary dataFileSummary) {
+    public DataFileSummaryDTO summarizeDataFile(String username, DataFileSummary dataFileSummary) throws IOException {
         Long id = dataFileSummary.getId();
 
         UserAccount userAccount = userAccountRestService.findByUsername(username);
@@ -439,27 +449,31 @@ public class DataFileEndpointService {
 
         DataFileInfo dataFileInfo = dataFile.getDataFileInfo();
 
-        // Set file delimiter and variable type
-        dataFileInfo.setFileDelimiter(dataFileSummary.getFileDelimiter());
-        dataFileInfo.setVariableType(dataFileSummary.getVariableType());
+        // Since we only get the string values from request
+        // Here we'll need to convert the string values to FileDelimiter and VariableType objects
+        FileDelimiter fileDelimiter = fileDelimiterService.getFileDelimiterRepository().findByName(dataFileSummary.getFileDelimiter());
+        VariableType variableType = variableTypeService.findByName(dataFileSummary.getVariableType());
 
-        try {
-            char delimiter = FileInfos.delimiterNameToChar(dataFileSummary.getFileDelimiter().getName());
-            Path file = Paths.get(dataFile.getAbsolutePath());
-            dataFileInfo.setNumOfRows(FileInfos.countLine(file.toFile()));
-            dataFileInfo.setNumOfColumns(FileInfos.countColumn(file.toFile(), delimiter));
-            dataFileInfo.setMd5checkSum(MessageDigestHash.computeMD5Hash(file));
-        } catch (IOException exception) {
-            LOGGER.error(exception.getMessage());
-        }
+        // Set file delimiter and variable type
+        dataFileInfo.setFileDelimiter(fileDelimiter);
+        dataFileInfo.setVariableType(variableType);
+
+        // Set the numbers of columns and rows based on the physical file
+        char delimiter = FileInfos.delimiterNameToChar(dataFileSummary.getFileDelimiter());
+        Path file = Paths.get(dataFile.getAbsolutePath(), dataFile.getName());
+        dataFileInfo.setNumOfRows(FileInfos.countLine(file.toFile()));
+        dataFileInfo.setNumOfColumns(FileInfos.countColumn(file.toFile(), delimiter));
 
         // Always assumethe the data file contains no missing value
         dataFileInfo.setMissingValue(Boolean.FALSE);
 
+        // Update the dataFileInfo property
         dataFile.setDataFileInfo(dataFileInfo);
+
+        // Update record in database table `data_file_info`
         dataFileRestService.saveDataFile(dataFile);
 
-        //
+        // We'll use this DataFileSummaryDTO to show the results in response
         DataFileSummaryDTO dataFileSummaryDTO = new DataFileSummaryDTO();
 
         dataFileSummaryDTO.setId(dataFile.getId());

@@ -18,9 +18,7 @@
  */
 package edu.pitt.dbmi.ccd.causal.rest.api.dto;
 
-import edu.pitt.dbmi.ccd.db.entity.FileDelimiter;
-import edu.pitt.dbmi.ccd.db.entity.VariableType;
-import org.glassfish.jersey.media.multipart.FormDataParam;
+import javax.ws.rs.FormParam;
 
 /**
  *
@@ -28,14 +26,23 @@ import org.glassfish.jersey.media.multipart.FormDataParam;
  */
 public class DataFileSummary {
 
-    @FormDataParam("id")
+    /*
+    * @FormParam requires the @Consumes(APPLICATION_FORM_URLENCODED) to be specified in endpoint
+     */
+    @FormParam("id")
     private Long id;
 
-    @FormDataParam("variableType")
-    private VariableType variableType;
+    /*
+    * We'll convert the string value to VariableType object
+     */
+    @FormParam("variableType")
+    private String variableType;
 
-    @FormDataParam("fileDelimiter")
-    private FileDelimiter fileDelimiter;
+    /*
+    * We'll convert the string value to FileDelimiter object
+     */
+    @FormParam("fileDelimiter")
+    private String fileDelimiter;
 
     public DataFileSummary() {
     }
@@ -48,19 +55,19 @@ public class DataFileSummary {
         this.id = id;
     }
 
-    public VariableType getVariableType() {
+    public String getVariableType() {
         return variableType;
     }
 
-    public void setVariableType(VariableType variableType) {
+    public void setVariableType(String variableType) {
         this.variableType = variableType;
     }
 
-    public FileDelimiter getFileDelimiter() {
+    public String getFileDelimiter() {
         return fileDelimiter;
     }
 
-    public void setFileDelimiter(FileDelimiter fileDelimiter) {
+    public void setFileDelimiter(String fileDelimiter) {
         this.fileDelimiter = fileDelimiter;
     }
 }

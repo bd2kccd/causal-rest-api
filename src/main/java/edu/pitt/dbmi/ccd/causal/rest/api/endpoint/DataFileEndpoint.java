@@ -39,6 +39,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.GenericEntity;
+import static javax.ws.rs.core.MediaType.APPLICATION_FORM_URLENCODED;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static javax.ws.rs.core.MediaType.APPLICATION_XML;
 import static javax.ws.rs.core.MediaType.MULTIPART_FORM_DATA;
@@ -155,14 +156,15 @@ public class DataFileEndpoint {
 
     /*
     * Data Summary
+    * @Consumes(APPLICATION_FORM_URLENCODED) works with @FormParam used in DataFileSummary
      */
     @POST
     @Path("/summarize")
+    @Consumes(APPLICATION_FORM_URLENCODED)
     @Produces({APPLICATION_JSON, APPLICATION_XML})
     @RolesAllowed(Role.USER)
     public Response summarizeDataFile(@PathParam("username") String username, @BeanParam DataFileSummary dataFileSummary) throws IOException {
         DataFileSummaryDTO dataFileSummaryDTO = dataFileEndpointService.summarizeDataFile(username, dataFileSummary);
-
         return Response.ok(dataFileSummaryDTO).build();
     }
 }
