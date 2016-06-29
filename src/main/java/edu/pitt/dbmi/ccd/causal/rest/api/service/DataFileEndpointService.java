@@ -19,6 +19,8 @@
 package edu.pitt.dbmi.ccd.causal.rest.api.service;
 
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.DataFileDTO;
+import edu.pitt.dbmi.ccd.causal.rest.api.dto.DataFileSummary;
+import edu.pitt.dbmi.ccd.causal.rest.api.dto.DataFileSummaryDTO;
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.ResumableChunkViaGet;
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.ResumableChunkViaPost;
 import edu.pitt.dbmi.ccd.causal.rest.api.exception.InternalErrorException;
@@ -417,6 +419,55 @@ public class DataFileEndpointService {
                 return FileVisitResult.CONTINUE;
             }
         });
+    }
+
+    /*
+    * Summarize data file
+     */
+    public DataFileSummaryDTO summarizeDataFile(String username, DataFileSummary dataFileSummary) {
+        Long id = dataFileSummary.getId();
+
+        UserAccount userAccount = userAccountRestService.findByUsername(username);
+        if (userAccount == null) {
+            throw new UserNotFoundException(username);
+        }
+
+        DataFile dataFile = dataFileRestService.findByIdAndUserAccount(id, userAccount);
+        if (dataFile == null) {
+            throw new NotFoundByIdException(id);
+        }
+
+        DataFileInfo dataFileInfo = dataFile.getDataFileInfo();
+
+        // Set file delimiter and variable type
+        dataFileInfo.setFileDelimiter(dataFileSummary.getFileDelimiter());
+        dataFileInfo.setVariableType(dataFileSummary.getVariableType());
+
+        try {
+            char delimiter = FileInfos.delimiterNameToChar(dataFileSummary.getFileDelimiter().getName());
+            Path file = Paths.get(dataFile.getAbsolutePath());
+            dataFileInfo.setNumOfRows(FileInfos.countLine(file.toFile()));
+            dataFileInfo.setNumOfColumns(FileInfos.countColumn(file.toFile(), delimiter));
+            dataFileInfo.setMd5checkSum(MessageDigestHash.computeMD5Hash(file));
+        } catch (IOException exception) {
+            LOGGER.error(exception.getMessage());
+        }
+
+        // Always assumethe the data file contains no missing value
+        dataFileInfo.setMissingValue(Boolean.FALSE);
+
+        dataFile.setDataFileInfo(dataFileInfo);
+        dataFileRestService.saveDataFile(dataFile);
+
+        //
+        DataFileSummaryDTO dataFileSummaryDTO = new DataFileSummaryDTO();
+
+        dataFileSummaryDTO.setId(dataFile.getId());
+        dataFileSummaryDTO.setFileName(dataFile.getName());
+        dataFileSummaryDTO.setVariableType(dataFileSummary.getVariableType());
+        dataFileSummaryDTO.setFileDelimiter(dataFileSummary.getFileDelimiter());
+
+        return dataFileSummaryDTO;
     }
 
     /*

@@ -20,6 +20,8 @@ package edu.pitt.dbmi.ccd.causal.rest.api.endpoint;
 
 import edu.pitt.dbmi.ccd.causal.rest.api.Role;
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.DataFileDTO;
+import edu.pitt.dbmi.ccd.causal.rest.api.dto.DataFileSummary;
+import edu.pitt.dbmi.ccd.causal.rest.api.dto.DataFileSummaryDTO;
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.ResumableChunkViaGet;
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.ResumableChunkViaPost;
 import edu.pitt.dbmi.ccd.causal.rest.api.service.DataFileEndpointService;
@@ -151,4 +153,16 @@ public class DataFileEndpoint {
         return Response.ok(md5checkSum).build();
     }
 
+    /*
+    * Data Summary
+     */
+    @POST
+    @Path("/summarize")
+    @Produces({APPLICATION_JSON, APPLICATION_XML})
+    @RolesAllowed(Role.USER)
+    public Response summarizeDataFile(@PathParam("username") String username, @BeanParam DataFileSummary dataFileSummary) throws IOException {
+        DataFileSummaryDTO dataFileSummaryDTO = dataFileEndpointService.summarizeDataFile(username, dataFileSummary);
+
+        return Response.ok(dataFileSummaryDTO).build();
+    }
 }
