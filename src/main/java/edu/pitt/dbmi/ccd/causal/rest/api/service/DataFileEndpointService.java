@@ -129,12 +129,37 @@ public class DataFileEndpointService {
 
         DataFileDTO dataFileDTO = new DataFileDTO();
 
+        DataFileSummaryDTO dataFileSummaryDTO = new DataFileSummaryDTO();
+
+        DataFileInfo dataFileInfo = dataFile.getDataFileInfo();
+
+        // Will get java.lang.NullPointerException when calling dataFileInfo.getFileDelimiter().getName()
+        // while dataFileInfo.getFileDelimiter() returns null
+        if (dataFileInfo.getFileDelimiter() != null) {
+            dataFileSummaryDTO.setFileDelimiter(dataFileInfo.getFileDelimiter().getName());
+        } else {
+            dataFileSummaryDTO.setFileDelimiter(null);
+        }
+
+        // Will get java.lang.NullPointerException when calling dataFileInfo.getVariableType().getName()
+        // while dataFileInfo.getVariableType() returns null
+        if (dataFileInfo.getVariableType() != null) {
+            dataFileSummaryDTO.setVariableType(dataFileInfo.getVariableType().getName());
+        } else {
+            dataFileSummaryDTO.setVariableType(null);
+        }
+
+        dataFileSummaryDTO.setMd5checkSum(dataFileInfo.getMd5checkSum());
+        dataFileSummaryDTO.setMissingValue(dataFileInfo.getMissingValue());
+        dataFileSummaryDTO.setNumOfColumns(dataFileInfo.getNumOfColumns());
+        dataFileSummaryDTO.setNumOfRows(dataFileInfo.getNumOfRows());
+
         dataFileDTO.setCreationTime(dataFile.getCreationTime());
         dataFileDTO.setFileSize(dataFile.getFileSize());
         dataFileDTO.setId(dataFile.getId());
         dataFileDTO.setLastModifiedTime(dataFile.getLastModifiedTime());
         dataFileDTO.setName(dataFile.getName());
-        dataFileDTO.setMd5checkSum(dataFile.getDataFileInfo().getMd5checkSum());
+        dataFileDTO.setFileSummary(dataFileSummaryDTO);
 
         return dataFileDTO;
     }
@@ -151,12 +176,38 @@ public class DataFileEndpointService {
         dataFiles.forEach(dataFile -> {
             DataFileDTO dataFileDTO = new DataFileDTO();
 
+            DataFileSummaryDTO dataFileSummaryDTO = new DataFileSummaryDTO();
+
+            DataFileInfo dataFileInfo = dataFile.getDataFileInfo();
+
+            // Will get java.lang.NullPointerException when calling dataFileInfo.getFileDelimiter().getName()
+            // while dataFileInfo.getFileDelimiter() returns null
+            if (dataFileInfo.getFileDelimiter() != null) {
+                dataFileSummaryDTO.setFileDelimiter(dataFileInfo.getFileDelimiter().getName());
+            } else {
+                dataFileSummaryDTO.setFileDelimiter(null);
+            }
+
+            // Will get java.lang.NullPointerException when calling dataFileInfo.getVariableType().getName()
+            // while dataFileInfo.getVariableType() returns null
+            if (dataFileInfo.getVariableType() != null) {
+                dataFileSummaryDTO.setVariableType(dataFileInfo.getVariableType().getName());
+            } else {
+                dataFileSummaryDTO.setVariableType(null);
+            }
+
+            // md5checkSum is always created by the time we add new data file
+            dataFileSummaryDTO.setMd5checkSum(dataFileInfo.getMd5checkSum());
+            dataFileSummaryDTO.setMissingValue(Boolean.FALSE);
+            dataFileSummaryDTO.setNumOfColumns(dataFileInfo.getNumOfColumns());
+            dataFileSummaryDTO.setNumOfRows(dataFileInfo.getNumOfRows());
+
+            dataFileDTO.setId(dataFile.getId());
+            dataFileDTO.setName(dataFile.getName());
             dataFileDTO.setCreationTime(dataFile.getCreationTime());
             dataFileDTO.setFileSize(dataFile.getFileSize());
-            dataFileDTO.setId(dataFile.getId());
             dataFileDTO.setLastModifiedTime(dataFile.getLastModifiedTime());
-            dataFileDTO.setName(dataFile.getName());
-            dataFileDTO.setMd5checkSum(dataFile.getDataFileInfo().getMd5checkSum());
+            dataFileDTO.setFileSummary(dataFileSummaryDTO);
 
             dataFileDTOs.add(dataFileDTO);
         });
@@ -224,11 +275,11 @@ public class DataFileEndpointService {
         }
 
         dataFileInfo.setFileDelimiter(null);
+        dataFileInfo.setVariableType(null);
         dataFileInfo.setMd5checkSum(md5checkSum);
-        dataFileInfo.setMissingValue(null);
+        dataFileInfo.setMissingValue(Boolean.FALSE);
         dataFileInfo.setNumOfColumns(null);
         dataFileInfo.setNumOfRows(null);
-        dataFileInfo.setVariableType(null);
 
         // Now add new records into database
         dataFile.setDataFileInfo(dataFileInfo);
@@ -242,12 +293,21 @@ public class DataFileEndpointService {
         // All other info can be obtained solely based on the file system but no ID
         DataFile newDataFile = dataFileRestService.findByAbsolutePathAndName(directory, fileName);
 
+        DataFileSummaryDTO dataFileSummaryDTO = new DataFileSummaryDTO();
+
+        dataFileSummaryDTO.setFileDelimiter(null);
+        dataFileSummaryDTO.setVariableType(null);
+        dataFileSummaryDTO.setMd5checkSum(md5checkSum);
+        dataFileSummaryDTO.setMissingValue(Boolean.FALSE);
+        dataFileSummaryDTO.setNumOfColumns(null);
+        dataFileSummaryDTO.setNumOfRows(null);
+
         dataFileDTO.setId(newDataFile.getId());
         dataFileDTO.setName(newDataFile.getName());
         dataFileDTO.setCreationTime(newDataFile.getCreationTime());
         dataFileDTO.setFileSize(newDataFile.getFileSize());
         dataFileDTO.setLastModifiedTime(newDataFile.getLastModifiedTime());
-        dataFileDTO.setMd5checkSum(newDataFile.getDataFileInfo().getMd5checkSum());
+        dataFileDTO.setFileSummary(dataFileSummaryDTO);
 
         return dataFileDTO;
     }
@@ -365,7 +425,7 @@ public class DataFileEndpointService {
         }
         dataFileInfo.setFileDelimiter(null);
         dataFileInfo.setMd5checkSum(md5checkSum);
-        dataFileInfo.setMissingValue(null);
+        dataFileInfo.setMissingValue(Boolean.FALSE);
         dataFileInfo.setNumOfColumns(null);
         dataFileInfo.setNumOfRows(null);
         dataFileInfo.setVariableType(null);
@@ -434,7 +494,7 @@ public class DataFileEndpointService {
     /*
     * Summarize data file by adding fileDelimiter, variableType, numOfRows, numOfColumns, and missingValue
      */
-    public DataFileSummaryDTO summarizeDataFile(String username, DataFileSummary dataFileSummary) throws IOException {
+    public DataFileDTO summarizeDataFile(String username, DataFileSummary dataFileSummary) throws IOException {
         Long id = dataFileSummary.getId();
 
         UserAccount userAccount = userAccountRestService.findByUsername(username);
@@ -473,15 +533,40 @@ public class DataFileEndpointService {
         // Update record in database table `data_file_info`
         dataFileRestService.saveDataFile(dataFile);
 
-        // We'll use this DataFileSummaryDTO to show the results in response
+        // Create DTO to be used for HTTP response
+        DataFileDTO dataFileDTO = new DataFileDTO();
+
         DataFileSummaryDTO dataFileSummaryDTO = new DataFileSummaryDTO();
 
-        dataFileSummaryDTO.setId(dataFile.getId());
-        dataFileSummaryDTO.setFileName(dataFile.getName());
-        dataFileSummaryDTO.setVariableType(dataFileSummary.getVariableType());
-        dataFileSummaryDTO.setFileDelimiter(dataFileSummary.getFileDelimiter());
+        // Will get java.lang.NullPointerException when calling dataFileInfo.getFileDelimiter().getName()
+        // while dataFileInfo.getFileDelimiter() returns null
+        if (dataFileInfo.getFileDelimiter() != null) {
+            dataFileSummaryDTO.setFileDelimiter(dataFileInfo.getFileDelimiter().getName());
+        } else {
+            dataFileSummaryDTO.setFileDelimiter(null);
+        }
 
-        return dataFileSummaryDTO;
+        // Will get java.lang.NullPointerException when calling dataFileInfo.getVariableType().getName()
+        // while dataFileInfo.getVariableType() returns null
+        if (dataFileInfo.getVariableType() != null) {
+            dataFileSummaryDTO.setVariableType(dataFileInfo.getVariableType().getName());
+        } else {
+            dataFileSummaryDTO.setVariableType(null);
+        }
+
+        dataFileSummaryDTO.setMd5checkSum(dataFileInfo.getMd5checkSum());
+        dataFileSummaryDTO.setMissingValue(dataFileInfo.getMissingValue());
+        dataFileSummaryDTO.setNumOfColumns(dataFileInfo.getNumOfColumns());
+        dataFileSummaryDTO.setNumOfRows(dataFileInfo.getNumOfRows());
+
+        dataFileDTO.setCreationTime(dataFile.getCreationTime());
+        dataFileDTO.setFileSize(dataFile.getFileSize());
+        dataFileDTO.setId(dataFile.getId());
+        dataFileDTO.setLastModifiedTime(dataFile.getLastModifiedTime());
+        dataFileDTO.setName(dataFile.getName());
+        dataFileDTO.setFileSummary(dataFileSummaryDTO);
+
+        return dataFileDTO;
     }
 
     /*

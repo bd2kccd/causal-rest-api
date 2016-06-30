@@ -50,7 +50,7 @@ public class DataFileDTO {
     private long fileSize;
 
     @XmlElement
-    private String md5checkSum;
+    private DataFileSummaryDTO fileSummary;
 
     public DataFileDTO() {
     }
@@ -95,11 +95,11 @@ public class DataFileDTO {
         this.fileSize = fileSize;
     }
 
-    public String getMd5checkSum() {
-        return md5checkSum;
+    public DataFileSummaryDTO getFileSummary() {
+        return fileSummary;
     }
 
-    public void setMd5checkSum(String md5checkSum) {
-        this.md5checkSum = md5checkSum;
+    public void setFileSummary(DataFileSummaryDTO fileSummary) {
+        this.fileSummary = fileSummary;
     }
 }

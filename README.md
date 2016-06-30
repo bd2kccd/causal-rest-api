@@ -74,7 +74,14 @@ This `GET` request to the endpoint `http://localhost:9000/causal/api/v1/usr/zhy1
     "creationTime": 1467132449000,
     "lastModifiedTime": 1467132449000,
     "fileSize": 278428,
-    "md5checkSum": "ed5f27a2cf94fe3735a5d9ed9191c382"
+    "fileSummary": {
+      "md5checkSum": "ed5f27a2cf94fe3735a5d9ed9191c382",
+      "variableType": "continuous",
+      "fileDelimiter": "tab",
+      "missingValue": false,
+      "numOfRows": 302,
+      "numOfColumns": 123
+    }
   },
   {
     "id": 10,
@@ -82,7 +89,14 @@ This `GET` request to the endpoint `http://localhost:9000/causal/api/v1/usr/zhy1
     "creationTime": 1467134048000,
     "lastModifiedTime": 1467134048000,
     "fileSize": 3309465,
-    "md5checkSum": "b1db7511ee293d297e3055d9a7b46c5e"
+    "fileSummary": {
+      "md5checkSum": "b1db7511ee293d297e3055d9a7b46c5e",
+      "variableType": null,
+      "fileDelimiter": null,
+      "missingValue": false,
+      "numOfRows": null,
+      "numOfColumns": null
+    }
   },
   {
     "id": 11,
@@ -90,7 +104,14 @@ This `GET` request to the endpoint `http://localhost:9000/causal/api/v1/usr/zhy1
     "creationTime": 1467140415000,
     "lastModifiedTime": 1467140415000,
     "fileSize": 3309465,
-    "md5checkSum": "b1db7511ee293d297e3055d9a7b46c5e"
+    "fileSummary": {
+      "md5checkSum": "b1db7511ee293d297e3055d9a7b46c5e",
+      "variableType": "continuous",
+      "fileDelimiter": "tab",
+      "missingValue": false,
+      "numOfRows": 302,
+      "numOfColumns": 608
+    }
   }
 ]
 ````
@@ -127,7 +148,14 @@ And the response will look like this:
         <creationTime>2016-06-28T12:47:29-04:00</creationTime>
         <lastModifiedTime>2016-06-28T12:47:29-04:00</lastModifiedTime>
         <fileSize>278428</fileSize>
-        <md5checkSum>ed5f27a2cf94fe3735a5d9ed9191c382</md5checkSum>
+        <fileSummary>
+            <fileDelimiter>tab</fileDelimiter>
+            <md5checkSum>ed5f27a2cf94fe3735a5d9ed9191c382</md5checkSum>
+            <missingValue>false</missingValue>
+            <numOfColumns>123</numOfColumns>
+            <numOfRows>302</numOfRows>
+            <variableType>continuous</variableType>
+        </fileSummary>
     </dataFile>
     <dataFile>
         <id>10</id>
@@ -135,7 +163,10 @@ And the response will look like this:
         <creationTime>2016-06-28T13:14:08-04:00</creationTime>
         <lastModifiedTime>2016-06-28T13:14:08-04:00</lastModifiedTime>
         <fileSize>3309465</fileSize>
-        <md5checkSum>b1db7511ee293d297e3055d9a7b46c5e</md5checkSum>
+        <fileSummary>
+            <md5checkSum>b1db7511ee293d297e3055d9a7b46c5e</md5checkSum>
+            <missingValue>false</missingValue>
+        </fileSummary>
     </dataFile>
     <dataFile>
         <id>11</id>
@@ -143,7 +174,14 @@ And the response will look like this:
         <creationTime>2016-06-28T15:00:15-04:00</creationTime>
         <lastModifiedTime>2016-06-28T15:00:15-04:00</lastModifiedTime>
         <fileSize>3309465</fileSize>
-        <md5checkSum>b1db7511ee293d297e3055d9a7b46c5e</md5checkSum>
+        <fileSummary>
+            <fileDelimiter>tab</fileDelimiter>
+            <md5checkSum>b1db7511ee293d297e3055d9a7b46c5e</md5checkSum>
+            <missingValue>false</missingValue>
+            <numOfColumns>608</numOfColumns>
+            <numOfRows>302</numOfRows>
+            <variableType>continuous</variableType>
+        </fileSummary>
     </dataFile>
 </dataFileDTOes>
 ````
@@ -167,7 +205,14 @@ And the resulting response looks like this:
   "creationTime": 1467132449000,
   "lastModifiedTime": 1467132449000,
   "fileSize": 278428,
-  "md5checkSum": "ed5f27a2cf94fe3735a5d9ed9191c382"
+  "fileSummary": {
+    "md5checkSum": "ed5f27a2cf94fe3735a5d9ed9191c382",
+    "variableType": "continuous",
+    "fileDelimiter": "tab",
+    "missingValue": false,
+    "numOfRows": 302,
+    "numOfColumns": 123
+  }
 }
 ````
 
@@ -337,6 +382,8 @@ b1db7511ee293d297e3055d9a7b46c5e
 
 ## Example 8: Summarize data file
 
+So from the second example we can tell that file with ID 10 doesn't have `variableType`, `fileDelimiter`, `numOfRows`, and `numOfColumns` specified under `fileSummary`. Among these attributes, variableType` and `fileDelimiter` are the ones that users will need to provide during this summarization process.
+
 Before we can go ahead to run the desired algorithm with the newly uploaded data file, we'll need to summarize the data by specifing the variable type and file delimiter.
 
 | Required Fields | Description |
@@ -351,16 +398,25 @@ Host: localhost:9000
 Authorization: Basic emh5MTk6MTIzNDU2
 Content-Type: application/x-www-form-urlencoded
 
-id=8&variableType=continuous&fileDelimiter=tab
+id=10&variableType=continuous&fileDelimiter=tab
 ````
 
 This POST request will summarize the data file and generate a response (JSON or XML) like below:
 
 ````
 {
-  "id": 8,
-  "fileName": "data_small.txt",
-  "variableType": "continuous",
-  "fileDelimiter": "tab"
+  "id": 10,
+  "name": "large-data.txt",
+  "creationTime": 1467134048000,
+  "lastModifiedTime": 1467134048000,
+  "fileSize": 3309465,
+  "fileSummary": {
+    "md5checkSum": "b1db7511ee293d297e3055d9a7b46c5e",
+    "variableType": "continuous",
+    "fileDelimiter": "tab",
+    "missingValue": false,
+    "numOfRows": 302,
+    "numOfColumns": 608
+  }
 }
 ````

@@ -24,31 +24,27 @@ package edu.pitt.dbmi.ccd.causal.rest.api.dto;
  */
 public class DataFileSummaryDTO {
 
-    private Long id;
-
-    private String fileName;
+    private String md5checkSum;
 
     private String variableType;
 
     private String fileDelimiter;
 
+    private boolean missingValue;
+
+    private Integer numOfRows;
+
+    private Integer numOfColumns;
+
     public DataFileSummaryDTO() {
     }
 
-    public Long getId() {
-        return id;
+    public String getMd5checkSum() {
+        return md5checkSum;
     }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getFileName() {
-        return fileName;
-    }
-
-    public void setFileName(String fileName) {
-        this.fileName = fileName;
+    public void setMd5checkSum(String md5checkSum) {
+        this.md5checkSum = md5checkSum;
     }
 
     public String getVariableType() {
@@ -65,5 +61,29 @@ public class DataFileSummaryDTO {
 
     public void setFileDelimiter(String fileDelimiter) {
         this.fileDelimiter = fileDelimiter;
+    }
+
+    public boolean getMissingValue() {
+        return missingValue;
+    }
+
+    public void setMissingValue(boolean missingValue) {
+        this.missingValue = missingValue;
+    }
+
+    public Integer getNumOfRows() {
+        return numOfRows;
+    }
+
+    public void setNumOfRows(Integer numOfRows) {
+        this.numOfRows = numOfRows;
+    }
+
+    public Integer getNumOfColumns() {
+        return numOfColumns;
+    }
+
+    public void setNumOfColumns(Integer numOfColumns) {
+        this.numOfColumns = numOfColumns;
     }
 }
