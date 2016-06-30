@@ -150,7 +150,6 @@ public class DataFileEndpointService {
         }
 
         dataFileSummaryDTO.setMd5checkSum(dataFileInfo.getMd5checkSum());
-        dataFileSummaryDTO.setMissingValue(dataFileInfo.getMissingValue());
         dataFileSummaryDTO.setNumOfColumns(dataFileInfo.getNumOfColumns());
         dataFileSummaryDTO.setNumOfRows(dataFileInfo.getNumOfRows());
 
@@ -198,7 +197,6 @@ public class DataFileEndpointService {
 
             // md5checkSum is always created by the time we add new data file
             dataFileSummaryDTO.setMd5checkSum(dataFileInfo.getMd5checkSum());
-            dataFileSummaryDTO.setMissingValue(Boolean.FALSE);
             dataFileSummaryDTO.setNumOfColumns(dataFileInfo.getNumOfColumns());
             dataFileSummaryDTO.setNumOfRows(dataFileInfo.getNumOfRows());
 
@@ -277,7 +275,6 @@ public class DataFileEndpointService {
         dataFileInfo.setFileDelimiter(null);
         dataFileInfo.setVariableType(null);
         dataFileInfo.setMd5checkSum(md5checkSum);
-        dataFileInfo.setMissingValue(Boolean.FALSE);
         dataFileInfo.setNumOfColumns(null);
         dataFileInfo.setNumOfRows(null);
 
@@ -298,7 +295,6 @@ public class DataFileEndpointService {
         dataFileSummaryDTO.setFileDelimiter(null);
         dataFileSummaryDTO.setVariableType(null);
         dataFileSummaryDTO.setMd5checkSum(md5checkSum);
-        dataFileSummaryDTO.setMissingValue(Boolean.FALSE);
         dataFileSummaryDTO.setNumOfColumns(null);
         dataFileSummaryDTO.setNumOfRows(null);
 
@@ -425,7 +421,6 @@ public class DataFileEndpointService {
         }
         dataFileInfo.setFileDelimiter(null);
         dataFileInfo.setMd5checkSum(md5checkSum);
-        dataFileInfo.setMissingValue(Boolean.FALSE);
         dataFileInfo.setNumOfColumns(null);
         dataFileInfo.setNumOfRows(null);
         dataFileInfo.setVariableType(null);
@@ -524,9 +519,7 @@ public class DataFileEndpointService {
         dataFileInfo.setNumOfRows(FileInfos.countLine(file.toFile()));
         dataFileInfo.setNumOfColumns(FileInfos.countColumn(file.toFile(), delimiter));
 
-        // Always assumethe the data file contains no missing value
-        dataFileInfo.setMissingValue(Boolean.FALSE);
-
+        // Ignore missing value here since it'll be removed from db in the new design
         // Update the dataFileInfo property
         dataFile.setDataFileInfo(dataFileInfo);
 
@@ -555,7 +548,6 @@ public class DataFileEndpointService {
         }
 
         dataFileSummaryDTO.setMd5checkSum(dataFileInfo.getMd5checkSum());
-        dataFileSummaryDTO.setMissingValue(dataFileInfo.getMissingValue());
         dataFileSummaryDTO.setNumOfColumns(dataFileInfo.getNumOfColumns());
         dataFileSummaryDTO.setNumOfRows(dataFileInfo.getNumOfRows());
 

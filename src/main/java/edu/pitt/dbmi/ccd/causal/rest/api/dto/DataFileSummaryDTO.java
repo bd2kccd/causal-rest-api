@@ -31,8 +31,6 @@ public class DataFileSummaryDTO {
 
     private String fileDelimiter;
 
-    private boolean missingValue;
-
     private Integer numOfRows;
 
     private Integer numOfColumns;
@@ -62,14 +60,6 @@ public class DataFileSummaryDTO {
 
     public void setFileDelimiter(String fileDelimiter) {
         this.fileDelimiter = fileDelimiter;
-    }
-
-    public boolean getMissingValue() {
-        return missingValue;
-    }
-
-    public void setMissingValue(boolean missingValue) {
-        this.missingValue = missingValue;
     }
 
     public Integer getNumOfRows() {

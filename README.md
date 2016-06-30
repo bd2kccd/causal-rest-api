@@ -78,7 +78,6 @@ This `GET` request to the endpoint `http://localhost:9000/causal/api/v1/usr/zhy1
       "md5checkSum": "ed5f27a2cf94fe3735a5d9ed9191c382",
       "variableType": "continuous",
       "fileDelimiter": "tab",
-      "missingValue": false,
       "numOfRows": 302,
       "numOfColumns": 123
     }
@@ -93,7 +92,6 @@ This `GET` request to the endpoint `http://localhost:9000/causal/api/v1/usr/zhy1
       "md5checkSum": "b1db7511ee293d297e3055d9a7b46c5e",
       "variableType": null,
       "fileDelimiter": null,
-      "missingValue": false,
       "numOfRows": null,
       "numOfColumns": null
     }
@@ -108,7 +106,6 @@ This `GET` request to the endpoint `http://localhost:9000/causal/api/v1/usr/zhy1
       "md5checkSum": "b1db7511ee293d297e3055d9a7b46c5e",
       "variableType": "continuous",
       "fileDelimiter": "tab",
-      "missingValue": false,
       "numOfRows": 302,
       "numOfColumns": 608
     }
@@ -151,7 +148,6 @@ And the response will look like this:
         <fileSummary>
             <fileDelimiter>tab</fileDelimiter>
             <md5checkSum>ed5f27a2cf94fe3735a5d9ed9191c382</md5checkSum>
-            <missingValue>false</missingValue>
             <numOfColumns>123</numOfColumns>
             <numOfRows>302</numOfRows>
             <variableType>continuous</variableType>
@@ -165,7 +161,6 @@ And the response will look like this:
         <fileSize>3309465</fileSize>
         <fileSummary>
             <md5checkSum>b1db7511ee293d297e3055d9a7b46c5e</md5checkSum>
-            <missingValue>false</missingValue>
         </fileSummary>
     </dataFile>
     <dataFile>
@@ -177,7 +172,6 @@ And the response will look like this:
         <fileSummary>
             <fileDelimiter>tab</fileDelimiter>
             <md5checkSum>b1db7511ee293d297e3055d9a7b46c5e</md5checkSum>
-            <missingValue>false</missingValue>
             <numOfColumns>608</numOfColumns>
             <numOfRows>302</numOfRows>
             <variableType>continuous</variableType>
@@ -209,7 +203,6 @@ And the resulting response looks like this:
     "md5checkSum": "ed5f27a2cf94fe3735a5d9ed9191c382",
     "variableType": "continuous",
     "fileDelimiter": "tab",
-    "missingValue": false,
     "numOfRows": 302,
     "numOfColumns": 123
   }
@@ -414,7 +407,6 @@ This POST request will summarize the data file and generate a response (JSON or 
     "md5checkSum": "b1db7511ee293d297e3055d9a7b46c5e",
     "variableType": "continuous",
     "fileDelimiter": "tab",
-    "missingValue": false,
     "numOfRows": 302,
     "numOfColumns": 608
   }
