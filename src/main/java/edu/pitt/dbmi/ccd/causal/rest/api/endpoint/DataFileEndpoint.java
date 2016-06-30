@@ -104,6 +104,10 @@ public class DataFileEndpoint {
 
     /*
     * For small file upload
+    * If you need to bin the named body part(s) of a multipart/form-data request entity body to
+    * a resource method parameter you can use @FormDataParam annotation.
+    * This annotation in conjunction with the media type multipart/form-data should be used for
+    * submitting and consuming forms that contain files, non-ASCII data, and binary data.
      */
     @POST
     @Path("/upload")
@@ -142,6 +146,11 @@ public class DataFileEndpoint {
 
     /*
     * Upload each chunk via multipart post and returns the md5checkSum string on the last one
+    *
+    * The @FormParam annotation in conjunction with the media type "application/x-www-form-urlencoded"
+    * is inefficient for sending and consuming large quantities of binary data or text containing non-ASCII characters.
+    * @FormDataParam annotation in conjunction with the media type "multipart/form-data" should be used for
+    * submitting and consuming forms that contain files, non-ASCII data, and binary data.
      */
     @POST
     @Path("/chunkUpload")
@@ -157,6 +166,8 @@ public class DataFileEndpoint {
     /*
     * Data Summary
     * @Consumes(APPLICATION_FORM_URLENCODED) works with @FormParam used in DataFileSummary
+    * The @FormParam annotation in conjunction with the media type "application/x-www-form-urlencoded"
+    * is good enough to get the posted data to summarize data, since there's no large file uploaded
      */
     @POST
     @Path("/summarize")

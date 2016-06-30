@@ -44,10 +44,12 @@ public class AuthFilter implements ContainerRequestFilter {
         this.authFilterService = authFilterService;
     }
 
+    // https://jersey.java.net/documentation/latest/filters-and-interceptors.html
     @Override
     public void filter(ContainerRequestContext requestContext) throws IOException {
         String method = requestContext.getMethod();
         String path = requestContext.getUriInfo().getPath(true);
+        // No auth needed to see the WADL
         if (method.equals("GET") && path.equals("application.wadl")) {
             return;
         }

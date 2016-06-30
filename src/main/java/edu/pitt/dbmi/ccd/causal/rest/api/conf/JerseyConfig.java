@@ -40,7 +40,8 @@ public class JerseyConfig extends ResourceConfig {
         );
 
         register(RolesAllowedDynamicFeature.class);
-        
+
+        // https://jersey.java.net/documentation/latest/media.html 9.3. Multipart
         // http://stackoverflow.com/questions/30653012/multipart-form-data-no-injection-source-found-for-a-parameter-of-type-public-ja
         register(MultiPartFeature.class);
     }
