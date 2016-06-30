@@ -19,7 +19,7 @@
 package edu.pitt.dbmi.ccd.causal.rest.api.service;
 
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.DataFileDTO;
-import edu.pitt.dbmi.ccd.causal.rest.api.dto.DataFileSummary;
+import edu.pitt.dbmi.ccd.causal.rest.api.dto.DataFileSummarization;
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.DataFileSummaryDTO;
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.ResumableChunkViaGet;
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.ResumableChunkViaPost;
@@ -494,8 +494,8 @@ public class DataFileEndpointService {
     /*
     * Summarize data file by adding fileDelimiter, variableType, numOfRows, numOfColumns, and missingValue
      */
-    public DataFileDTO summarizeDataFile(String username, DataFileSummary dataFileSummary) throws IOException {
-        Long id = dataFileSummary.getId();
+    public DataFileDTO summarizeDataFile(String username, DataFileSummarization dataFileSummarization) throws IOException {
+        Long id = dataFileSummarization.getId();
 
         UserAccount userAccount = userAccountRestService.findByUsername(username);
         if (userAccount == null) {
@@ -511,15 +511,15 @@ public class DataFileEndpointService {
 
         // Since we only get the string values from request
         // Here we'll need to convert the string values to FileDelimiter and VariableType objects
-        FileDelimiter fileDelimiter = fileDelimiterService.getFileDelimiterRepository().findByName(dataFileSummary.getFileDelimiter());
-        VariableType variableType = variableTypeService.findByName(dataFileSummary.getVariableType());
+        FileDelimiter fileDelimiter = fileDelimiterService.getFileDelimiterRepository().findByName(dataFileSummarization.getFileDelimiter());
+        VariableType variableType = variableTypeService.findByName(dataFileSummarization.getVariableType());
 
         // Set file delimiter and variable type
         dataFileInfo.setFileDelimiter(fileDelimiter);
         dataFileInfo.setVariableType(variableType);
 
         // Set the numbers of columns and rows based on the physical file
-        char delimiter = FileInfos.delimiterNameToChar(dataFileSummary.getFileDelimiter());
+        char delimiter = FileInfos.delimiterNameToChar(dataFileSummarization.getFileDelimiter());
         Path file = Paths.get(dataFile.getAbsolutePath(), dataFile.getName());
         dataFileInfo.setNumOfRows(FileInfos.countLine(file.toFile()));
         dataFileInfo.setNumOfColumns(FileInfos.countColumn(file.toFile(), delimiter));

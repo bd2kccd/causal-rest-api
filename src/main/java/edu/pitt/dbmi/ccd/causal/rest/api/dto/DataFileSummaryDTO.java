@@ -19,6 +19,7 @@
 package edu.pitt.dbmi.ccd.causal.rest.api.dto;
 
 /**
+ * This DTO is used inside DataFileDTO
  *
  * @author Zhou Yuan (zhy19@pitt.edu)
  */

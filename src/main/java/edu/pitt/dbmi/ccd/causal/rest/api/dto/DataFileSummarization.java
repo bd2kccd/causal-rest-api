@@ -21,10 +21,11 @@ package edu.pitt.dbmi.ccd.causal.rest.api.dto;
 import javax.ws.rs.FormParam;
 
 /**
+ * This bean is used to get form data when user wants to summarize a data file
  *
  * @author Zhou Yuan (zhy19@pitt.edu)
  */
-public class DataFileSummary {
+public class DataFileSummarization {
 
     /*
     * @FormParam requires the @Consumes(APPLICATION_FORM_URLENCODED) to be specified in endpoint
@@ -44,7 +45,7 @@ public class DataFileSummary {
     @FormParam("fileDelimiter")
     private String fileDelimiter;
 
-    public DataFileSummary() {
+    public DataFileSummarization() {
     }
 
     public Long getId() {
