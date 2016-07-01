@@ -418,3 +418,32 @@ This POST request will summarize the data file and generate a response (JSON or 
   }
 }
 ````
+
+## Example 9: Compare algorithm result files
+
+From Example 4 we can list all the algorithm result files, based on the results, we can also choose multiple files and run a comparison. 
+
+````
+GET /causal/api/v1/usr/zhy19/algorithm/results/compare/fgs_sim_data_20vars_100cases.csv_1466171729046.txt!!fgs_data_small.txt_1467305104859.txt HTTP/1.1
+Host: localhost:9000
+Authorization: Basic emh5MTk6MTIzNDU2
+````
+This request will generate a result comparison file with the following content (shortened version):
+
+````
+fgs_sim_data_20vars_100cases.csv_1466171729046.txt	fgs_data_small.txt_1467305104859.txt
+NR4A2,FOS	0	0
+X5,X17	0	0
+MMP11,ASB5	0	0
+X12,X8	0	0
+hsa_miR_654_3p,hsa_miR_337_3p	0	0
+RND1,FGA	0	0
+HHLA2,UBXN10	0	0
+HS6ST2,RND1	0	0
+SCRG1,hsa_miR_377	0	0
+CDH3,diag	0	0
+SERPINI2,FGG	0	0
+hsa_miR_451,hsa_miR_136_	0	0
+````
+
+From this comparison, you can see if the two algorithm graphs have common edges and endpoints.
