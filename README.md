@@ -432,6 +432,7 @@ This request will generate a result comparison file with the following content (
 
 ````
 fgs_sim_data_20vars_100cases.csv_1466171729046.txt	fgs_data_small.txt_1467305104859.txt
+Edges	In All	Same End Point
 NR4A2,FOS	0	0
 X5,X17	0	0
 MMP11,ASB5	0	0

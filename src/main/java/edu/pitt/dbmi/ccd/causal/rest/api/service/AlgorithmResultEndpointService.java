@@ -159,8 +159,15 @@ public class AlgorithmResultEndpointService {
                 sb.append(fileName);
                 sb.append("\t");
             });
+            // Write each file name on top
             writer.write(sb.toString().trim());
             writer.write("\n");
+
+            // Write table headers
+            writer.write(String.format("%s\t%s\t%s\n",
+                    "Edges",
+                    "In All",
+                    "Same End Point"));
 
             List<ResultComparisonData> comparisonData = resultComparison.getComparisonData();
             for (ResultComparisonData comparison : comparisonData) {
