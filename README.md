@@ -161,6 +161,10 @@ And the response will look like this:
         <fileSize>3309465</fileSize>
         <fileSummary>
             <md5checkSum>b1db7511ee293d297e3055d9a7b46c5e</md5checkSum>
+            <variableType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"/>
+            <fileDelimiter xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"/>
+            <numOfRows xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"/>
+            <numOfColumns xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"/>
         </fileSummary>
     </dataFile>
     <dataFile>
@@ -375,7 +379,7 @@ b1db7511ee293d297e3055d9a7b46c5e
 
 ## Example 8: Summarize data file
 
-So from the second example we can tell that file with ID 10 doesn't have `variableType`, `fileDelimiter`, `numOfRows`, and `numOfColumns` specified under `fileSummary`. Among these attributes, variableType` and `fileDelimiter` are the ones that users will need to provide during this summarization process.
+So from the first example we can tell that file with ID 10 doesn't have `variableType`, `fileDelimiter`, `numOfRows`, and `numOfColumns` specified under `fileSummary`. Among these attributes, variableType` and `fileDelimiter` are the ones that users will need to provide during this summarization process.
 
 Before we can go ahead to run the desired algorithm with the newly uploaded data file, we'll need to summarize the data by specifing the variable type and file delimiter.
 

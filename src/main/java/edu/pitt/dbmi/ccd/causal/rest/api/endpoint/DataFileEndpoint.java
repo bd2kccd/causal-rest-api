@@ -107,6 +107,8 @@ public class DataFileEndpoint {
     * a resource method parameter you can use @FormDataParam annotation.
     * This annotation in conjunction with the media type multipart/form-data should be used for
     * submitting and consuming forms that contain files, non-ASCII data, and binary data.
+    *
+    * Client must use name="file" for their file upload 
      */
     @POST
     @Path("/upload")

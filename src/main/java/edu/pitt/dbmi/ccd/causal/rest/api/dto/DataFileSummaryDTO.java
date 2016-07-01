@@ -18,21 +18,33 @@
  */
 package edu.pitt.dbmi.ccd.causal.rest.api.dto;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+
 /**
  * This DTO is used inside DataFileDTO
  *
  * @author Zhou Yuan (zhy19@pitt.edu)
  */
+@XmlRootElement(name = "fileSummary")
+@XmlAccessorType(XmlAccessType.FIELD)
 public class DataFileSummaryDTO {
 
+    @XmlElement
     private String md5checkSum;
 
+    @XmlElement(nillable = true)
     private String variableType;
 
+    @XmlElement(nillable = true)
     private String fileDelimiter;
 
+    @XmlElement(nillable = true)
     private Integer numOfRows;
 
+    @XmlElement(nillable = true)
     private Integer numOfColumns;
 
     public DataFileSummaryDTO() {
