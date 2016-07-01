@@ -20,6 +20,7 @@ package edu.pitt.dbmi.ccd.causal.rest.api.endpoint;
 
 import edu.pitt.dbmi.ccd.causal.rest.api.Role;
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.AlgorithmResultDTO;
+import edu.pitt.dbmi.ccd.causal.rest.api.dto.ResultComparisonFileDTO;
 import edu.pitt.dbmi.ccd.causal.rest.api.service.AlgorithmResultEndpointService;
 import java.io.File;
 import java.io.IOException;
@@ -43,7 +44,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @PermitAll
-@Path("/usr/{username}/results/algorithm")
+@Path("/usr/{username}/algorithm/results")
 public class AlgorithmResultEndpoint {
 
     private final AlgorithmResultEndpointService algorithmResultEndpointService;
@@ -72,6 +73,18 @@ public class AlgorithmResultEndpoint {
 
         return Response.ok(file)
                 .header("Content-Disposition", "attachment; filename=" + fileName)
+                .build();
+    }
+
+    @GET
+    @Path("/compare/{fileNames}")
+    @RolesAllowed(Role.USER)
+    public Response compareAlgorithmResults(@PathParam("username") String username, @PathParam("fileNames") String fileNames) throws IOException {
+        // Get the result comparsion file content and file name
+        ResultComparisonFileDTO comparisonFileDTO = algorithmResultEndpointService.compareAlgorithmResults(username, fileNames);
+
+        return Response.ok(comparisonFileDTO.getFile())
+                .header("Content-Disposition", "attachment; filename=" + comparisonFileDTO.getFileName())
                 .build();
     }
 }

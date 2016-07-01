@@ -37,12 +37,15 @@ public class CausalRestProperties {
 
     @Value("${ccd.folder.data}")
     private String dataFolder;
-    
+
     @Value("${ccd.folder.results}")
     private String resultsFolder;
 
     @Value("${ccd.folder.results.algorithm}")
     private String algorithmFolder;
+
+    @Value("${ccd.folder.results.comparison}")
+    private String comparisonFolder;
 
     public CausalRestProperties() {
     }
@@ -58,25 +61,32 @@ public class CausalRestProperties {
     public String getDataFolder() {
         return dataFolder;
     }
-    
+
     public String getResultsFolder() {
         return resultsFolder;
     }
-    
+
     public String getAlgorithmFolder() {
         return algorithmFolder;
+    }
+
+    public String getComparisonFolder() {
+        return comparisonFolder;
     }
 
     public void setDataFolder(String dataFolder) {
         this.dataFolder = dataFolder;
     }
-    
+
     public void setResultsFolder(String resultsFolder) {
         this.resultsFolder = resultsFolder;
     }
-    
+
     public void setAlgorithmFolder(String algorithmFolder) {
         this.algorithmFolder = algorithmFolder;
     }
 
+    public void setComparisonFolder(String comparisonFolder) {
+        this.comparisonFolder = comparisonFolder;
+    }
 }

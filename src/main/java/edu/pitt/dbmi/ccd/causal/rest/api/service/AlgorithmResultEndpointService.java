@@ -19,16 +19,31 @@
 package edu.pitt.dbmi.ccd.causal.rest.api.service;
 
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.AlgorithmResultDTO;
+import edu.pitt.dbmi.ccd.causal.rest.api.dto.ResultComparison;
+import edu.pitt.dbmi.ccd.causal.rest.api.dto.ResultComparisonData;
+import edu.pitt.dbmi.ccd.causal.rest.api.dto.ResultComparisonFileDTO;
 import edu.pitt.dbmi.ccd.causal.rest.api.exception.ResourceNotFoundException;
 import edu.pitt.dbmi.ccd.causal.rest.api.prop.CausalRestProperties;
 import edu.pitt.dbmi.ccd.commons.file.info.BasicFileInfo;
 import edu.pitt.dbmi.ccd.commons.file.info.FileInfos;
+import edu.pitt.dbmi.ccd.commons.graph.SimpleGraph;
+import edu.pitt.dbmi.ccd.commons.graph.SimpleGraphComparison;
+import edu.pitt.dbmi.ccd.commons.graph.SimpleGraphUtil;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -38,6 +53,8 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class AlgorithmResultEndpointService {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(AlgorithmResultEndpointService.class);
 
     private final CausalRestProperties causalRestProperties;
 
@@ -90,4 +107,81 @@ public class AlgorithmResultEndpointService {
             throw new ResourceNotFoundException();
         }
     }
+
+    public ResultComparisonFileDTO compareAlgorithmResults(String username, String fileNames) {
+        String workspaceDir = causalRestProperties.getWorkspaceDir();
+        String resultsFolder = causalRestProperties.getResultsFolder();
+        String algorithmFolder = causalRestProperties.getAlgorithmFolder();
+        String comparisonFolder = causalRestProperties.getComparisonFolder();
+
+        // Split the concatenated file names
+        List<String> items = Arrays.asList(fileNames.split("!!"));
+
+        List<SimpleGraph> graphs = new LinkedList<>();
+        items.forEach(fileName -> {
+            Path file = Paths.get(workspaceDir, username, resultsFolder, algorithmFolder, fileName);
+            if (Files.exists(file)) {
+                try (BufferedReader reader = Files.newBufferedReader(file, Charset.defaultCharset())) {
+                    graphs.add(SimpleGraphUtil.readInSimpleGraph(reader));
+                } catch (IOException exception) {
+                    LOGGER.error(String.format("Unable to read file '%s'.", fileName), exception);
+                }
+            }
+        });
+
+        SimpleGraphComparison simpleGraphComparison = new SimpleGraphComparison();
+        simpleGraphComparison.compare(graphs);
+
+        Set<String> distinctEdges = simpleGraphComparison.getDistinctEdges();
+        Set<String> edgesInAll = simpleGraphComparison.getEdgesInAll();
+        Set<String> sameEdgeTypes = simpleGraphComparison.getSameEdgeTypes();
+
+        String resultFileName = "result_comparison_" + System.currentTimeMillis() + ".txt";
+
+        ResultComparison resultComparison = new ResultComparison(resultFileName);
+        resultComparison.getFileNames().addAll(items);
+
+        List<ResultComparisonData> comparisonResults = resultComparison.getComparisonData();
+        int countIndex = 0;
+        for (String edge : distinctEdges) {
+            ResultComparisonData rc = new ResultComparisonData(edge);
+            rc.setInAll(edgesInAll.contains(edge));
+            rc.setSameEdgeType(sameEdgeTypes.contains(edge));
+            rc.setCountIndex(++countIndex);
+
+            comparisonResults.add(rc);
+        }
+
+        Path file = Paths.get(workspaceDir, username, resultsFolder, comparisonFolder, resultFileName);
+        try (BufferedWriter writer = Files.newBufferedWriter(file, StandardOpenOption.CREATE)) {
+            StringBuilder sb = new StringBuilder();
+            items.forEach(fileName -> {
+                sb.append(fileName);
+                sb.append("\t");
+            });
+            writer.write(sb.toString().trim());
+            writer.write("\n");
+
+            List<ResultComparisonData> comparisonData = resultComparison.getComparisonData();
+            for (ResultComparisonData comparison : comparisonData) {
+                writer.write(String.format("%s\t%s\t%s\n",
+                        comparison.getEdge(),
+                        comparison.isInAll() ? "1" : "0",
+                        comparison.isSameEdgeType() ? "1" : "0"));
+            }
+        } catch (IOException exception) {
+            LOGGER.error(String.format("Unable to write file '%s'.", resultFileName), exception);
+        }
+
+        // For response, this DTO contains the result file name and actual file content
+        ResultComparisonFileDTO resultComparisonFileDTO = new ResultComparisonFileDTO();
+
+        File resultComparisonFile = new File(file.toString());
+
+        resultComparisonFileDTO.setFileName(resultFileName);
+        resultComparisonFileDTO.setFile(resultComparisonFile);
+
+        return resultComparisonFileDTO;
+    }
+
 }
