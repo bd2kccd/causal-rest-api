@@ -125,7 +125,7 @@ If the Authorization header is not provided, the response will look like this:
 }
 ````
 
-You can also specify the response format to XML in your request
+You can also specify the response format as XML in your request
 
 ````
 GET /causal/api/v1/usr/zhy19/data HTTP/1.1
@@ -183,6 +183,7 @@ And the response will look like this:
     </dataFile>
 </dataFileDTOes>
 ````
+Form the above output, we can also tell that data file with ID 10 doesn't have all the `fileSummary` field values set, we'll cover this in the data summarization section.
 
 ## Example 2: Get the deatil information of a data file based on ID
 
@@ -275,6 +276,7 @@ The response to this request will look like this:
 
 ## Example 6: Upload small data file
 
+This is a multipart file upload, and the client is required to use `name="file"` to name their file upload field in their form.
 
 ````
 POST /causal/api/v1/usr/zhy19/data/upload HTTP/1.1
