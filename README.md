@@ -6,7 +6,7 @@ This RESTful API is designed for causal web. And it implements the [JAX-RS](http
 
 If you want to run this API server and expose the API to your users, you'll first need to have the [Causal Web Application](https://github.com/bd2kccd/causal-web) installed and running. Your API users will use this web app to create their user accounts before they can consume the API.
 
-In order to build the API server, you'll need the released version of [ccd-commons-0.3.1](https://github.com/bd2kccd/ccd-commons/releases/tag/v0.3.0) by going to the repo and checkout this specific release version:
+In order to build the API server, you'll need the released version of [ccd-commons-0.3.1](https://github.com/bd2kccd/ccd-commons/releases/tag/v0.3.1) by going to the repo and checkout this specific release version:
 
 ````
 git clone https://github.com/bd2kccd/ccd-commons.git
