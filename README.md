@@ -190,7 +190,7 @@ Form the above output, we can also tell that data file with ID 10 doesn't have a
 You can also query the data file info for a given file id
 
 ````
-GET /causal/api/v1/zhy19/data/id/8 HTTP/1.1
+GET /causal/api/v1/zhy19/data/8 HTTP/1.1
 Host: localhost:9000
 Authorization: Basic emh5MTk6MTIzNDU2
 ````
