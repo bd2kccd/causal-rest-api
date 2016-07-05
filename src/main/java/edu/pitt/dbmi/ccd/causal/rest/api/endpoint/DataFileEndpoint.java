@@ -59,7 +59,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @PermitAll
-@Path("/usr/{username}/data")
+@Path("/{username}/data")
 public class DataFileEndpoint {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DataFileEndpoint.class);
@@ -72,7 +72,7 @@ public class DataFileEndpoint {
     }
 
     @DELETE
-    @Path("/id/{id}")
+    @Path("/{id}")
     @RolesAllowed(Role.USER)
     public Response deleteById(@PathParam("username") String username, @PathParam("id") Long id) {
         dataFileEndpointService.deleteByIdAndUsername(id, username);
@@ -81,7 +81,7 @@ public class DataFileEndpoint {
     }
 
     @GET
-    @Path("/id/{id}")
+    @Path("/{id}")
     @Produces({APPLICATION_JSON, APPLICATION_XML})
     @RolesAllowed(Role.USER)
     public Response findById(@PathParam("username") String username, @PathParam("id") Long id) {
@@ -108,7 +108,7 @@ public class DataFileEndpoint {
     * This annotation in conjunction with the media type multipart/form-data should be used for
     * submitting and consuming forms that contain files, non-ASCII data, and binary data.
     *
-    * Client must use name="file" for their file upload 
+    * Client must use name="file" for their file upload
      */
     @POST
     @Path("/upload")
