@@ -18,8 +18,8 @@
  */
 package edu.pitt.dbmi.ccd.causal.rest.api.dto;
 
-import javax.validation.constraints.NotNull;
-import org.hibernate.validator.constraints.NotEmpty;
+import java.util.List;
+import javax.ws.rs.FormParam;
 
 /**
  *
@@ -27,21 +27,23 @@ import org.hibernate.validator.constraints.NotEmpty;
  */
 public class NewJob {
 
-    @NotNull
-    @NotEmpty
+    /*
+     * @FormParam requires the @Consumes(APPLICATION_FORM_URLENCODED) to be specified in endpoint
+     */
+    @FormParam("algorithmName")
     private String algorithmName;
 
-    @NotNull
-    @NotEmpty
+    @FormParam("algorithm")
     private String algorithm;
 
-    private String dataset;
+    @FormParam("dataset")
+    private List<String> dataset;
 
-    private String[] jvmOptions;
+    @FormParam("jvmOptions")
+    private List<String> jvmOptions;
 
-    @NotNull
-    @NotEmpty
-    private String[] parameters;
+    @FormParam("parameters")
+    private List<String> parameters;
 
     public NewJob() {
     }
@@ -62,27 +64,27 @@ public class NewJob {
         this.algorithm = algorithm;
     }
 
-    public String getDataset() {
+    public List<String> getDataset() {
         return dataset;
     }
 
-    public void setDataset(String dataset) {
+    public void setDataset(List<String> dataset) {
         this.dataset = dataset;
     }
 
-    public String[] getJvmOptions() {
+    public List<String> getJvmOptions() {
         return jvmOptions;
     }
 
-    public void setJvmOptions(String[] jvmOptions) {
+    public void setJvmOptions(List<String> jvmOptions) {
         this.jvmOptions = jvmOptions;
     }
 
-    public String[] getParameters() {
+    public List<String> getParameters() {
         return parameters;
     }
 
-    public void setParameters(String[] parameters) {
+    public void setParameters(List<String> parameters) {
         this.parameters = parameters;
     }
 }

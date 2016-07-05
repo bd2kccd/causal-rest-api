@@ -35,6 +35,12 @@ public class CausalRestProperties {
     @Value("${ccd.dir.workspace}")
     private String workspaceDir;
 
+    @Value("${ccd.folder.lib}")
+    private String libFolder;
+
+    @Value("${ccd.jar.algorithm}")
+    private String algorithmJar;
+
     @Value("${ccd.folder.data}")
     private String dataFolder;
 
@@ -59,6 +65,22 @@ public class CausalRestProperties {
 
     public void setWorkspaceDir(String workspaceDir) {
         this.workspaceDir = workspaceDir;
+    }
+
+    public String getLibFolder() {
+        return libFolder;
+    }
+
+    public void setLibFolder(String libFolder) {
+        this.libFolder = libFolder;
+    }
+
+    public String getAlgorithmJar() {
+        return algorithmJar;
+    }
+
+    public void setAlgorithmJar(String algorithmJar) {
+        this.algorithmJar = algorithmJar;
     }
 
     public String getDataFolder() {

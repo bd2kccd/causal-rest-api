@@ -28,19 +28,19 @@ import javax.ws.rs.FormParam;
 public class DataFileSummarization {
 
     /*
-    * @FormParam requires the @Consumes(APPLICATION_FORM_URLENCODED) to be specified in endpoint
+     * @FormParam requires the @Consumes(APPLICATION_FORM_URLENCODED) to be specified in endpoint
      */
     @FormParam("id")
     private Long id;
 
     /*
-    * We'll convert the string value to VariableType object
+     * We'll convert the string value to VariableType object
      */
     @FormParam("variableType")
     private String variableType;
 
     /*
-    * We'll convert the string value to FileDelimiter object
+     * We'll convert the string value to FileDelimiter object
      */
     @FormParam("fileDelimiter")
     private String fileDelimiter;

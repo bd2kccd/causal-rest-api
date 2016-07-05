@@ -30,6 +30,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import static javax.ws.rs.core.MediaType.APPLICATION_FORM_URLENCODED;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -53,8 +54,9 @@ public class JobQueueEndpoint {
     @Consumes(APPLICATION_FORM_URLENCODED)
     @RolesAllowed(Role.USER)
     public Response addNewJob(@PathParam("username") String username, @BeanParam NewJob newJob) throws IOException {
-        //Long id = jobQueueEndpointService.addNewJob(username);
+        Long id = jobQueueEndpointService.addNewJob(username, newJob);
 
-        return Response.ok().build();
+        // Return 201 Created status code and the job id in body
+        return Response.status(Status.CREATED).entity(id).build();
     }
 }
