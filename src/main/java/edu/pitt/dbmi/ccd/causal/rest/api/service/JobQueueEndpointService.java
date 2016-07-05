@@ -19,9 +19,12 @@
 package edu.pitt.dbmi.ccd.causal.rest.api.service;
 
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.NewJob;
+import edu.pitt.dbmi.ccd.causal.rest.api.exception.NotFoundByIdException;
 import edu.pitt.dbmi.ccd.causal.rest.api.exception.UserNotFoundException;
 import edu.pitt.dbmi.ccd.causal.rest.api.prop.CausalRestProperties;
+import edu.pitt.dbmi.ccd.causal.rest.api.service.db.DataFileRestService;
 import edu.pitt.dbmi.ccd.causal.rest.api.service.db.UserAccountRestService;
+import edu.pitt.dbmi.ccd.db.entity.DataFile;
 import edu.pitt.dbmi.ccd.db.entity.JobQueueInfo;
 import edu.pitt.dbmi.ccd.db.entity.UserAccount;
 import edu.pitt.dbmi.ccd.db.service.JobQueueInfoService;
@@ -45,23 +48,28 @@ public class JobQueueEndpointService {
 
     private final UserAccountRestService userAccountRestService;
 
+    private final DataFileRestService dataFileRestService;
+
     private final JobQueueInfoService jobQueueInfoService;
 
     @Autowired
     public JobQueueEndpointService(
             CausalRestProperties causalRestProperties,
             UserAccountRestService userAccountRestService,
+            DataFileRestService dataFileRestService,
             JobQueueInfoService jobQueueInfoService) {
         this.causalRestProperties = causalRestProperties;
         this.userAccountRestService = userAccountRestService;
+        this.dataFileRestService = dataFileRestService;
         this.jobQueueInfoService = jobQueueInfoService;
     }
 
     public Long addNewJob(String username, NewJob newJob) {
+        // algorithmName is prefixed in the result file name
         String algorithmName = newJob.getAlgorithmName();
 
         String algorithm = newJob.getAlgorithm();
-        List<String> dataset = newJob.getDataset();
+        Long dataFileId = newJob.getDataFileId();
         // Not implimenting prior knowledge in API
         List<String> jvmOptions = newJob.getJvmOptions();
         List<String> parameters = newJob.getParameters();
@@ -77,6 +85,11 @@ public class JobQueueEndpointService {
 
         Path userResultDir = Paths.get(workspaceDir, username, resultsFolder, algorithmFolder);
         Path userTmpDir = Paths.get(workspaceDir, username, tmpFolder);
+
+        UserAccount userAccount = userAccountRestService.findByUsername(username);
+        if (userAccount == null) {
+            throw new UserNotFoundException(username);
+        }
 
         // Building the command line
         List<String> commands = new LinkedList<>();
@@ -94,15 +107,17 @@ public class JobQueueEndpointService {
         commands.add("--algorithm");
         commands.add(algorithm);
 
-        // add dataset
-        List<String> datasetPath = new LinkedList<>();
-        dataset.forEach(dataFile -> {
-            Path dataPath = Paths.get(workspaceDir, username, dataFolder, dataFile);
-            datasetPath.add(dataPath.toAbsolutePath().toString());
-        });
-        String datasetList = listToSeperatedValues(datasetPath, ",");
+        // add data file, get data file name by id
+        DataFile dataFile = dataFileRestService.findByIdAndUserAccount(dataFileId, userAccount);
+        if (dataFile == null) {
+            throw new NotFoundByIdException(dataFileId);
+        }
+
+        Path dataPath = Paths.get(workspaceDir, username, dataFolder, dataFile.getName());
+
+        // Add data file
         commands.add("--data");
-        commands.add(datasetList);
+        commands.add(dataPath.toAbsolutePath().toString());
 
         // add parameters
         commands.addAll(parameters);
@@ -111,18 +126,11 @@ public class JobQueueEndpointService {
         commands.add("--no-validation-output");
 
         long currentTime = System.currentTimeMillis();
-        String fileName = (dataset.size() > 1)
-                ? String.format("%s_%s_%d", algorithmName, "multi-dataset", currentTime)
-                : String.format("%s_%s_%d", algorithmName, listToSeperatedValues(dataset, ","), currentTime);
+        String fileName = String.format("%s_%s_%d", algorithmName, dataFile.getName(), currentTime);
         commands.add("--output-prefix");
         commands.add(fileName);
 
         String cmd = listToSeperatedValues(commands, ";");
-
-        UserAccount userAccount = userAccountRestService.findByUsername(username);
-        if (userAccount == null) {
-            throw new UserNotFoundException(username);
-        }
 
         // Insert to database table `job_queue_info`
         JobQueueInfo jobQueueInfo = new JobQueueInfo();

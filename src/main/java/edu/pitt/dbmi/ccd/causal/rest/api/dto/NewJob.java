@@ -36,8 +36,8 @@ public class NewJob {
     @FormParam("algorithm")
     private String algorithm;
 
-    @FormParam("dataset")
-    private List<String> dataset;
+    @FormParam("dataFileId")
+    private Long dataFileId;
 
     @FormParam("jvmOptions")
     private List<String> jvmOptions;
@@ -64,12 +64,12 @@ public class NewJob {
         this.algorithm = algorithm;
     }
 
-    public List<String> getDataset() {
-        return dataset;
+    public Long getDataFileId() {
+        return dataFileId;
     }
 
-    public void setDataset(List<String> dataset) {
-        this.dataset = dataset;
+    public void setDataFileId(Long dataFileId) {
+        this.dataFileId = dataFileId;
     }
 
     public List<String> getJvmOptions() {
