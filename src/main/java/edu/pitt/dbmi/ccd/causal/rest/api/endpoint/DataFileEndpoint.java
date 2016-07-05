@@ -46,8 +46,6 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -61,8 +59,6 @@ import org.springframework.stereotype.Component;
 @PermitAll
 @Path("/{username}/data")
 public class DataFileEndpoint {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(DataFileEndpoint.class);
 
     private final DataFileEndpointService dataFileEndpointService;
 
@@ -102,13 +98,13 @@ public class DataFileEndpoint {
     }
 
     /*
-    * For small file upload
-    * If you need to bin the named body part(s) of a multipart/form-data request entity body to
-    * a resource method parameter you can use @FormDataParam annotation.
-    * This annotation in conjunction with the media type multipart/form-data should be used for
-    * submitting and consuming forms that contain files, non-ASCII data, and binary data.
-    *
-    * Client must use name="file" for their file upload
+     * For small file upload
+     * If you need to bin the named body part(s) of a multipart/form-data request entity body to
+     * a resource method parameter you can use @FormDataParam annotation.
+     * This annotation in conjunction with the media type multipart/form-data should be used for
+     * submitting and consuming forms that contain files, non-ASCII data, and binary data.
+     *
+     * Client must use name="file" for their file upload
      */
     @POST
     @Path("/upload")
@@ -125,11 +121,11 @@ public class DataFileEndpoint {
     }
 
     /*
-    * For resumeable big file upload, chunk by chunk upload,
-    * needs resumable client (either resumable.js via the HTML5 File API or resumable upload java client)
-    * based on https://github.com/bd2kccd/ccd-ws
-    *
-    * Check to see if the file chunk has already been uploaded
+     * For resumeable big file upload, chunk by chunk upload,
+     * needs resumable client (either resumable.js via the HTML5 File API or resumable upload java client)
+     * based on https://github.com/bd2kccd/ccd-ws
+     *
+     * Check to see if the file chunk has already been uploaded
      */
     @GET
     @Path("/chunkUpload")
@@ -146,12 +142,12 @@ public class DataFileEndpoint {
     }
 
     /*
-    * Upload each chunk via multipart post and returns the md5checkSum string on the last one
-    *
-    * The @FormParam annotation in conjunction with the media type "application/x-www-form-urlencoded"
-    * is inefficient for sending and consuming large quantities of binary data or text containing non-ASCII characters.
-    * @FormDataParam annotation in conjunction with the media type "multipart/form-data" should be used for
-    * submitting and consuming forms that contain files, non-ASCII data, and binary data.
+     * Upload each chunk via multipart post and returns the md5checkSum string on the last one
+     *
+     * The @FormParam annotation in conjunction with the media type "application/x-www-form-urlencoded"
+     * is inefficient for sending and consuming large quantities of binary data or text containing non-ASCII characters.
+     * @FormDataParam annotation in conjunction with the media type "multipart/form-data" should be used for
+     * submitting and consuming forms that contain files, non-ASCII data, and binary data.
      */
     @POST
     @Path("/chunkUpload")
@@ -165,10 +161,10 @@ public class DataFileEndpoint {
     }
 
     /*
-    * Data Summary
-    * @Consumes(APPLICATION_FORM_URLENCODED) works with @FormParam used in DataFileSummary
-    * The @FormParam annotation in conjunction with the media type "application/x-www-form-urlencoded"
-    * is good enough to get the posted data to summarize data, since there's no large file uploaded
+     * Data Summary
+     * @Consumes(APPLICATION_FORM_URLENCODED) works with @FormParam used in DataFileSummary
+     * The @FormParam annotation in conjunction with the media type "application/x-www-form-urlencoded"
+     * is good enough to get the posted data to summarize data, since there's no large file uploaded
      */
     @POST
     @Path("/summarize")

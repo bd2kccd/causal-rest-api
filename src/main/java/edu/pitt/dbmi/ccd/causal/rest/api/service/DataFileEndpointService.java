@@ -214,7 +214,7 @@ public class DataFileEndpointService {
     }
 
     /*
-    * Small file upload, not resumable
+     * Small file upload, not resumable
      */
     public DataFileDTO upload(String username, InputStream inputStream, FormDataContentDisposition fileDetail) throws FileNotFoundException, IOException {
         String workspaceDir = causalRestProperties.getWorkspaceDir();
@@ -309,7 +309,7 @@ public class DataFileEndpointService {
     }
 
     /*
-    * Chunk upload, check chunk existence
+     * Chunk upload, check chunk existence
      */
     public boolean chunkExists(ResumableChunkViaGet chunk, String username) throws IOException {
         String identifier = chunk.getResumableIdentifier();
@@ -329,7 +329,7 @@ public class DataFileEndpointService {
     }
 
     /*
-    * Chunk upload, upload each chunk data and generate md5checksum on completion of the whole file
+     * Chunk upload, upload each chunk data and generate md5checksum on completion of the whole file
      */
     public String uploadChunk(ResumableChunkViaPost chunk, String username) throws IOException {
         String fileName = chunk.getResumableFilename();
@@ -350,7 +350,7 @@ public class DataFileEndpointService {
     }
 
     /*
-    * Chunk upload, store chunk data to the data folder
+     * Chunk upload, store chunk data to the data folder
      */
     public void storeChunk(ResumableChunkViaPost chunk, String username) throws IOException {
         String identifier = chunk.getResumableIdentifier();
@@ -372,7 +372,7 @@ public class DataFileEndpointService {
     }
 
     /*
-    * Chunk upload, check if all chunks are uploaded
+     * Chunk upload, check if all chunks are uploaded
      */
     public boolean allChunksUploaded(ResumableChunkViaPost chunk, String username) throws IOException {
         String identifier = chunk.getResumableIdentifier();
@@ -391,7 +391,7 @@ public class DataFileEndpointService {
     }
 
     /*
-    * Chunk upload, save data information to database
+     * Chunk upload, save data information to database
      */
     private String saveDataFile(Path file, String username) throws IOException {
         UserAccount userAccount = userAccountRestService.findByUsername(username);
@@ -432,7 +432,7 @@ public class DataFileEndpointService {
     }
 
     /*
-    * Chunk upload, delete tmp chunks from data folder
+     * Chunk upload, delete tmp chunks from data folder
      */
     public String mergeDeleteSave(ResumableChunkViaPost chunk, String username) throws IOException {
         String fileName = chunk.getResumableFilename();
@@ -464,7 +464,7 @@ public class DataFileEndpointService {
     }
 
     /*
-    * Chunk upload, recursively delete subdirectories
+     * Chunk upload, recursively delete subdirectories
      */
     private void deleteNonEmptyDir(Path path) throws IOException {
         Files.walkFileTree(path, new SimpleFileVisitor<Path>() {
@@ -487,7 +487,7 @@ public class DataFileEndpointService {
     }
 
     /*
-    * Summarize data file by adding fileDelimiter, variableType, numOfRows, numOfColumns, and missingValue
+     * Summarize data file by adding fileDelimiter, variableType, numOfRows, numOfColumns, and missingValue
      */
     public DataFileDTO summarizeDataFile(String username, DataFileSummarization dataFileSummarization) throws IOException {
         Long id = dataFileSummarization.getId();
