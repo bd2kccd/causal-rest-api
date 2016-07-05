@@ -30,14 +30,11 @@ public class NewJob {
     /*
      * @FormParam requires the @Consumes(APPLICATION_FORM_URLENCODED) to be specified in endpoint
      */
-    @FormParam("algorithmName")
-    private String algorithmName;
-
     @FormParam("algorithm")
     private String algorithm;
 
-    @FormParam("dataFileId")
-    private Long dataFileId;
+    @FormParam("dataFileIdList")
+    private List<Long> dataFileIdList;
 
     @FormParam("jvmOptions")
     private List<String> jvmOptions;
@@ -48,14 +45,6 @@ public class NewJob {
     public NewJob() {
     }
 
-    public String getAlgorithmName() {
-        return algorithmName;
-    }
-
-    public void setAlgorithmName(String algorithmName) {
-        this.algorithmName = algorithmName;
-    }
-
     public String getAlgorithm() {
         return algorithm;
     }
@@ -64,12 +53,12 @@ public class NewJob {
         this.algorithm = algorithm;
     }
 
-    public Long getDataFileId() {
-        return dataFileId;
+    public List<Long> getDataFileIdList() {
+        return dataFileIdList;
     }
 
-    public void setDataFileId(Long dataFileId) {
-        this.dataFileId = dataFileId;
+    public void setDataFileIdList(List<Long> dataFileIdList) {
+        this.dataFileIdList = dataFileIdList;
     }
 
     public List<String> getJvmOptions() {

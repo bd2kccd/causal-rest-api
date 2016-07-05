@@ -19,7 +19,6 @@
 package edu.pitt.dbmi.ccd.causal.rest.api.service;
 
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.NewJob;
-import edu.pitt.dbmi.ccd.causal.rest.api.exception.NotFoundByIdException;
 import edu.pitt.dbmi.ccd.causal.rest.api.exception.UserNotFoundException;
 import edu.pitt.dbmi.ccd.causal.rest.api.prop.CausalRestProperties;
 import edu.pitt.dbmi.ccd.causal.rest.api.service.db.DataFileRestService;
@@ -65,11 +64,9 @@ public class JobQueueEndpointService {
     }
 
     public Long addNewJob(String username, NewJob newJob) {
-        // algorithmName is prefixed in the result file name
-        String algorithmName = newJob.getAlgorithmName();
-
+        // Right now, we only support "fgsc" and "fgsd"
         String algorithm = newJob.getAlgorithm();
-        Long dataFileId = newJob.getDataFileId();
+        List<Long> dataFileIdList = newJob.getDataFileIdList();
         // Not implimenting prior knowledge in API
         List<String> jvmOptions = newJob.getJvmOptions();
         List<String> parameters = newJob.getParameters();
@@ -95,47 +92,60 @@ public class JobQueueEndpointService {
         List<String> commands = new LinkedList<>();
         commands.add("java");
 
-        // add jvm options
+        // Add jvm options
         commands.addAll(jvmOptions);
 
-        // add classpath
+        // Add classpath
         Path classPath = Paths.get(workspaceDir, libFolder, algorithmJar);
         commands.add("-jar");
         commands.add(classPath.toString());
 
-        // add algorithm
+        // Add algorithm
         commands.add("--algorithm");
         commands.add(algorithm);
 
-        // add data file, get data file name by id
-        DataFile dataFile = dataFileRestService.findByIdAndUserAccount(dataFileId, userAccount);
-        if (dataFile == null) {
-            throw new NotFoundByIdException(dataFileId);
-        }
-
-        Path dataPath = Paths.get(workspaceDir, username, dataFolder, dataFile.getName());
-
-        // Add data file
+        // Add dataset
+        List<String> datasetPath = new LinkedList<>();
+        dataFileIdList.forEach(dataFileId -> {
+            // Get data file name by file id
+            DataFile dataFile = dataFileRestService.findByIdAndUserAccount(dataFileId, userAccount);
+            Path dataPath = Paths.get(workspaceDir, username, dataFolder, dataFile.getName());
+            datasetPath.add(dataPath.toAbsolutePath().toString());
+        });
+        String datasetList = listToSeperatedValues(datasetPath, ",");
         commands.add("--data");
-        commands.add(dataPath.toAbsolutePath().toString());
+        commands.add(datasetList);
 
-        // add parameters
+        // Add parameters
         commands.addAll(parameters);
 
-        // don't create any validation files
+        // Don't create any validation files
         commands.add("--no-validation-output");
 
         long currentTime = System.currentTimeMillis();
-        String fileName = String.format("%s_%s_%d", algorithmName, dataFile.getName(), currentTime);
+        // Algorithm result file name
+        String fileName;
+
+        if (dataFileIdList.size() > 1) {
+            // FGS Image takes multi image files
+            fileName = String.format("%s_%s_%d", algorithm, "multi-dataset", currentTime);
+        } else {
+            Long id = dataFileIdList.get(0);
+            DataFile df = dataFileRestService.findByIdAndUserAccount(id, userAccount);
+            fileName = String.format("%s_%s_%d", algorithm, df.getName(), currentTime);
+        }
+
         commands.add("--output-prefix");
         commands.add(fileName);
 
+        // Then separate those commands with ; and store the whole string into database
+        // ccd-job-queue will assemble the command line again
         String cmd = listToSeperatedValues(commands, ";");
 
         // Insert to database table `job_queue_info`
         JobQueueInfo jobQueueInfo = new JobQueueInfo();
         jobQueueInfo.setAddedTime(new Date(System.currentTimeMillis()));
-        jobQueueInfo.setAlgorName(algorithmName);
+        jobQueueInfo.setAlgorName(algorithm);
         jobQueueInfo.setCommands(cmd);
         jobQueueInfo.setFileName(fileName);
         jobQueueInfo.setOutputDirectory(userResultDir.toAbsolutePath().toString());
