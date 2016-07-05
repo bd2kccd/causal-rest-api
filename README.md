@@ -428,7 +428,7 @@ GET /causal/api/v1/usr/zhy19/algorithm/results/compare/fgs_sim_data_20vars_100ca
 Host: localhost:9000
 Authorization: Basic emh5MTk6MTIzNDU2
 ````
-This request will generate a result comparison file with the following content (shortened version):
+When you specify multiple file names, use the `!!` as a delimiter. This request will generate a result comparison file with the following content (shortened version):
 
 ````
 fgs_sim_data_20vars_100cases.csv_1466171729046.txt	fgs_data_small.txt_1467305104859.txt
