@@ -139,7 +139,8 @@ public class JobQueueEndpointService {
         commands.add(fileName);
 
         // Then separate those commands with ; and store the whole string into database
-        // ccd-job-queue will assemble the command line again
+        // ccd-job-queue will assemble the command line again at
+        // https://github.com/bd2kccd/ccd-job-queue/blob/master/src/main/java/edu/pitt/dbmi/ccd/queue/service/AlgorithmQueueService.java#L79
         String cmd = listToSeperatedValues(commands, ";");
 
         // Insert to database table `job_queue_info`
@@ -156,6 +157,20 @@ public class JobQueueEndpointService {
         jobQueueInfo = jobQueueInfoService.saveJobIntoQueue(jobQueueInfo);
 
         return jobQueueInfo.getId();
+    }
+
+    public String checkJobStatus(String username, Long id) {
+        JobQueueInfo jobQueueInfo = jobQueueInfoService.findOne(id);
+
+        int jobStatus = jobQueueInfo.getStatus();
+
+        // Once job is completed, the database record will be gone
+        // so jobStatus can be null by then
+        if (jobStatus == 1) {
+            return "Pending";
+        } else {
+            return "Completed";
+        }
     }
 
     public String listToSeperatedValues(List<String> list, String delimiter) {

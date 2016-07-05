@@ -25,6 +25,7 @@ import java.io.IOException;
 import javax.annotation.security.RolesAllowed;
 import javax.ws.rs.BeanParam;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -58,5 +59,16 @@ public class JobQueueEndpoint {
 
         // Return 201 Created status code and the job id in body
         return Response.status(Status.CREATED).entity(id).build();
+    }
+
+    /*
+     * Checking job status for a given job ID
+     */
+    @GET
+    @Path("/{id}")
+    @RolesAllowed(Role.USER)
+    public Response jobStatus(@PathParam("username") String username, @PathParam("id") Long id) throws IOException {
+        String jobStatus = jobQueueEndpointService.checkJobStatus(username, id);
+        return Response.ok(jobStatus).build();
     }
 }
