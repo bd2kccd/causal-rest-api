@@ -28,7 +28,6 @@ import edu.pitt.dbmi.ccd.causal.rest.api.exception.NotFoundByIdException;
 import edu.pitt.dbmi.ccd.causal.rest.api.exception.UserNotFoundException;
 import edu.pitt.dbmi.ccd.causal.rest.api.prop.CausalRestProperties;
 import edu.pitt.dbmi.ccd.causal.rest.api.service.db.DataFileRestService;
-import edu.pitt.dbmi.ccd.causal.rest.api.service.db.UserAccountRestService;
 import edu.pitt.dbmi.ccd.commons.file.MessageDigestHash;
 import edu.pitt.dbmi.ccd.commons.file.info.BasicFileInfo;
 import edu.pitt.dbmi.ccd.commons.file.info.FileInfos;
@@ -38,6 +37,7 @@ import edu.pitt.dbmi.ccd.db.entity.FileDelimiter;
 import edu.pitt.dbmi.ccd.db.entity.UserAccount;
 import edu.pitt.dbmi.ccd.db.entity.VariableType;
 import edu.pitt.dbmi.ccd.db.service.FileDelimiterService;
+import edu.pitt.dbmi.ccd.db.service.UserAccountService;
 import edu.pitt.dbmi.ccd.db.service.VariableTypeService;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -76,7 +76,7 @@ public class DataFileEndpointService {
 
     private final CausalRestProperties causalRestProperties;
 
-    private final UserAccountRestService userAccountRestService;
+    private final UserAccountService userAccountService;
 
     private final DataFileRestService dataFileRestService;
 
@@ -85,9 +85,9 @@ public class DataFileEndpointService {
     private final FileDelimiterService fileDelimiterService;
 
     @Autowired
-    public DataFileEndpointService(CausalRestProperties causalRestProperties, UserAccountRestService userAccountRestService, DataFileRestService dataFileRestService, VariableTypeService variableTypeService, FileDelimiterService fileDelimiterService) {
+    public DataFileEndpointService(CausalRestProperties causalRestProperties, UserAccountService userAccountService, DataFileRestService dataFileRestService, VariableTypeService variableTypeService, FileDelimiterService fileDelimiterService) {
         this.causalRestProperties = causalRestProperties;
-        this.userAccountRestService = userAccountRestService;
+        this.userAccountService = userAccountService;
         this.dataFileRestService = dataFileRestService;
         this.variableTypeService = variableTypeService;
         this.fileDelimiterService = fileDelimiterService;
@@ -100,7 +100,7 @@ public class DataFileEndpointService {
      * @param username
      */
     public void deleteByIdAndUsername(Long id, String username) {
-        UserAccount userAccount = userAccountRestService.findByUsername(username);
+        UserAccount userAccount = userAccountService.findByUsername(username);
         if (userAccount == null) {
             throw new UserNotFoundException(username);
         }
@@ -130,7 +130,7 @@ public class DataFileEndpointService {
      * @return
      */
     public DataFileDTO findByIdAndUsername(Long id, String username) {
-        UserAccount userAccount = userAccountRestService.findByUsername(username);
+        UserAccount userAccount = userAccountService.findByUsername(username);
         if (userAccount == null) {
             throw new UserNotFoundException(username);
         }
@@ -185,7 +185,7 @@ public class DataFileEndpointService {
     public List<DataFileDTO> listDataFiles(String username) {
         List<DataFileDTO> dataFileDTOs = new LinkedList<>();
 
-        UserAccount userAccount = userAccountRestService.findByUsername(username);
+        UserAccount userAccount = userAccountService.findByUsername(username);
         if (userAccount == null) {
             throw new UserNotFoundException(username);
         }
@@ -264,7 +264,7 @@ public class DataFileEndpointService {
         // Then we'll also need to insert the data file info into three database tables:
         // `data_file_info`, `data_file`, and `user_account_data_file_rel`
         // First we'll need to know who uploaded this file
-        UserAccount userAccount = userAccountRestService.findByUsername(username);
+        UserAccount userAccount = userAccountService.findByUsername(username);
 
         // Get file information with FileInfos of ccd-commons
         BasicFileInfo fileInfo = FileInfos.basicPathInfo(uploadedFile);
@@ -445,7 +445,7 @@ public class DataFileEndpointService {
      * @throws IOException
      */
     private String saveDataFile(Path file, String username) throws IOException {
-        UserAccount userAccount = userAccountRestService.findByUsername(username);
+        UserAccount userAccount = userAccountService.findByUsername(username);
 
         BasicFileInfo fileInfo = FileInfos.basicPathInfo(file);
         String directory = fileInfo.getAbsolutePath().toString();
@@ -557,7 +557,7 @@ public class DataFileEndpointService {
     public DataFileDTO summarizeDataFile(String username, DataFileSummarization dataFileSummarization) throws IOException {
         Long id = dataFileSummarization.getId();
 
-        UserAccount userAccount = userAccountRestService.findByUsername(username);
+        UserAccount userAccount = userAccountService.findByUsername(username);
         if (userAccount == null) {
             throw new UserNotFoundException(username);
         }

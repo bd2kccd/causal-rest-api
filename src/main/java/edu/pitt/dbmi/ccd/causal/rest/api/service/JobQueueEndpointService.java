@@ -22,11 +22,11 @@ import edu.pitt.dbmi.ccd.causal.rest.api.dto.NewJob;
 import edu.pitt.dbmi.ccd.causal.rest.api.exception.UserNotFoundException;
 import edu.pitt.dbmi.ccd.causal.rest.api.prop.CausalRestProperties;
 import edu.pitt.dbmi.ccd.causal.rest.api.service.db.DataFileRestService;
-import edu.pitt.dbmi.ccd.causal.rest.api.service.db.UserAccountRestService;
 import edu.pitt.dbmi.ccd.db.entity.DataFile;
 import edu.pitt.dbmi.ccd.db.entity.JobQueueInfo;
 import edu.pitt.dbmi.ccd.db.entity.UserAccount;
 import edu.pitt.dbmi.ccd.db.service.JobQueueInfoService;
+import edu.pitt.dbmi.ccd.db.service.UserAccountService;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collections;
@@ -45,7 +45,7 @@ public class JobQueueEndpointService {
 
     private final CausalRestProperties causalRestProperties;
 
-    private final UserAccountRestService userAccountRestService;
+    private final UserAccountService userAccountService;
 
     private final DataFileRestService dataFileRestService;
 
@@ -54,11 +54,11 @@ public class JobQueueEndpointService {
     @Autowired
     public JobQueueEndpointService(
             CausalRestProperties causalRestProperties,
-            UserAccountRestService userAccountRestService,
+            UserAccountService userAccountService,
             DataFileRestService dataFileRestService,
             JobQueueInfoService jobQueueInfoService) {
         this.causalRestProperties = causalRestProperties;
-        this.userAccountRestService = userAccountRestService;
+        this.userAccountService = userAccountService;
         this.dataFileRestService = dataFileRestService;
         this.jobQueueInfoService = jobQueueInfoService;
     }
@@ -90,7 +90,7 @@ public class JobQueueEndpointService {
         Path userResultDir = Paths.get(workspaceDir, username, resultsFolder, algorithmFolder);
         Path userTmpDir = Paths.get(workspaceDir, username, tmpFolder);
 
-        UserAccount userAccount = userAccountRestService.findByUsername(username);
+        UserAccount userAccount = userAccountService.findByUsername(username);
         if (userAccount == null) {
             throw new UserNotFoundException(username);
         }
