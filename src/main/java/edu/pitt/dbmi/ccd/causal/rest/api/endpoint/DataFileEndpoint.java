@@ -67,6 +67,13 @@ public class DataFileEndpoint {
         this.dataFileEndpointService = dataFileEndpointService;
     }
 
+    /**
+     * Delete a data file based on a given ID
+     *
+     * @param username
+     * @param id
+     * @return 204
+     */
     @DELETE
     @Path("/{id}")
     @RolesAllowed(Role.USER)
@@ -76,6 +83,13 @@ public class DataFileEndpoint {
         return Response.noContent().build();
     }
 
+    /**
+     * Get data file info for a given ID
+     *
+     * @param username
+     * @param id
+     * @return 200 with data file info
+     */
     @GET
     @Path("/{id}")
     @Produces({APPLICATION_JSON, APPLICATION_XML})
@@ -86,6 +100,12 @@ public class DataFileEndpoint {
         return Response.ok(dataFileDTO).build();
     }
 
+    /**
+     * List all the existing data files
+     *
+     * @param username
+     * @return 200 with file list
+     */
     @GET
     @Produces({APPLICATION_JSON, APPLICATION_XML})
     @RolesAllowed(Role.USER)
@@ -97,14 +117,23 @@ public class DataFileEndpoint {
         return Response.ok(entity).build();
     }
 
-    /*
+    /**
      * For small file upload
-     * If you need to bin the named body part(s) of a multipart/form-data request entity body to
-     * a resource method parameter you can use @FormDataParam annotation.
-     * This annotation in conjunction with the media type multipart/form-data should be used for
-     * submitting and consuming forms that contain files, non-ASCII data, and binary data.
+     *
+     * If you need to bin the named body part(s) of a multipart/form-data
+     * request entity body to a resource method parameter you can use the
+     *
+     * @FormDataParam annotation. This annotation in conjunction with the media
+     * type multipart/form-data should be used for submitting and consuming
+     * forms that contain files, non-ASCII data, and binary data.
      *
      * Client must use name="file" for their file upload
+     *
+     * @param username
+     * @param inputStream
+     * @param fileDetail
+     * @return 200 with uploaded file info
+     * @throws IOException
      */
     @POST
     @Path("/upload")
@@ -120,12 +149,16 @@ public class DataFileEndpoint {
         return Response.ok(dataFileDTO).build();
     }
 
-    /*
-     * For resumeable big file upload, chunk by chunk upload,
-     * needs resumable client (either resumable.js via the HTML5 File API or resumable upload java client)
-     * based on https://github.com/bd2kccd/ccd-ws
+    /**
+     * Check to see if the resumable file chunk has already been uploaded
      *
-     * Check to see if the file chunk has already been uploaded
+     * needs resumable client (either resumable.js via the HTML5 File API or
+     * resumable upload java client) based on https://github.com/bd2kccd/ccd-ws
+     *
+     * @param username
+     * @param chunkViaGet
+     * @return 200 or 404
+     * @throws IOException
      */
     @GET
     @Path("/chunkUpload")
@@ -141,13 +174,23 @@ public class DataFileEndpoint {
         }
     }
 
-    /*
-     * Upload each chunk via multipart post and returns the md5checkSum string on the last one
+    /**
+     * Upload each chunk via multipart post and returns the md5checkSum string
+     * on the last one
      *
-     * The @FormParam annotation in conjunction with the media type "application/x-www-form-urlencoded"
-     * is inefficient for sending and consuming large quantities of binary data or text containing non-ASCII characters.
-     * @FormDataParam annotation in conjunction with the media type "multipart/form-data" should be used for
-     * submitting and consuming forms that contain files, non-ASCII data, and binary data.
+     * The @FormParam annotation in conjunction with the media type
+     * "application/x-www-form-urlencoded" is inefficient for sending and
+     * consuming large quantities of binary data or text containing non-ASCII
+     * characters.
+     *
+     * The @FormDataParam annotation in conjunction with the media type
+     * "multipart/form-data" should be used for submitting and consuming forms
+     * that contain files, non-ASCII data, and binary data.
+     *
+     * @param username
+     * @param chunkViaPost
+     * @return 200 OK status code with md5checkSum string
+     * @throws IOException
      */
     @POST
     @Path("/chunkUpload")
@@ -160,11 +203,18 @@ public class DataFileEndpoint {
         return Response.ok(md5checkSum).build();
     }
 
-    /*
+    /**
      * Data Summary
-     * @Consumes(APPLICATION_FORM_URLENCODED) works with @FormParam used in DataFileSummary
-     * The @FormParam annotation in conjunction with the media type "application/x-www-form-urlencoded"
-     * is good enough to get the posted data to summarize data, since there's no large file uploaded
+     *
+     * The @Consumes(APPLICATION_FORM_URLENCODED) works with @FormParam used in
+     * DataFileSummary The @FormParam annotation in conjunction with the media
+     * type "application/x-www-form-urlencoded" is good enough to get the posted
+     * data to summarize data, since there's no large file uploaded
+     *
+     * @param username
+     * @param dataFileSummarization
+     * @return
+     * @throws IOException
      */
     @POST
     @Path("/summarize")

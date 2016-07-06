@@ -176,13 +176,8 @@ public class JobQueueEndpointService {
      */
     public String checkJobStatus(String username, Long id) {
         JobQueueInfo jobQueueInfo = jobQueueInfoService.findOne(id);
-
-        if (jobQueueInfo == null) {
-            return "Completed";
-        }
-
         // As long as there's database record, the job is pending
-        return "Pending";
+        return (jobQueueInfo == null) ? "Completed" : "Pending";
     }
 
     /**

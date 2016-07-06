@@ -48,8 +48,13 @@ public class JobQueueEndpoint {
         this.jobQueueEndpointService = jobQueueEndpointService;
     }
 
-    /*
+    /**
      * Adding a new job
+     *
+     * @param username
+     * @param newJob
+     * @return 201 Created status code with new job ID
+     * @throws IOException
      */
     @POST
     @Consumes(APPLICATION_FORM_URLENCODED)
@@ -61,8 +66,13 @@ public class JobQueueEndpoint {
         return Response.status(Status.CREATED).entity(id).build();
     }
 
-    /*
+    /**
      * Checking job status for a given job ID
+     *
+     * @param username
+     * @param id
+     * @return 200 OK status code with job status ("Pending" or "Completed")
+     * @throws IOException
      */
     @GET
     @Path("/{id}")

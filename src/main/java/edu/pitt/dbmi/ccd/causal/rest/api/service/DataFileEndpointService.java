@@ -93,6 +93,12 @@ public class DataFileEndpointService {
         this.fileDelimiterService = fileDelimiterService;
     }
 
+    /**
+     * Delete a data file for a given file ID
+     *
+     * @param id
+     * @param username
+     */
     public void deleteByIdAndUsername(Long id, String username) {
         UserAccount userAccount = userAccountRestService.findByUsername(username);
         if (userAccount == null) {
@@ -116,6 +122,13 @@ public class DataFileEndpointService {
         }
     }
 
+    /**
+     * Get a data file info for a given file ID
+     *
+     * @param id
+     * @param username
+     * @return
+     */
     public DataFileDTO findByIdAndUsername(Long id, String username) {
         UserAccount userAccount = userAccountRestService.findByUsername(username);
         if (userAccount == null) {
@@ -163,6 +176,12 @@ public class DataFileEndpointService {
         return dataFileDTO;
     }
 
+    /**
+     * List all the available data files for a given user
+     *
+     * @param username
+     * @return
+     */
     public List<DataFileDTO> listDataFiles(String username) {
         List<DataFileDTO> dataFileDTOs = new LinkedList<>();
 
@@ -213,8 +232,15 @@ public class DataFileEndpointService {
         return dataFileDTOs;
     }
 
-    /*
+    /**
      * Small file upload, not resumable
+     *
+     * @param username
+     * @param inputStream
+     * @param fileDetail
+     * @return Info of just uploaded file
+     * @throws FileNotFoundException
+     * @throws IOException
      */
     public DataFileDTO upload(String username, InputStream inputStream, FormDataContentDisposition fileDetail) throws FileNotFoundException, IOException {
         String workspaceDir = causalRestProperties.getWorkspaceDir();
@@ -308,8 +334,13 @@ public class DataFileEndpointService {
         return dataFileDTO;
     }
 
-    /*
+    /**
      * Chunk upload, check chunk existence
+     *
+     * @param chunk
+     * @param username
+     * @return true or false
+     * @throws IOException
      */
     public boolean chunkExists(ResumableChunkViaGet chunk, String username) throws IOException {
         String identifier = chunk.getResumableIdentifier();
@@ -328,8 +359,14 @@ public class DataFileEndpointService {
         return false;
     }
 
-    /*
-     * Chunk upload, upload each chunk data and generate md5checksum on completion of the whole file
+    /**
+     * Chunk upload, upload each chunk data and generate md5checksum on
+     * completion of the whole file
+     *
+     * @param chunk
+     * @param username
+     * @return md5checksum string
+     * @throws IOException
      */
     public String uploadChunk(ResumableChunkViaPost chunk, String username) throws IOException {
         String fileName = chunk.getResumableFilename();
@@ -349,8 +386,12 @@ public class DataFileEndpointService {
         return md5checkSum;
     }
 
-    /*
+    /**
      * Chunk upload, store chunk data to the data folder
+     *
+     * @param chunk
+     * @param username
+     * @throws IOException
      */
     public void storeChunk(ResumableChunkViaPost chunk, String username) throws IOException {
         String identifier = chunk.getResumableIdentifier();
@@ -371,8 +412,13 @@ public class DataFileEndpointService {
         Files.copy(chunk.getFile(), chunkFile, StandardCopyOption.REPLACE_EXISTING);
     }
 
-    /*
+    /**
      * Chunk upload, check if all chunks are uploaded
+     *
+     * @param chunk
+     * @param username
+     * @return true or false
+     * @throws IOException
      */
     public boolean allChunksUploaded(ResumableChunkViaPost chunk, String username) throws IOException {
         String identifier = chunk.getResumableIdentifier();
@@ -390,8 +436,13 @@ public class DataFileEndpointService {
         return true;
     }
 
-    /*
+    /**
      * Chunk upload, save data information to database
+     *
+     * @param file
+     * @param username
+     * @return md5checkSum string
+     * @throws IOException
      */
     private String saveDataFile(Path file, String username) throws IOException {
         UserAccount userAccount = userAccountRestService.findByUsername(username);
@@ -431,8 +482,13 @@ public class DataFileEndpointService {
         return md5checkSum;
     }
 
-    /*
+    /**
      * Chunk upload, delete tmp chunks from data folder
+     *
+     * @param chunk
+     * @param username
+     * @return md5checkSum string
+     * @throws IOException
      */
     public String mergeDeleteSave(ResumableChunkViaPost chunk, String username) throws IOException {
         String fileName = chunk.getResumableFilename();
@@ -463,8 +519,11 @@ public class DataFileEndpointService {
         return md5checkSum;
     }
 
-    /*
+    /**
      * Chunk upload, recursively delete subdirectories
+     *
+     * @param path
+     * @throws IOException
      */
     private void deleteNonEmptyDir(Path path) throws IOException {
         Files.walkFileTree(path, new SimpleFileVisitor<Path>() {
@@ -486,8 +545,14 @@ public class DataFileEndpointService {
         });
     }
 
-    /*
-     * Summarize data file by adding fileDelimiter, variableType, numOfRows, numOfColumns, and missingValue
+    /**
+     * Summarize data file by adding fileDelimiter, variableType, numOfRows,
+     * numOfColumns, and missingValue
+     *
+     * @param username
+     * @param dataFileSummarization
+     * @return The info of just summarized file
+     * @throws IOException
      */
     public DataFileDTO summarizeDataFile(String username, DataFileSummarization dataFileSummarization) throws IOException {
         Long id = dataFileSummarization.getId();

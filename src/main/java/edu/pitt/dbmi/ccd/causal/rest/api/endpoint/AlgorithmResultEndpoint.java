@@ -54,6 +54,13 @@ public class AlgorithmResultEndpoint {
         this.algorithmResultEndpointService = algorithmResultEndpointService;
     }
 
+    /**
+     * List all the algorithm result files
+     *
+     * @param username
+     * @return 200 with a list of existing result files
+     * @throws IOException
+     */
     @GET
     @Produces({APPLICATION_JSON, APPLICATION_XML})
     @RolesAllowed(Role.USER)
@@ -65,6 +72,14 @@ public class AlgorithmResultEndpoint {
         return Response.ok(entity).build();
     }
 
+    /**
+     * Download the content of a result file for a given ID
+     *
+     * @param username
+     * @param fileName
+     * @return Plain text file content
+     * @throws IOException
+     */
     @GET
     @Path("/{fileName}")
     @RolesAllowed(Role.USER)
@@ -76,6 +91,14 @@ public class AlgorithmResultEndpoint {
                 .build();
     }
 
+    /**
+     * Compare multi result files
+     *
+     * @param username
+     * @param fileNames
+     * @return The comparison result text file content
+     * @throws IOException
+     */
     @GET
     @Path("/compare/{fileNames}")
     @RolesAllowed(Role.USER)

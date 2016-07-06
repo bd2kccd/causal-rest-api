@@ -63,6 +63,13 @@ public class AlgorithmResultEndpointService {
         this.causalRestProperties = causalRestProperties;
     }
 
+    /**
+     * List all the algorithm result files for a given user
+     *
+     * @param username
+     * @return A list of result files
+     * @throws IOException
+     */
     public List<AlgorithmResultDTO> listAlgorithmResults(String username) throws IOException {
         String workspaceDir = causalRestProperties.getWorkspaceDir();
         String resultsFolder = causalRestProperties.getResultsFolder();
@@ -93,6 +100,13 @@ public class AlgorithmResultEndpointService {
         return algorithmResultDTOs;
     }
 
+    /**
+     * Get the result file content based on user and the file name
+     *
+     * @param username
+     * @param fileName
+     * @return
+     */
     public File getAlgorithmResultFile(String username, String fileName) {
         String workspaceDir = causalRestProperties.getWorkspaceDir();
         String resultsFolder = causalRestProperties.getResultsFolder();
@@ -108,6 +122,13 @@ public class AlgorithmResultEndpointService {
         }
     }
 
+    /**
+     * Handles the comparison of multi result files
+     *
+     * @param username
+     * @param fileNames
+     * @return Comparison result
+     */
     public ResultComparisonFileDTO compareAlgorithmResults(String username, String fileNames) {
         String workspaceDir = causalRestProperties.getWorkspaceDir();
         String resultsFolder = causalRestProperties.getResultsFolder();
