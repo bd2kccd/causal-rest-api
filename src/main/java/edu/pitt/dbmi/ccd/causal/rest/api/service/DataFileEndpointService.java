@@ -36,6 +36,7 @@ import edu.pitt.dbmi.ccd.db.entity.DataFileInfo;
 import edu.pitt.dbmi.ccd.db.entity.FileDelimiter;
 import edu.pitt.dbmi.ccd.db.entity.UserAccount;
 import edu.pitt.dbmi.ccd.db.entity.VariableType;
+import edu.pitt.dbmi.ccd.db.service.DataFileService;
 import edu.pitt.dbmi.ccd.db.service.FileDelimiterService;
 import edu.pitt.dbmi.ccd.db.service.UserAccountService;
 import edu.pitt.dbmi.ccd.db.service.VariableTypeService;
@@ -80,15 +81,24 @@ public class DataFileEndpointService {
 
     private final DataFileRestService dataFileRestService;
 
+    private final DataFileService dataFileService;
+
     private final VariableTypeService variableTypeService;
 
     private final FileDelimiterService fileDelimiterService;
 
     @Autowired
-    public DataFileEndpointService(CausalRestProperties causalRestProperties, UserAccountService userAccountService, DataFileRestService dataFileRestService, VariableTypeService variableTypeService, FileDelimiterService fileDelimiterService) {
+    public DataFileEndpointService(
+            CausalRestProperties causalRestProperties,
+            UserAccountService userAccountService,
+            DataFileRestService dataFileRestService,
+            DataFileService dataFileService,
+            VariableTypeService variableTypeService,
+            FileDelimiterService fileDelimiterService) {
         this.causalRestProperties = causalRestProperties;
         this.userAccountService = userAccountService;
         this.dataFileRestService = dataFileRestService;
+        this.dataFileService = dataFileService;
         this.variableTypeService = variableTypeService;
         this.fileDelimiterService = fileDelimiterService;
     }
@@ -276,7 +286,7 @@ public class DataFileEndpointService {
         long lastModifiedTime = fileInfo.getLastModifiedTime();
 
         // Let's check if a file with the same fileName has already been there
-        DataFile dataFile = dataFileRestService.findByAbsolutePathAndName(directory, fileName);
+        DataFile dataFile = dataFileService.findByAbsolutePathAndName(directory, fileName);
 
         if (dataFile == null) {
             dataFile = new DataFile();

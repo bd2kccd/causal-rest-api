@@ -18,11 +18,12 @@
  */
 package edu.pitt.dbmi.ccd.causal.rest.api.service.db;
 
-import edu.pitt.dbmi.ccd.causal.rest.api.repository.DataFileInfoRestRepository;
 import edu.pitt.dbmi.ccd.causal.rest.api.repository.DataFileRestRepository;
 import edu.pitt.dbmi.ccd.db.entity.DataFile;
 import edu.pitt.dbmi.ccd.db.entity.DataFileInfo;
 import edu.pitt.dbmi.ccd.db.entity.UserAccount;
+import edu.pitt.dbmi.ccd.db.repository.DataFileInfoRepository;
+import edu.pitt.dbmi.ccd.db.repository.DataFileRepository;
 import java.util.Collections;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,12 +42,18 @@ public class DataFileRestService {
 
     private final DataFileRestRepository dataFileRestRepository;
 
-    private final DataFileInfoRestRepository dataFileInfoRestRepository;
+    private final DataFileRepository dataFileRepository;
+
+    private final DataFileInfoRepository dataFileInfoRepository;
 
     @Autowired
-    public DataFileRestService(DataFileRestRepository dataFileRestRepository, DataFileInfoRestRepository dataFileInfoRestRepository) {
+    public DataFileRestService(
+            DataFileRestRepository dataFileRestRepository,
+            DataFileRepository dataFileRepository,
+            DataFileInfoRepository dataFileInfoRepository) {
         this.dataFileRestRepository = dataFileRestRepository;
-        this.dataFileInfoRestRepository = dataFileInfoRestRepository;
+        this.dataFileRepository = dataFileRepository;
+        this.dataFileInfoRepository = dataFileInfoRepository;
     }
 
     public DataFile findByIdAndUserAccount(Long id, UserAccount userAccount) {
@@ -61,21 +68,21 @@ public class DataFileRestService {
         DataFileInfo dataFileInfo = dataFile.getDataFileInfo();
         if (dataFileInfo != null) {
             // Delete record from `data_file_info` table
-            dataFileInfoRestRepository.delete(dataFileInfo);
+            dataFileInfoRepository.delete(dataFileInfo);
         }
 
         // Delete record from `data_file` table
         dataFileRestRepository.delete(dataFile);
     }
-    
+
     public DataFile findByAbsolutePathAndName(String absolutePath, String name) {
-        return dataFileRestRepository.findByAbsolutePathAndName(absolutePath, name);
+        return dataFileRepository.findByAbsolutePathAndName(absolutePath, name);
     }
-    
+
     public DataFile saveDataFile(DataFile dataFile) {
         DataFileInfo dataFileInfo = dataFile.getDataFileInfo();
         if (dataFileInfo != null) {
-            dataFileInfoRestRepository.save(dataFileInfo);
+            dataFileInfoRepository.save(dataFileInfo);
         }
 
         return dataFileRestRepository.save(dataFile);
