@@ -18,7 +18,7 @@
  */
 package edu.pitt.dbmi.ccd.causal.rest.api.service;
 
-import edu.pitt.dbmi.ccd.causal.rest.api.dto.AlgorithmResultDTO;
+import edu.pitt.dbmi.ccd.causal.rest.api.dto.ResultFileDTO;
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.ResultComparison;
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.ResultComparisonData;
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.ResultComparisonFileDTO;
@@ -52,14 +52,14 @@ import org.springframework.stereotype.Service;
  * @author Zhou Yuan (zhy19@pitt.edu)
  */
 @Service
-public class AlgorithmResultEndpointService {
+public class ResultFileEndpointService {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(AlgorithmResultEndpointService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ResultFileEndpointService.class);
 
     private final CausalRestProperties causalRestProperties;
 
     @Autowired
-    public AlgorithmResultEndpointService(CausalRestProperties causalRestProperties) {
+    public ResultFileEndpointService(CausalRestProperties causalRestProperties) {
         this.causalRestProperties = causalRestProperties;
     }
 
@@ -70,25 +70,25 @@ public class AlgorithmResultEndpointService {
      * @return A list of result files
      * @throws IOException
      */
-    public List<AlgorithmResultDTO> listAlgorithmResults(String username) throws IOException {
+    public List<ResultFileDTO> listAlgorithmResults(String username) throws IOException {
         String workspaceDir = causalRestProperties.getWorkspaceDir();
         String resultsFolder = causalRestProperties.getResultsFolder();
         String algorithmFolder = causalRestProperties.getAlgorithmFolder();
         Path algorithmDir = Paths.get(workspaceDir, username, resultsFolder, algorithmFolder);
 
-        List<AlgorithmResultDTO> algorithmResultDTOs = new LinkedList<>();
+        List<ResultFileDTO> algorithmResultDTOs = new LinkedList<>();
 
         List<Path> algorithmResultFiles = FileInfos.listDirectory(algorithmDir, false);
 
         for (Path algorithmResultFile : algorithmResultFiles) {
             // Create DTO for each file
-            AlgorithmResultDTO algorithmResultDTO = new AlgorithmResultDTO();
+            ResultFileDTO algorithmResultDTO = new ResultFileDTO();
             // Get file information of each path
             BasicFileInfo fileInfo = FileInfos.basicPathInfo(algorithmResultFile);
 
             // In ccd-commons, BasicFileInfo.getCreationTime() and BasicFileInfo.getLastModifiedTime()
             // return long type instead of Date, that's why we defined creationTime and lastModifiedTime as long
-            // in AlgorithmResultDTO.java
+            // in ResultFileDTO.java
             algorithmResultDTO.setCreationTime(fileInfo.getCreationTime());
             algorithmResultDTO.setFileSize(fileInfo.getSize());
             algorithmResultDTO.setLastModifiedTime(fileInfo.getLastModifiedTime());
@@ -129,25 +129,25 @@ public class AlgorithmResultEndpointService {
      * @return A list of result comparison files
      * @throws IOException
      */
-    public List<AlgorithmResultDTO> listAlgorithmResultComparisons(String username) throws IOException {
+    public List<ResultFileDTO> listAlgorithmResultComparisons(String username) throws IOException {
         String workspaceDir = causalRestProperties.getWorkspaceDir();
         String resultsFolder = causalRestProperties.getResultsFolder();
         String comparisonFolder = causalRestProperties.getComparisonFolder();
         Path comparisonDir = Paths.get(workspaceDir, username, resultsFolder, comparisonFolder);
 
-        List<AlgorithmResultDTO> algorithmResultDTOs = new LinkedList<>();
+        List<ResultFileDTO> algorithmResultDTOs = new LinkedList<>();
 
         List<Path> comparisonFiles = FileInfos.listDirectory(comparisonDir, false);
 
         for (Path comparisonFile : comparisonFiles) {
             // Create DTO for each file
-            AlgorithmResultDTO algorithmResultDTO = new AlgorithmResultDTO();
+            ResultFileDTO algorithmResultDTO = new ResultFileDTO();
             // Get file information of each path
             BasicFileInfo fileInfo = FileInfos.basicPathInfo(comparisonFile);
 
             // In ccd-commons, BasicFileInfo.getCreationTime() and BasicFileInfo.getLastModifiedTime()
             // return long type instead of Date, that's why we defined creationTime and lastModifiedTime as long
-            // in AlgorithmResultDTO.java
+            // in ResultFileDTO.java
             algorithmResultDTO.setCreationTime(fileInfo.getCreationTime());
             algorithmResultDTO.setFileSize(fileInfo.getSize());
             algorithmResultDTO.setLastModifiedTime(fileInfo.getLastModifiedTime());

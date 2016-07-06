@@ -29,7 +29,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  */
 @XmlRootElement(name = "AlgorithmResult")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class AlgorithmResultDTO {
+public class ResultFileDTO {
     @XmlElement
     private String name;
 
@@ -48,7 +48,7 @@ public class AlgorithmResultDTO {
     @XmlElement
     private long fileSize;
     
-    public AlgorithmResultDTO() {
+    public ResultFileDTO() {
     }
     
     public String getName() {

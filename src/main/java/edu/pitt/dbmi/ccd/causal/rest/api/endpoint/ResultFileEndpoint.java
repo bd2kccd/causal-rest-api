@@ -19,9 +19,9 @@
 package edu.pitt.dbmi.ccd.causal.rest.api.endpoint;
 
 import edu.pitt.dbmi.ccd.causal.rest.api.Role;
-import edu.pitt.dbmi.ccd.causal.rest.api.dto.AlgorithmResultDTO;
+import edu.pitt.dbmi.ccd.causal.rest.api.dto.ResultFileDTO;
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.ResultComparisonFileDTO;
-import edu.pitt.dbmi.ccd.causal.rest.api.service.AlgorithmResultEndpointService;
+import edu.pitt.dbmi.ccd.causal.rest.api.service.ResultFileEndpointService;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
@@ -45,12 +45,12 @@ import org.springframework.stereotype.Component;
 @Component
 @PermitAll
 @Path("/{username}/results")
-public class AlgorithmResultEndpoint {
+public class ResultFileEndpoint {
 
-    private final AlgorithmResultEndpointService algorithmResultEndpointService;
+    private final ResultFileEndpointService algorithmResultEndpointService;
 
     @Autowired
-    public AlgorithmResultEndpoint(AlgorithmResultEndpointService algorithmResultEndpointService) {
+    public ResultFileEndpoint(ResultFileEndpointService algorithmResultEndpointService) {
         this.algorithmResultEndpointService = algorithmResultEndpointService;
     }
 
@@ -65,8 +65,8 @@ public class AlgorithmResultEndpoint {
     @Produces({APPLICATION_JSON, APPLICATION_XML})
     @RolesAllowed(Role.USER)
     public Response listAlgorithmResultFiles(@PathParam("username") String username) throws IOException {
-        List<AlgorithmResultDTO> algorithmResultDTOs = algorithmResultEndpointService.listAlgorithmResults(username);
-        GenericEntity<List<AlgorithmResultDTO>> entity = new GenericEntity<List<AlgorithmResultDTO>>(algorithmResultDTOs) {
+        List<ResultFileDTO> algorithmResultDTOs = algorithmResultEndpointService.listAlgorithmResults(username);
+        GenericEntity<List<ResultFileDTO>> entity = new GenericEntity<List<ResultFileDTO>>(algorithmResultDTOs) {
         };
 
         return Response.ok(entity).build();
@@ -103,8 +103,8 @@ public class AlgorithmResultEndpoint {
     @Produces({APPLICATION_JSON, APPLICATION_XML})
     @RolesAllowed(Role.USER)
     public Response listAlgorithmResultComparisonFiles(@PathParam("username") String username) throws IOException {
-        List<AlgorithmResultDTO> algorithmResultDTOs = algorithmResultEndpointService.listAlgorithmResultComparisons(username);
-        GenericEntity<List<AlgorithmResultDTO>> entity = new GenericEntity<List<AlgorithmResultDTO>>(algorithmResultDTOs) {
+        List<ResultFileDTO> algorithmResultDTOs = algorithmResultEndpointService.listAlgorithmResultComparisons(username);
+        GenericEntity<List<ResultFileDTO>> entity = new GenericEntity<List<ResultFileDTO>>(algorithmResultDTOs) {
         };
 
         return Response.ok(entity).build();
