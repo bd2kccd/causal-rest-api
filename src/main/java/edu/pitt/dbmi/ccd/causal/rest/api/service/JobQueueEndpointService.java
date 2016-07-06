@@ -63,6 +63,13 @@ public class JobQueueEndpointService {
         this.jobQueueInfoService = jobQueueInfoService;
     }
 
+    /**
+     * Add a new job to the job queue and run the algorithm
+     *
+     * @param username
+     * @param newJob
+     * @return Job ID
+     */
     public Long addNewJob(String username, NewJob newJob) {
         // Right now, we only support "fgsc" and "fgsd"
         String algorithm = newJob.getAlgorithm();
@@ -112,7 +119,7 @@ public class JobQueueEndpointService {
             Path dataPath = Paths.get(workspaceDir, username, dataFolder, dataFile.getName());
             datasetPath.add(dataPath.toAbsolutePath().toString());
         });
-        String datasetList = listToSeperatedValues(datasetPath, ",");
+        String datasetList = listToSeparatedValues(datasetPath, ",");
         commands.add("--data");
         commands.add(datasetList);
 
@@ -141,7 +148,7 @@ public class JobQueueEndpointService {
         // Then separate those commands with ; and store the whole string into database
         // ccd-job-queue will assemble the command line again at
         // https://github.com/bd2kccd/ccd-job-queue/blob/master/src/main/java/edu/pitt/dbmi/ccd/queue/service/AlgorithmQueueService.java#L79
-        String cmd = listToSeperatedValues(commands, ";");
+        String cmd = listToSeparatedValues(commands, ";");
 
         // Insert to database table `job_queue_info`
         JobQueueInfo jobQueueInfo = new JobQueueInfo();
@@ -159,21 +166,33 @@ public class JobQueueEndpointService {
         return jobQueueInfo.getId();
     }
 
+    /**
+     * Record added to table `job_queue_info` when new job added and the record
+     * will be gone once the job is done
+     *
+     * @param username
+     * @param id
+     * @return The job status ("Pending" or "Completed")
+     */
     public String checkJobStatus(String username, Long id) {
         JobQueueInfo jobQueueInfo = jobQueueInfoService.findOne(id);
 
-        int jobStatus = jobQueueInfo.getStatus();
-
-        // Once job is completed, the database record will be gone
-        // so jobStatus can be null by then
-        if (jobStatus == 1) {
-            return "Pending";
-        } else {
+        if (jobQueueInfo == null) {
             return "Completed";
         }
+
+        // As long as there's database record, the job is pending
+        return "Pending";
     }
 
-    public String listToSeperatedValues(List<String> list, String delimiter) {
+    /**
+     * Convert a string list into a delimiter separated string
+     *
+     * @param list
+     * @param delimiter
+     * @return A delimiter separated string
+     */
+    private String listToSeparatedValues(List<String> list, String delimiter) {
         StringBuilder sb = new StringBuilder();
         list.forEach(item -> {
             sb.append(item);
