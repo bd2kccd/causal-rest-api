@@ -508,7 +508,31 @@ CDH3,diag	0	0
 SERPINI2,FGG	0	0
 ````
 
-## Example 12: Add a new job to run the desired algorithm on a given data file
+## Example 12: List all the available causal discovery algorithms
+
+````
+GET /causal/api/v1/zhy19/algorithms HTTP/1.1
+Host: localhost:9000
+Authorization: Basic emh5MTk6MTIzNDU2
+````
+Currently we support "FGS continuous" and "FGS discrete".
+
+````
+[
+  {
+    "id": 1,
+    "name": "fgs",
+    "description": "FGS continuous"
+  },
+  {
+    "id": 2,
+    "name": "fgs-discrete",
+    "description": "FGS discrete"
+  }
+]
+````
+
+## Example 13: Add a new job to run the desired algorithm on a given data file
 
 ````
 POST /causal/api/v1/zhy19/jobs HTTP/1.1
@@ -518,9 +542,9 @@ Authorization: Basic emh5MTk6MTIzNDU2
 algorithm=fgs&dataFileIdList=11
 ````
 
-In this example, we are running the FGS algorithm on the file with ID 11. And this call will result the job ID 6 with a 201 Created response status code.
+In this example, we are running the "FGS continuous" algorithm on the file with ID 11. And this call will result the job ID 6 with a 201 Created response status code.
 
-## Example 13: Check the job status
+## Example 14: Check the job status
 
 Once the new job is submitted, it takes time and resources to run the algorithm on the server. During the waiting, you can check the status of a given job ID:
 
