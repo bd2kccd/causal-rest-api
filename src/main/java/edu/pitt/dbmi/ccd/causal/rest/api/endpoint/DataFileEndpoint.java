@@ -72,7 +72,7 @@ public class DataFileEndpoint {
      *
      * @param username
      * @param id
-     * @return 204
+     * @return 204 No content
      */
     @DELETE
     @Path("/{id}")

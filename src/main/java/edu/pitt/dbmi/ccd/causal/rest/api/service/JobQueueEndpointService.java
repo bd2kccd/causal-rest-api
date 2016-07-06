@@ -170,14 +170,13 @@ public class JobQueueEndpointService {
      * Record added to table `job_queue_info` when new job added and the record
      * will be gone once the job is done
      *
-     * @param username
      * @param id
-     * @return The job status ("Pending" or "Completed")
+     * @return true on completed or false on running
      */
-    public String checkJobStatus(String username, Long id) {
+    public boolean checkJobStatus(Long id) {
         JobQueueInfo jobQueueInfo = jobQueueInfoService.findOne(id);
         // As long as there's database record, the job is pending
-        return (jobQueueInfo == null) ? "Completed" : "Pending";
+        return (jobQueueInfo == null);
     }
 
     /**

@@ -69,7 +69,6 @@ public class JobQueueEndpoint {
     /**
      * Checking job status for a given job ID
      *
-     * @param username
      * @param id
      * @return 200 OK status code with job status ("Pending" or "Completed")
      * @throws IOException
@@ -77,8 +76,14 @@ public class JobQueueEndpoint {
     @GET
     @Path("/{id}")
     @RolesAllowed(Role.USER)
-    public Response jobStatus(@PathParam("username") String username, @PathParam("id") Long id) throws IOException {
-        String jobStatus = jobQueueEndpointService.checkJobStatus(username, id);
-        return Response.ok(jobStatus).build();
+    public Response jobStatus(@PathParam("id") Long id) throws IOException {
+        boolean completed = jobQueueEndpointService.checkJobStatus(id);
+
+        if (completed) {
+            return Response.ok("Job " + id + " has been completed.").build();
+        } else {
+            return Response.ok("Job " + id + " is still running.").build();
+        }
     }
+
 }
