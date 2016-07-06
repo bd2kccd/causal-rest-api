@@ -27,7 +27,6 @@ import edu.pitt.dbmi.ccd.causal.rest.api.exception.InternalErrorException;
 import edu.pitt.dbmi.ccd.causal.rest.api.exception.NotFoundByIdException;
 import edu.pitt.dbmi.ccd.causal.rest.api.exception.UserNotFoundException;
 import edu.pitt.dbmi.ccd.causal.rest.api.prop.CausalRestProperties;
-import edu.pitt.dbmi.ccd.causal.rest.api.service.db.DataFileRestService;
 import edu.pitt.dbmi.ccd.commons.file.MessageDigestHash;
 import edu.pitt.dbmi.ccd.commons.file.info.BasicFileInfo;
 import edu.pitt.dbmi.ccd.commons.file.info.FileInfos;
@@ -79,8 +78,6 @@ public class DataFileEndpointService {
 
     private final UserAccountService userAccountService;
 
-    private final DataFileRestService dataFileRestService;
-
     private final DataFileService dataFileService;
 
     private final VariableTypeService variableTypeService;
@@ -91,13 +88,11 @@ public class DataFileEndpointService {
     public DataFileEndpointService(
             CausalRestProperties causalRestProperties,
             UserAccountService userAccountService,
-            DataFileRestService dataFileRestService,
             DataFileService dataFileService,
             VariableTypeService variableTypeService,
             FileDelimiterService fileDelimiterService) {
         this.causalRestProperties = causalRestProperties;
         this.userAccountService = userAccountService;
-        this.dataFileRestService = dataFileRestService;
         this.dataFileService = dataFileService;
         this.variableTypeService = variableTypeService;
         this.fileDelimiterService = fileDelimiterService;
@@ -115,14 +110,14 @@ public class DataFileEndpointService {
             throw new UserNotFoundException(username);
         }
 
-        DataFile dataFile = dataFileRestService.findByIdAndUserAccount(id, userAccount);
+        DataFile dataFile = dataFileService.findByIdAndUserAccount(id, userAccount);
         if (dataFile == null) {
             throw new NotFoundByIdException(id);
         }
 
         try {
             // Delete records from data_file_info table and data_file table
-            dataFileRestService.delete(dataFile);
+            dataFileService.deleteDataFile(dataFile);
             // Delete the physical file from workspace folder
             Files.deleteIfExists(Paths.get(dataFile.getAbsolutePath(), dataFile.getName()));
         } catch (Exception exception) {
@@ -145,7 +140,7 @@ public class DataFileEndpointService {
             throw new UserNotFoundException(username);
         }
 
-        DataFile dataFile = dataFileRestService.findByIdAndUserAccount(id, userAccount);
+        DataFile dataFile = dataFileService.findByIdAndUserAccount(id, userAccount);
         if (dataFile == null) {
             throw new NotFoundByIdException(id);
         }
@@ -200,7 +195,7 @@ public class DataFileEndpointService {
             throw new UserNotFoundException(username);
         }
 
-        List<DataFile> dataFiles = dataFileRestService.findByUserAccount(userAccount);
+        List<DataFile> dataFiles = dataFileService.findByUserAccount(userAccount);
         dataFiles.forEach(dataFile -> {
             DataFileDTO dataFileDTO = new DataFileDTO();
 
@@ -316,7 +311,7 @@ public class DataFileEndpointService {
 
         // Now add new records into database
         dataFile.setDataFileInfo(dataFileInfo);
-        dataFileRestService.saveDataFile(dataFile);
+        dataFileService.saveDataFile(dataFile);
 
         // Create DTO to be used for HTTP response
         DataFileDTO dataFileDTO = new DataFileDTO();
@@ -324,7 +319,7 @@ public class DataFileEndpointService {
         // We should get the data from database since the new record has an ID
         // that can be used for later API calls
         // All other info can be obtained solely based on the file system but no ID
-        DataFile newDataFile = dataFileRestService.findByAbsolutePathAndName(directory, fileName);
+        DataFile newDataFile = dataFileService.findByAbsolutePathAndName(directory, fileName);
 
         DataFileSummaryDTO dataFileSummaryDTO = new DataFileSummaryDTO();
 
@@ -464,7 +459,7 @@ public class DataFileEndpointService {
         long creationTime = fileInfo.getCreationTime();
         long lastModifiedTime = fileInfo.getLastModifiedTime();
 
-        DataFile dataFile = dataFileRestService.findByAbsolutePathAndName(directory, fileName);
+        DataFile dataFile = dataFileService.findByAbsolutePathAndName(directory, fileName);
         if (dataFile == null) {
             dataFile = new DataFile();
             dataFile.setUserAccounts(Collections.singleton(userAccount));
@@ -487,7 +482,7 @@ public class DataFileEndpointService {
         dataFileInfo.setVariableType(null);
 
         dataFile.setDataFileInfo(dataFileInfo);
-        dataFileRestService.saveDataFile(dataFile);
+        dataFileService.saveDataFile(dataFile);
 
         return md5checkSum;
     }
@@ -572,7 +567,7 @@ public class DataFileEndpointService {
             throw new UserNotFoundException(username);
         }
 
-        DataFile dataFile = dataFileRestService.findByIdAndUserAccount(id, userAccount);
+        DataFile dataFile = dataFileService.findByIdAndUserAccount(id, userAccount);
         if (dataFile == null) {
             throw new NotFoundByIdException(id);
         }
@@ -599,7 +594,7 @@ public class DataFileEndpointService {
         dataFile.setDataFileInfo(dataFileInfo);
 
         // Update record in database table `data_file_info`
-        dataFileRestService.saveDataFile(dataFile);
+        dataFileService.saveDataFile(dataFile);
 
         // Create DTO to be used for HTTP response
         DataFileDTO dataFileDTO = new DataFileDTO();

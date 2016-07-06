@@ -21,10 +21,10 @@ package edu.pitt.dbmi.ccd.causal.rest.api.service;
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.NewJob;
 import edu.pitt.dbmi.ccd.causal.rest.api.exception.UserNotFoundException;
 import edu.pitt.dbmi.ccd.causal.rest.api.prop.CausalRestProperties;
-import edu.pitt.dbmi.ccd.causal.rest.api.service.db.DataFileRestService;
 import edu.pitt.dbmi.ccd.db.entity.DataFile;
 import edu.pitt.dbmi.ccd.db.entity.JobQueueInfo;
 import edu.pitt.dbmi.ccd.db.entity.UserAccount;
+import edu.pitt.dbmi.ccd.db.service.DataFileService;
 import edu.pitt.dbmi.ccd.db.service.JobQueueInfoService;
 import edu.pitt.dbmi.ccd.db.service.UserAccountService;
 import java.nio.file.Path;
@@ -47,7 +47,7 @@ public class JobQueueEndpointService {
 
     private final UserAccountService userAccountService;
 
-    private final DataFileRestService dataFileRestService;
+    private final DataFileService dataFileService;
 
     private final JobQueueInfoService jobQueueInfoService;
 
@@ -55,11 +55,11 @@ public class JobQueueEndpointService {
     public JobQueueEndpointService(
             CausalRestProperties causalRestProperties,
             UserAccountService userAccountService,
-            DataFileRestService dataFileRestService,
+            DataFileService dataFileService,
             JobQueueInfoService jobQueueInfoService) {
         this.causalRestProperties = causalRestProperties;
         this.userAccountService = userAccountService;
-        this.dataFileRestService = dataFileRestService;
+        this.dataFileService = dataFileService;
         this.jobQueueInfoService = jobQueueInfoService;
     }
 
@@ -115,7 +115,7 @@ public class JobQueueEndpointService {
         List<String> datasetPath = new LinkedList<>();
         dataFileIdList.forEach(dataFileId -> {
             // Get data file name by file id
-            DataFile dataFile = dataFileRestService.findByIdAndUserAccount(dataFileId, userAccount);
+            DataFile dataFile = dataFileService.findByIdAndUserAccount(dataFileId, userAccount);
             Path dataPath = Paths.get(workspaceDir, username, dataFolder, dataFile.getName());
             datasetPath.add(dataPath.toAbsolutePath().toString());
         });
@@ -138,7 +138,7 @@ public class JobQueueEndpointService {
             fileName = String.format("%s_%s_%d", algorithm, "multi-dataset", currentTime);
         } else {
             Long id = dataFileIdList.get(0);
-            DataFile df = dataFileRestService.findByIdAndUserAccount(id, userAccount);
+            DataFile df = dataFileService.findByIdAndUserAccount(id, userAccount);
             fileName = String.format("%s_%s_%d", algorithm, df.getName(), currentTime);
         }
 

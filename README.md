@@ -15,12 +15,12 @@ git checkout tags/v0.3.1
 mvn clean install
 ````
 
-You'll also need to download [ccd-db-0.6.1](https://github.com/bd2kccd/ccd-db) branch:
+You'll also need to download [ccd-db-0.6.2](https://github.com/bd2kccd/ccd-db) branch:
 
 ````
 git clone https://github.com/bd2kccd/ccd-db.git
 cd ccd-db
-git checkout v0.6.1
+git checkout v0.6.2
 mvn clean install
 ````
 
