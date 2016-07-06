@@ -105,7 +105,7 @@ public class AlgorithmResultEndpointService {
      *
      * @param username
      * @param fileName
-     * @return
+     * @return The algorithm result file
      */
     public File getAlgorithmResultFile(String username, String fileName) {
         String workspaceDir = causalRestProperties.getWorkspaceDir();
@@ -114,6 +114,65 @@ public class AlgorithmResultEndpointService {
         Path resultFile = Paths.get(workspaceDir, username, resultsFolder, algorithmFolder, fileName);
 
         File file = new File(resultFile.toString());
+
+        if (file.exists() && !file.isDirectory()) {
+            return file;
+        } else {
+            throw new ResourceNotFoundException();
+        }
+    }
+
+    /**
+     * List all the algorithm results comparison files for a given user
+     *
+     * @param username
+     * @return A list of result comparison files
+     * @throws IOException
+     */
+    public List<AlgorithmResultDTO> listAlgorithmResultComparisons(String username) throws IOException {
+        String workspaceDir = causalRestProperties.getWorkspaceDir();
+        String resultsFolder = causalRestProperties.getResultsFolder();
+        String comparisonFolder = causalRestProperties.getComparisonFolder();
+        Path comparisonDir = Paths.get(workspaceDir, username, resultsFolder, comparisonFolder);
+
+        List<AlgorithmResultDTO> algorithmResultDTOs = new LinkedList<>();
+
+        List<Path> comparisonFiles = FileInfos.listDirectory(comparisonDir, false);
+
+        for (Path comparisonFile : comparisonFiles) {
+            // Create DTO for each file
+            AlgorithmResultDTO algorithmResultDTO = new AlgorithmResultDTO();
+            // Get file information of each path
+            BasicFileInfo fileInfo = FileInfos.basicPathInfo(comparisonFile);
+
+            // In ccd-commons, BasicFileInfo.getCreationTime() and BasicFileInfo.getLastModifiedTime()
+            // return long type instead of Date, that's why we defined creationTime and lastModifiedTime as long
+            // in AlgorithmResultDTO.java
+            algorithmResultDTO.setCreationTime(fileInfo.getCreationTime());
+            algorithmResultDTO.setFileSize(fileInfo.getSize());
+            algorithmResultDTO.setLastModifiedTime(fileInfo.getLastModifiedTime());
+            algorithmResultDTO.setName(fileInfo.getFilename());
+
+            algorithmResultDTOs.add(algorithmResultDTO);
+        }
+
+        return algorithmResultDTOs;
+    }
+
+    /**
+     * Get the result comparison file content based on user and the file name
+     *
+     * @param username
+     * @param fileName
+     * @return The comparison file
+     */
+    public File getAlgorithmResultsComparisonFile(String username, String fileName) {
+        String workspaceDir = causalRestProperties.getWorkspaceDir();
+        String resultsFolder = causalRestProperties.getResultsFolder();
+        String comparisonFolder = causalRestProperties.getComparisonFolder();
+        Path comparisonFile = Paths.get(workspaceDir, username, resultsFolder, comparisonFolder, fileName);
+
+        File file = new File(comparisonFile.toString());
 
         if (file.exists() && !file.isDirectory()) {
             return file;

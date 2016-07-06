@@ -44,7 +44,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @PermitAll
-@Path("/usr/{username}/results")
+@Path("/{username}/results")
 public class AlgorithmResultEndpoint {
 
     private final AlgorithmResultEndpointService algorithmResultEndpointService;
@@ -73,7 +73,7 @@ public class AlgorithmResultEndpoint {
     }
 
     /**
-     * Download the content of a result file for a given ID
+     * Download the content of a result file for a given file name
      *
      * @param username
      * @param fileName
@@ -85,6 +85,44 @@ public class AlgorithmResultEndpoint {
     @RolesAllowed(Role.USER)
     public Response downloadAlgorithmResultFile(@PathParam("username") String username, @PathParam("fileName") String fileName) throws IOException {
         File file = algorithmResultEndpointService.getAlgorithmResultFile(username, fileName);
+
+        return Response.ok(file)
+                .header("Content-Disposition", "attachment; filename=" + fileName)
+                .build();
+    }
+
+    /**
+     * List all the comparison files
+     *
+     * @param username
+     * @return
+     * @throws IOException
+     */
+    @GET
+    @Path("/comparisons")
+    @Produces({APPLICATION_JSON, APPLICATION_XML})
+    @RolesAllowed(Role.USER)
+    public Response listAlgorithmResultComparisonFiles(@PathParam("username") String username) throws IOException {
+        List<AlgorithmResultDTO> algorithmResultDTOs = algorithmResultEndpointService.listAlgorithmResultComparisons(username);
+        GenericEntity<List<AlgorithmResultDTO>> entity = new GenericEntity<List<AlgorithmResultDTO>>(algorithmResultDTOs) {
+        };
+
+        return Response.ok(entity).build();
+    }
+
+    /**
+     * Download the content of a results comparison file for a given file name
+     *
+     * @param username
+     * @param fileName
+     * @return Plain text file content
+     * @throws IOException
+     */
+    @GET
+    @Path("/comparisons/{fileName}")
+    @RolesAllowed(Role.USER)
+    public Response downloadAlgorithmResultsComparisonFile(@PathParam("username") String username, @PathParam("fileName") String fileName) throws IOException {
+        File file = algorithmResultEndpointService.getAlgorithmResultsComparisonFile(username, fileName);
 
         return Response.ok(file)
                 .header("Content-Disposition", "attachment; filename=" + fileName)
