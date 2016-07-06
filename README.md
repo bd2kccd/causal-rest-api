@@ -507,3 +507,27 @@ SCRG1,hsa_miR_377	0	0
 CDH3,diag	0	0
 SERPINI2,FGG	0	0
 ````
+
+## Example 12: Add a new job to run the desired algorithm on a given data file
+
+````
+POST /causal/api/v1/zhy19/jobs HTTP/1.1
+Host: localhost:9000
+Authorization: Basic emh5MTk6MTIzNDU2
+
+algorithm=fgs&dataFileIdList=11
+````
+
+In this example, we are running the FGS algorithm on the file with ID 11. And this call will result the job ID 6 with a 201 Created response status code.
+
+## Example 13: Check the job status
+
+Once the new job is submitted, it takes time and resources to run the algorithm on the server. During the waiting, you can check the status of a given job ID:
+
+````
+GET /causal/api/v1/zhy19/jobs/6 HTTP/1.1
+Host: localhost:9000
+Authorization: Basic emh5MTk6MTIzNDU2
+````
+
+This will either return "Pending" or "Completed".
