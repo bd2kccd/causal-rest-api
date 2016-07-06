@@ -24,6 +24,15 @@ git checkout v0.6.1
 mvn clean install
 ````
 
+And the last piece is [ccd-job-queue-0.1.4](https://github.com/bd2kccd/ccd-job-queue)
+
+````
+git clone https://github.com/bd2kccd/ccd-job-queue.git
+cd ccd-job-queue
+git checkout tags/v0.1.4
+mvn clean install
+````
+
 Then you can go get and install `causal-rest-api`:
 
 ````
