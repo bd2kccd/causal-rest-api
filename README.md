@@ -68,6 +68,123 @@ Since this API is developed with Jersey, which supports [WADL](https://en.wikipe
 
 ### Data Management
 
+#### Upload small data file
+
+This is a multipart file upload, and the client is required to use `name="file"` to name their file upload field in their form.
+
+````
+POST /causal/api/v1/zhy19/data/upload HTTP/1.1
+Host: localhost:9000
+Authorization: Basic emh5MTk6MTIzNDU2
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+
+----WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="file"; filename=""
+Content-Type: 
+
+
+----WebKitFormBoundary7MA4YWxkTrZu0gW
+````
+
+If the Authorization header is not provided, the response will look like this:
+
+````
+{
+  "timestamp": 1465414501443,
+  "status": 401,
+  "error": "Unauthorized",
+  "message": "User credentials are required.",
+  "path": "/zhy19/dataupload"
+}
+````
+
+This POST request will upload the data file to the target server location and add corresponding records into database. And the response will contain the following pieces:
+
+````
+{
+  "id": 6,
+  "name": "Lung-tetrad_hv.txt",
+  "creationTime": 1466622267000,
+  "lastModifiedTime": 1466622267000,
+  "fileSize": 3309465,
+  "md5checkSum": "b1db7511ee293d297e3055d9a7b46c5e"
+}
+````
+
+#### Resumable data file upload
+
+In addition to the regular file upload described in Example 6, we also provide the option of stable and resumable large file upload. It requires the client side to have a resumable upload implementation. We currently support client integrated with R[esumable.js](http://resumablejs.com/), whihc provides multiple simultaneous, stable 
+and resumable uploads via the HTML5 File API.
+
+In this example, the data file is splited into 3 chunks. The upload of each chunk consists of a GET request and a POST request. 
+
+````
+GET /causal/api/v1/zhy19/data/chunkUpload?resumableChunkNumber=2&resumableChunkSize=1048576&resumableCurrentChunkSize=1048576&resumableTotalSize=3309465&resumableType=text%2Fplain&resumableIdentifier=3309465-large-datatxt&resumableFilename=large-data.txt&resumableRelativePath=large-data.txt&resumableTotalChunks=3 HTTP/1.1
+Host: localhost:9000
+Authorization: Basic emh5MTk6MTIzNDU2
+````
+
+This GET request checks if the data chunk is already on the server side. If nothing there, the client will issue another POST request to upload the actual data.
+
+````
+POST /causal/api/v1/zhy19/data/chunkUpload HTTP/1.1
+Host: localhost:9000
+Authorization: Basic emh5MTk6MTIzNDU2
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundaryMFjgApg56XGyeTnZ
+
+------WebKitFormBoundaryMFjgApg56XGyeTnZ
+Content-Disposition: form-data; name="resumableChunkNumber"
+
+2
+------WebKitFormBoundaryMFjgApg56XGyeTnZ
+Content-Disposition: form-data; name="resumableChunkSize"
+
+1048576
+------WebKitFormBoundaryMFjgApg56XGyeTnZ
+Content-Disposition: form-data; name="resumableCurrentChunkSize"
+
+1048576
+------WebKitFormBoundaryMFjgApg56XGyeTnZ
+Content-Disposition: form-data; name="resumableTotalSize"
+
+3309465
+------WebKitFormBoundaryMFjgApg56XGyeTnZ
+Content-Disposition: form-data; name="resumableType"
+
+text/plain
+------WebKitFormBoundaryMFjgApg56XGyeTnZ
+Content-Disposition: form-data; name="resumableIdentifier"
+
+3309465-large-datatxt
+------WebKitFormBoundaryMFjgApg56XGyeTnZ
+Content-Disposition: form-data; name="resumableFilename"
+
+large-data.txt
+------WebKitFormBoundaryMFjgApg56XGyeTnZ
+Content-Disposition: form-data; name="resumableRelativePath"
+
+large-data.txt
+------WebKitFormBoundaryMFjgApg56XGyeTnZ
+Content-Disposition: form-data; name="resumableTotalChunks"
+
+3
+------WebKitFormBoundaryMFjgApg56XGyeTnZ
+Content-Disposition: form-data; name="file"; filename="blob"
+Content-Type: application/octet-stream
+
+
+------WebKitFormBoundaryMFjgApg56XGyeTnZ--
+````
+
+Each chunk upload POST will get a 200 status code from response if everything works fine.
+
+
+And finally the md5checkSum string of the reassemabled file will be returned once the whole file has been uploaded successfully. In this example, the POST request that uploads the third chunk will response this:
+
+````
+b1db7511ee293d297e3055d9a7b46c5e
+````
+
 #### List all data files of a user
 
 ````
@@ -124,18 +241,6 @@ This `GET` request to the endpoint `http://localhost:9000/causal/api/v1/zhy19/da
     }
   }
 ]
-````
-
-If the Authorization header is not provided, the response will look like this:
-
-````
-{
-  "timestamp": 1465414501443,
-  "status": 401,
-  "error": "Unauthorized",
-  "message": "User credentials are required.",
-  "path": "/zhy19/data"
-}
 ````
 
 You can also specify the response format as XML in your request
@@ -237,110 +342,6 @@ Authorization: Basic emh5MTk6MTIzNDU2
 
 And this will result a HTTP 204 No Content status in response on success, which means the server successfully processed the deletion request but there's no content to response.
 
-## Upload small data file
-
-This is a multipart file upload, and the client is required to use `name="file"` to name their file upload field in their form.
-
-````
-POST /causal/api/v1/zhy19/data/upload HTTP/1.1
-Host: localhost:9000
-Authorization: Basic emh5MTk6MTIzNDU2
-Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
-
-----WebKitFormBoundary7MA4YWxkTrZu0gW
-Content-Disposition: form-data; name="file"; filename=""
-Content-Type: 
-
-
-----WebKitFormBoundary7MA4YWxkTrZu0gW
-````
-
-This POST request will upload the data file to the target server location and add corresponding records into database. And the response will contain the following pieces:
-
-````
-{
-  "id": 6,
-  "name": "Lung-tetrad_hv.txt",
-  "creationTime": 1466622267000,
-  "lastModifiedTime": 1466622267000,
-  "fileSize": 3309465,
-  "md5checkSum": "b1db7511ee293d297e3055d9a7b46c5e"
-}
-````
-
-## Resumable data file upload
-
-In addition to the regular file upload described in Example 6, we also provide the option of stable and resumable large file upload. It requires the client side to have a resumable upload implementation. We currently support client integrated with R[esumable.js](http://resumablejs.com/), whihc provides multiple simultaneous, stable 
-and resumable uploads via the HTML5 File API.
-
-In this example, the data file is splited into 3 chunks. The upload of each chunk consists of a GET request and a POST request. 
-
-````
-GET /causal/api/v1/zhy19/data/chunkUpload?resumableChunkNumber=2&resumableChunkSize=1048576&resumableCurrentChunkSize=1048576&resumableTotalSize=3309465&resumableType=text%2Fplain&resumableIdentifier=3309465-large-datatxt&resumableFilename=large-data.txt&resumableRelativePath=large-data.txt&resumableTotalChunks=3 HTTP/1.1
-Host: localhost:9000
-Authorization: Basic emh5MTk6MTIzNDU2
-````
-
-This GET request checks if the data chunk is already on the server side. If nothing there, the client will issue another POST request to upload the actual data.
-
-````
-POST /causal/api/v1/zhy19/data/chunkUpload HTTP/1.1
-Host: localhost:9000
-Authorization: Basic emh5MTk6MTIzNDU2
-Content-Type: multipart/form-data; boundary=----WebKitFormBoundaryMFjgApg56XGyeTnZ
-
-------WebKitFormBoundaryMFjgApg56XGyeTnZ
-Content-Disposition: form-data; name="resumableChunkNumber"
-
-2
-------WebKitFormBoundaryMFjgApg56XGyeTnZ
-Content-Disposition: form-data; name="resumableChunkSize"
-
-1048576
-------WebKitFormBoundaryMFjgApg56XGyeTnZ
-Content-Disposition: form-data; name="resumableCurrentChunkSize"
-
-1048576
-------WebKitFormBoundaryMFjgApg56XGyeTnZ
-Content-Disposition: form-data; name="resumableTotalSize"
-
-3309465
-------WebKitFormBoundaryMFjgApg56XGyeTnZ
-Content-Disposition: form-data; name="resumableType"
-
-text/plain
-------WebKitFormBoundaryMFjgApg56XGyeTnZ
-Content-Disposition: form-data; name="resumableIdentifier"
-
-3309465-large-datatxt
-------WebKitFormBoundaryMFjgApg56XGyeTnZ
-Content-Disposition: form-data; name="resumableFilename"
-
-large-data.txt
-------WebKitFormBoundaryMFjgApg56XGyeTnZ
-Content-Disposition: form-data; name="resumableRelativePath"
-
-large-data.txt
-------WebKitFormBoundaryMFjgApg56XGyeTnZ
-Content-Disposition: form-data; name="resumableTotalChunks"
-
-3
-------WebKitFormBoundaryMFjgApg56XGyeTnZ
-Content-Disposition: form-data; name="file"; filename="blob"
-Content-Type: application/octet-stream
-
-
-------WebKitFormBoundaryMFjgApg56XGyeTnZ--
-````
-
-Each chunk upload POST will get a 200 status code from response if everything works fine.
-
-
-And finally the md5checkSum string of the reassemabled file will be returned once the whole file has been uploaded successfully. In this example, the POST request that uploads the third chunk will response this:
-
-````
-b1db7511ee293d297e3055d9a7b46c5e
-````
 
 #### Summarize data file
 
