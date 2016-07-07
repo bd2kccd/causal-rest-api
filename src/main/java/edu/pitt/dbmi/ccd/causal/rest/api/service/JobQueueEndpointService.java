@@ -73,7 +73,7 @@ public class JobQueueEndpointService {
     public Long addNewJob(String username, NewJob newJob) {
         // Right now, we only support "fgsc" and "fgsd"
         String algorithm = newJob.getAlgorithm();
-        List<Long> dataFileIdList = newJob.getDataFileIdList();
+        Long[] dataFileIdList = newJob.getDataFileIdList();
         // Not implimenting prior knowledge in API
         List<String> jvmOptions = newJob.getJvmOptions();
         List<String> parameters = newJob.getParameters();
@@ -113,12 +113,14 @@ public class JobQueueEndpointService {
 
         // Add dataset
         List<String> datasetPath = new LinkedList<>();
-        dataFileIdList.forEach(dataFileId -> {
+
+        for (Long dataFileId : dataFileIdList) {
             // Get data file name by file id
             DataFile dataFile = dataFileService.findByIdAndUserAccount(dataFileId, userAccount);
             Path dataPath = Paths.get(workspaceDir, username, dataFolder, dataFile.getName());
             datasetPath.add(dataPath.toAbsolutePath().toString());
-        });
+        }
+
         String datasetList = listToSeparatedValues(datasetPath, ",");
         commands.add("--data");
         commands.add(datasetList);
@@ -133,11 +135,11 @@ public class JobQueueEndpointService {
         // Algorithm result file name
         String fileName;
 
-        if (dataFileIdList.size() > 1) {
+        if (dataFileIdList.length > 1) {
             // FGS Image takes multi image files
             fileName = String.format("%s_%s_%d", algorithm, "multi-dataset", currentTime);
         } else {
-            Long id = dataFileIdList.get(0);
+            Long id = dataFileIdList[0];
             DataFile df = dataFileService.findByIdAndUserAccount(id, userAccount);
             fileName = String.format("%s_%s_%d", algorithm, df.getName(), currentTime);
         }

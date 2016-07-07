@@ -19,7 +19,6 @@
 package edu.pitt.dbmi.ccd.causal.rest.api.dto;
 
 import java.util.List;
-import javax.ws.rs.FormParam;
 
 /**
  *
@@ -27,19 +26,12 @@ import javax.ws.rs.FormParam;
  */
 public class NewJob {
 
-    /*
-     * @FormParam requires the @Consumes(APPLICATION_FORM_URLENCODED) to be specified in endpoint
-     */
-    @FormParam("algorithm")
     private String algorithm;
 
-    @FormParam("dataFileIdList")
-    private List<Long> dataFileIdList;
+    private Long[] dataFileIdList;
 
-    @FormParam("jvmOptions")
     private List<String> jvmOptions;
 
-    @FormParam("parameters")
     private List<String> parameters;
 
     public NewJob() {
@@ -53,11 +45,11 @@ public class NewJob {
         this.algorithm = algorithm;
     }
 
-    public List<Long> getDataFileIdList() {
+    public Long[] getDataFileIdList() {
         return dataFileIdList;
     }
 
-    public void setDataFileIdList(List<Long> dataFileIdList) {
+    public void setDataFileIdList(Long[] dataFileIdList) {
         this.dataFileIdList = dataFileIdList;
     }
 

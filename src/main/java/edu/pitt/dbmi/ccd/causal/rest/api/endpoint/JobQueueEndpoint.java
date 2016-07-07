@@ -23,13 +23,12 @@ import edu.pitt.dbmi.ccd.causal.rest.api.dto.NewJob;
 import edu.pitt.dbmi.ccd.causal.rest.api.service.JobQueueEndpointService;
 import java.io.IOException;
 import javax.annotation.security.RolesAllowed;
-import javax.ws.rs.BeanParam;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
-import static javax.ws.rs.core.MediaType.APPLICATION_FORM_URLENCODED;
+import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,9 +56,9 @@ public class JobQueueEndpoint {
      * @throws IOException
      */
     @POST
-    @Consumes(APPLICATION_FORM_URLENCODED)
+    @Consumes(APPLICATION_JSON)
     @RolesAllowed(Role.USER)
-    public Response addNewJob(@PathParam("username") String username, @BeanParam NewJob newJob) throws IOException {
+    public Response addNewJob(@PathParam("username") String username, NewJob newJob) throws IOException {
         Long id = jobQueueEndpointService.addNewJob(username, newJob);
 
         // Return 201 Created status code and the job id in body

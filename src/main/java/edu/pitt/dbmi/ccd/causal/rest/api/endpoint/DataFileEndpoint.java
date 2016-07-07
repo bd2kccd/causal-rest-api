@@ -38,7 +38,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.GenericEntity;
-import static javax.ws.rs.core.MediaType.APPLICATION_FORM_URLENCODED;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static javax.ws.rs.core.MediaType.APPLICATION_XML;
 import static javax.ws.rs.core.MediaType.MULTIPART_FORM_DATA;
@@ -206,11 +205,6 @@ public class DataFileEndpoint {
     /**
      * Data Summary
      *
-     * The @Consumes(APPLICATION_FORM_URLENCODED) works with @FormParam used in
-     * DataFileSummary The @FormParam annotation in conjunction with the media
-     * type "application/x-www-form-urlencoded" is good enough to get the posted
-     * data to summarize data, since there's no large file uploaded
-     *
      * @param username
      * @param dataFileSummarization
      * @return
@@ -218,10 +212,10 @@ public class DataFileEndpoint {
      */
     @POST
     @Path("/summarize")
-    @Consumes(APPLICATION_FORM_URLENCODED)
+    @Consumes(APPLICATION_JSON)
     @Produces({APPLICATION_JSON, APPLICATION_XML})
     @RolesAllowed(Role.USER)
-    public Response summarizeDataFile(@PathParam("username") String username, @BeanParam DataFileSummarization dataFileSummarization) throws IOException {
+    public Response summarizeDataFile(@PathParam("username") String username, DataFileSummarization dataFileSummarization) throws IOException {
         DataFileDTO dataFileDTO = dataFileEndpointService.summarizeDataFile(username, dataFileSummarization);
         return Response.ok(dataFileDTO).build();
     }

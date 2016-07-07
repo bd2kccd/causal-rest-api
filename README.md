@@ -360,9 +360,13 @@ Before we can go ahead to run the desired algorithm with the newly uploaded data
 POST /causal/api/v1/zhy19/data/summarize HTTP/1.1
 Host: localhost:9000
 Authorization: Basic emh5MTk6MTIzNDU2
-Content-Type: application/x-www-form-urlencoded
+Content-Type: application/json
 
-id=10&variableType=continuous&fileDelimiter=tab
+{
+    "id": 1,
+    "variableType": "continuous",
+    "fileDelimiter": "comma"
+}
 ````
 
 This POST request will summarize the data file and generate a response (JSON or XML) like below:
