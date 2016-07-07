@@ -301,6 +301,7 @@ And the response will look like this:
     </dataFile>
 </dataFileDTOes>
 ````
+
 Form the above output, we can also tell that data file with ID 10 doesn't have all the `fileSummary` field values set, we'll cover this in the data summarization section.
 
 #### Get the deatil information of a data file based on ID
@@ -385,6 +386,8 @@ This POST request will summarize the data file and generate a response (JSON or 
 
 ### Run Causal Discovery Algorithm
 
+Once the data file is uploaded and summaried, you can start running a Causal Discovery Algorithm on the uploaded data file.
+
 #### List all the available causal discovery algorithms
 
 ````
@@ -410,6 +413,8 @@ Currently we support "FGS continuous" and "FGS discrete".
 ````
 
 #### Add a new job to run the desired algorithm on a given data file
+
+This is a POST request with `enctype="application/x-www-form-urlencoded"` and the algorithm and data file id will need to be specified in the POST body when you make the request.
 
 ````
 POST /causal/api/v1/zhy19/jobs HTTP/1.1
