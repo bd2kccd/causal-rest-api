@@ -24,6 +24,7 @@ import edu.pitt.dbmi.ccd.causal.rest.api.service.JobQueueEndpointService;
 import java.io.IOException;
 import javax.annotation.security.RolesAllowed;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -82,6 +83,26 @@ public class JobQueueEndpoint {
             return Response.ok("Job " + id + " has been completed.").build();
         } else {
             return Response.ok("Job " + id + " is still running.").build();
+        }
+    }
+
+    /**
+     * Cancel a running job
+     *
+     * @param id
+     * @return
+     * @throws IOException
+     */
+    @DELETE
+    @Path("/{id}")
+    @RolesAllowed(Role.USER)
+    public Response cancelJob(@PathParam("id") Long id) throws IOException {
+        boolean canceled = jobQueueEndpointService.cancelJob(id);
+
+        if (canceled) {
+            return Response.ok("Job " + id + " has been canceled").build();
+        } else {
+            return Response.ok("Unable to cancel job " + id).build();
         }
     }
 

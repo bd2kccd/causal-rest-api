@@ -446,7 +446,23 @@ Authorization: Basic emh5MTk6MTIzNDU2
 
 This will either return "Pending" or "Completed".
 
+#### Cancel a running job
 
+Sometimes you may want to cancel a submitted job.
+
+````
+DELETE /causal/api/v1/zhy19/jobs/9 HTTP/1.1
+Host: localhost:9000
+Authorization: Basic emh5MTk6MTIzNDU2
+Content-Type: application/json
+
+{
+    "algorithm": "fgs",
+    "dataFileIdList": [8]
+}
+````
+
+This call will response either "Job 8 has been canceled" or "Unable to cancel job 8". It's not guranteed that the system can always cencal a job successfully.
 
 ### 3. Result Management
 

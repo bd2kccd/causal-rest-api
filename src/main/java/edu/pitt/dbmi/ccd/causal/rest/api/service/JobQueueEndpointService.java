@@ -174,6 +174,26 @@ public class JobQueueEndpointService {
     }
 
     /**
+     * Cancel a running job
+     *
+     * @param id
+     * @return true on canceled or false if job is already completed
+     */
+    public boolean cancelJob(Long id) {
+        JobQueueInfo job = jobQueueInfoService.findOne(id);
+        // If can't find the job id from database, it's already completed
+        // Then we are unable to cancel the job
+        if (job == null) {
+            return false;
+        }
+        // Set status to 2 in database so the job queue knows it's a flag to kill the job
+        job.setStatus(2);
+        jobQueueInfoService.saveJobIntoQueue(job);
+
+        return true;
+    }
+
+    /**
      * Convert a string list into a delimiter separated string
      *
      * @param list
