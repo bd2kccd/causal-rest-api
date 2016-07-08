@@ -18,6 +18,9 @@
  */
 package edu.pitt.dbmi.ccd.causal.rest.api.dto;
 
+import javax.validation.constraints.NotNull;
+import org.hibernate.validator.constraints.NotBlank;
+
 /**
  * This bean is used to get form data when user wants to summarize a data file
  *
@@ -25,16 +28,19 @@ package edu.pitt.dbmi.ccd.causal.rest.api.dto;
  */
 public class DataFileSummarization {
 
+    @NotNull
     private Long id;
 
     /*
      * We'll convert the string value to VariableType object
      */
+    @NotBlank
     private String variableType;
 
     /*
      * We'll convert the string value to FileDelimiter object
      */
+    @NotBlank
     private String fileDelimiter;
 
     public DataFileSummarization() {

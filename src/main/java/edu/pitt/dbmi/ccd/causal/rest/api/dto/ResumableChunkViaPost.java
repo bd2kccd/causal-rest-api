@@ -19,7 +19,9 @@
 package edu.pitt.dbmi.ccd.causal.rest.api.dto;
 
 import java.io.InputStream;
+import javax.validation.constraints.NotNull;
 import org.glassfish.jersey.media.multipart.FormDataParam;
+import org.hibernate.validator.constraints.NotBlank;
 
 /**
  * All form data (metadata and input stream) found in the multipart post
@@ -30,30 +32,39 @@ public class ResumableChunkViaPost {
 
     // We have to use @FormDataParam rather than @FormParam
     // since this is multipart post
+    @NotNull
     @FormDataParam("resumableChunkSize")
     private long resumableChunkSize;
 
+    @NotNull
     @FormDataParam("resumableTotalSize")
     private long resumableTotalSize;
 
+    @NotNull
     @FormDataParam("resumableCurrentChunkSize")
     private long resumableCurrentChunkSize;
 
+    @NotNull
     @FormDataParam("resumableChunkNumber")
     private int resumableChunkNumber;
 
+    @NotNull
     @FormDataParam("resumableTotalChunks")
     private int resumableTotalChunks;
 
+    @NotBlank
     @FormDataParam("resumableIdentifier")
     private String resumableIdentifier;
 
+    @NotBlank
     @FormDataParam("resumableFilename")
     private String resumableFilename;
 
+    @NotBlank
     @FormDataParam("resumableRelativePath")
     private String resumableRelativePath;
 
+    @NotBlank
     @FormDataParam("resumableType")
     private String resumableType;
 

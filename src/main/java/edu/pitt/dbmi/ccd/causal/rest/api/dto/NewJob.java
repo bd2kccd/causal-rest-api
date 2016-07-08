@@ -18,14 +18,19 @@
  */
 package edu.pitt.dbmi.ccd.causal.rest.api.dto;
 
+import org.hibernate.validator.constraints.NotBlank;
+import org.hibernate.validator.constraints.NotEmpty;
+
 /**
  *
  * @author Zhou Yuan (zhy19@pitt.edu)
  */
 public class NewJob {
 
+    @NotBlank
     private String algorithm;
 
+    @NotEmpty
     private Long[] dataFileIdList;
 
     public NewJob() {

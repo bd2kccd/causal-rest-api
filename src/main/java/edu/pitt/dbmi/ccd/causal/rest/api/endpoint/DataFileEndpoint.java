@@ -29,6 +29,7 @@ import java.io.InputStream;
 import java.util.List;
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
+import javax.validation.Valid;
 import javax.ws.rs.BeanParam;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -195,7 +196,7 @@ public class DataFileEndpoint {
     @Path("/chunkUpload")
     @Consumes(MULTIPART_FORM_DATA)
     @RolesAllowed(Role.USER)
-    public Response processChunkUpload(@PathParam("username") String username, @BeanParam ResumableChunkViaPost chunkViaPost) throws IOException {
+    public Response processChunkUpload(@PathParam("username") String username, @Valid @BeanParam ResumableChunkViaPost chunkViaPost) throws IOException {
         String md5checkSum = dataFileEndpointService.uploadChunk(chunkViaPost, username);
         // Only the last POST request will get a md5checksum on the completion of whole file
         // all requests before the last chunk will only get a 200 status code without response body
@@ -215,7 +216,7 @@ public class DataFileEndpoint {
     @Consumes(APPLICATION_JSON)
     @Produces({APPLICATION_JSON, APPLICATION_XML})
     @RolesAllowed(Role.USER)
-    public Response summarizeDataFile(@PathParam("username") String username, DataFileSummarization dataFileSummarization) throws IOException {
+    public Response summarizeDataFile(@PathParam("username") String username, @Valid DataFileSummarization dataFileSummarization) throws IOException {
         DataFileDTO dataFileDTO = dataFileEndpointService.summarizeDataFile(username, dataFileSummarization);
         return Response.ok(dataFileDTO).build();
     }

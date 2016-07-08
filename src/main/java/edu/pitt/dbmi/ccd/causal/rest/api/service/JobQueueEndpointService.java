@@ -171,6 +171,10 @@ public class JobQueueEndpointService {
         JobQueueInfo jobQueueInfo = jobQueueInfoService.findOne(id);
         // As long as there's database record, the job is pending
         return (jobQueueInfo == null);
+
+        // We should also check to see if the result file exists
+        // Since users may recheck the status of a canceld job,
+        // and it will say "Completed" just by checking the database record
     }
 
     /**

@@ -23,6 +23,7 @@ import edu.pitt.dbmi.ccd.causal.rest.api.dto.NewJob;
 import edu.pitt.dbmi.ccd.causal.rest.api.service.JobQueueEndpointService;
 import java.io.IOException;
 import javax.annotation.security.RolesAllowed;
+import javax.validation.Valid;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -59,7 +60,7 @@ public class JobQueueEndpoint {
     @POST
     @Consumes(APPLICATION_JSON)
     @RolesAllowed(Role.USER)
-    public Response addNewJob(@PathParam("username") String username, NewJob newJob) throws IOException {
+    public Response addNewJob(@PathParam("username") String username, @Valid NewJob newJob) throws IOException {
         Long id = jobQueueEndpointService.addNewJob(username, newJob);
 
         // Return 201 Created status code and the job id in body
