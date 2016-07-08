@@ -18,8 +18,6 @@
  */
 package edu.pitt.dbmi.ccd.causal.rest.api.dto;
 
-import java.util.List;
-
 /**
  *
  * @author Zhou Yuan (zhy19@pitt.edu)
@@ -29,10 +27,6 @@ public class NewJob {
     private String algorithm;
 
     private Long[] dataFileIdList;
-
-    private List<String> jvmOptions;
-
-    private List<String> parameters;
 
     public NewJob() {
     }
@@ -53,19 +47,4 @@ public class NewJob {
         this.dataFileIdList = dataFileIdList;
     }
 
-    public List<String> getJvmOptions() {
-        return jvmOptions;
-    }
-
-    public void setJvmOptions(List<String> jvmOptions) {
-        this.jvmOptions = jvmOptions;
-    }
-
-    public List<String> getParameters() {
-        return parameters;
-    }
-
-    public void setParameters(List<String> parameters) {
-        this.parameters = parameters;
-    }
 }

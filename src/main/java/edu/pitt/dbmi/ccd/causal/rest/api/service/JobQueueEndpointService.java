@@ -75,8 +75,6 @@ public class JobQueueEndpointService {
         String algorithm = newJob.getAlgorithm();
         Long[] dataFileIdList = newJob.getDataFileIdList();
         // Not implimenting prior knowledge in API
-        List<String> jvmOptions = newJob.getJvmOptions();
-        List<String> parameters = newJob.getParameters();
 
         String workspaceDir = causalRestProperties.getWorkspaceDir();
         String libFolder = causalRestProperties.getLibFolder();
@@ -98,9 +96,6 @@ public class JobQueueEndpointService {
         // Building the command line
         List<String> commands = new LinkedList<>();
         commands.add("java");
-
-        // Add jvm options
-        commands.addAll(jvmOptions);
 
         // Add classpath
         Path classPath = Paths.get(workspaceDir, libFolder, algorithmJar);
@@ -124,9 +119,6 @@ public class JobQueueEndpointService {
         String datasetList = listToSeparatedValues(datasetPath, ",");
         commands.add("--data");
         commands.add(datasetList);
-
-        // Add parameters
-        commands.addAll(parameters);
 
         // Don't create any validation files
         commands.add("--no-validation-output");
