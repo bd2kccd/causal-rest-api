@@ -423,18 +423,30 @@ Currently we support "FGS continuous" and "FGS discrete".
 This is a POST request and the algorithm and data file id will need to be specified in the POST body as a JSON when you make the request.
 
 ````
-POST /causal/api/v1/zhy19/jobs HTTP/1.1
+POST /causal/api/v1/zhy19/jobs/fgs HTTP/1.1
 Host: localhost:9000
 Authorization: Basic emh5MTk6MTIzNDU2
 Content-Type: application/json
 
 {
-    "algorithm": "fgs",
     "dataFileIdList": "[8]"
 }
 ````
 
-In this example, we are running the "FGS continuous" algorithm on the file with ID 11. And this call will result the job ID 6 with a 201 Created response status code.
+In this example, we are running the "FGS continuous" algorithm on the file with ID 8. And this call will return the job ID number with a 201 Created response status code.
+
+When you need to run "FGS discrete", just send the request to a different endpont URI:
+
+````
+POST /causal/api/v1/zhy19/jobs/fgs-discrete HTTP/1.1
+Host: localhost:9000
+Authorization: Basic emh5MTk6MTIzNDU2
+Content-Type: application/json
+
+{
+    "dataFileIdList": "[9]"
+}
+````
 
 #### Check the job status
 

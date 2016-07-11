@@ -18,8 +18,8 @@
  */
 package edu.pitt.dbmi.ccd.causal.rest.api.dto;
 
-import org.hibernate.validator.constraints.NotBlank;
 import org.hibernate.validator.constraints.NotEmpty;
+import org.springframework.beans.factory.annotation.Value;
 
 /**
  *
@@ -27,21 +27,26 @@ import org.hibernate.validator.constraints.NotEmpty;
  */
 public class NewJob {
 
-    @NotBlank(message = "Please specify the algorithm name.")
-    private String algorithm;
-
     @NotEmpty(message = "Please specify the id of the data file.")
-    private Long[] dataFileIdList;
+    protected Long[] dataFileIdList;
+
+    // Algorithm parameters
+    protected int depth;
+
+    @Value("true")
+    private boolean heuristicSpeedup;
+
+    @Value("true")
+    protected boolean verbose;
+
+    // Data validation
+    @Value("true")
+    protected boolean nonZeroVarianceValidation;
+
+    @Value("true")
+    protected boolean uniqueVarNameValidation;
 
     public NewJob() {
-    }
-
-    public String getAlgorithm() {
-        return algorithm;
-    }
-
-    public void setAlgorithm(String algorithm) {
-        this.algorithm = algorithm;
     }
 
     public Long[] getDataFileIdList() {
@@ -50,6 +55,46 @@ public class NewJob {
 
     public void setDataFileIdList(Long[] dataFileIdList) {
         this.dataFileIdList = dataFileIdList;
+    }
+
+    public int getDepth() {
+        return depth;
+    }
+
+    public void setDepth(int depth) {
+        this.depth = depth;
+    }
+
+    public boolean isHeuristicSpeedup() {
+        return heuristicSpeedup;
+    }
+
+    public void setHeuristicSpeedup(boolean heuristicSpeedup) {
+        this.heuristicSpeedup = heuristicSpeedup;
+    }
+
+    public boolean isVerbose() {
+        return verbose;
+    }
+
+    public void setVerbose(boolean verbose) {
+        this.verbose = verbose;
+    }
+
+    public boolean isNonZeroVarianceValidation() {
+        return nonZeroVarianceValidation;
+    }
+
+    public void setNonZeroVarianceValidation(boolean nonZeroVarianceValidation) {
+        this.nonZeroVarianceValidation = nonZeroVarianceValidation;
+    }
+
+    public boolean isUniqueVarNameValidation() {
+        return uniqueVarNameValidation;
+    }
+
+    public void setUniqueVarNameValidation(boolean uniqueVarNameValidation) {
+        this.uniqueVarNameValidation = uniqueVarNameValidation;
     }
 
 }

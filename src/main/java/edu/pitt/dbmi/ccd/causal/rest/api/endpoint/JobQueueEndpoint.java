@@ -19,7 +19,7 @@
 package edu.pitt.dbmi.ccd.causal.rest.api.endpoint;
 
 import edu.pitt.dbmi.ccd.causal.rest.api.Role;
-import edu.pitt.dbmi.ccd.causal.rest.api.dto.NewJob;
+import edu.pitt.dbmi.ccd.causal.rest.api.dto.FgsContinuousNewJob;
 import edu.pitt.dbmi.ccd.causal.rest.api.service.JobQueueEndpointService;
 import java.io.IOException;
 import javax.annotation.security.RolesAllowed;
@@ -50,7 +50,7 @@ public class JobQueueEndpoint {
     }
 
     /**
-     * Adding a new job
+     * Adding a new job and run FGS continuous
      *
      * @param username
      * @param newJob
@@ -58,10 +58,11 @@ public class JobQueueEndpoint {
      * @throws IOException
      */
     @POST
+    @Path("/fgs")
     @Consumes(APPLICATION_JSON)
     @RolesAllowed(Role.USER)
-    public Response addNewJob(@PathParam("username") String username, @Valid NewJob newJob) throws IOException {
-        Long id = jobQueueEndpointService.addNewJob(username, newJob);
+    public Response addFgsContinuousNewJob(@PathParam("username") String username, @Valid FgsContinuousNewJob newJob) throws IOException {
+        Long id = jobQueueEndpointService.addFgsContinuousNewJob(username, newJob);
 
         // Return 201 Created status code and the job id in body
         return Response.status(Status.CREATED).entity(id).build();

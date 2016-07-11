@@ -18,7 +18,8 @@
  */
 package edu.pitt.dbmi.ccd.causal.rest.api.service;
 
-import edu.pitt.dbmi.ccd.causal.rest.api.dto.NewJob;
+import edu.pitt.dbmi.ccd.causal.rest.api.dto.FgsContinuousNewJob;
+import edu.pitt.dbmi.ccd.causal.rest.api.dto.FgsDiscreteNewJob;
 import edu.pitt.dbmi.ccd.causal.rest.api.exception.UserNotFoundException;
 import edu.pitt.dbmi.ccd.causal.rest.api.prop.CausalRestProperties;
 import edu.pitt.dbmi.ccd.db.entity.DataFile;
@@ -70,12 +71,15 @@ public class JobQueueEndpointService {
      * @param newJob
      * @return Job ID
      */
-    public Long addNewJob(String username, NewJob newJob) {
-        // Right now, we only support "fgsc" and "fgsd"
-        String algorithm = newJob.getAlgorithm();
+    public void addFgsDiscreteNewJob(String username, FgsDiscreteNewJob newJob) {
+
+    }
+
+    public Long addFgsContinuousNewJob(String username, FgsContinuousNewJob newJob) {
+        // Right now, we only support "fgs" and "fgs-discrete"
+        String algorithm = "fgs";
         Long[] dataFileIdList = newJob.getDataFileIdList();
         // Not implimenting prior knowledge in API
-
         String workspaceDir = causalRestProperties.getWorkspaceDir();
         String libFolder = causalRestProperties.getLibFolder();
         String tmpFolder = causalRestProperties.getTmpFolder();
