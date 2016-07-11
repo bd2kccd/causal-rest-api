@@ -34,13 +34,13 @@ public class DataFileSummarization {
     /*
      * We'll convert the string value to VariableType object
      */
-    @NotBlank
+    @NotBlank(message = "Please specify the variable type.")
     private String variableType;
 
     /*
      * We'll convert the string value to FileDelimiter object
      */
-    @NotBlank
+    @NotBlank(message = "Please specify the file delimiter.")
     private String fileDelimiter;
 
     public DataFileSummarization() {

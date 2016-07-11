@@ -27,10 +27,10 @@ import org.hibernate.validator.constraints.NotEmpty;
  */
 public class NewJob {
 
-    @NotBlank
+    @NotBlank(message = "Please specify the algorithm name.")
     private String algorithm;
 
-    @NotEmpty
+    @NotEmpty(message = "Please specify the id of the data file.")
     private Long[] dataFileIdList;
 
     public NewJob() {
