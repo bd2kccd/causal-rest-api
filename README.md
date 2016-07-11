@@ -51,6 +51,8 @@ There are 4 configuration files to configure located at `causal-rest-api/src/mai
 - **application.properties**: Spring Boot application settings
 - **causal.properties**: Data file directory path and folder settings
 
+Befor editing the `causal.properties` file, you need to create a workspace for the application to work in. Create a directory called workspace, for an example `/home/zhy19/ccd/workspace`. Inside the workspace directory, create another folder called `lib`. Then build the jar file of Tetred using the [tetrad-5.3.0-20160624](https://github.com/cmu-phil/tetrad/releases/tag/v5.3.0-20160624) pre-release version. After that, copy the jar file to the `lib` folder created earlier.
+
 ## Start the API Server
 
 Once you have all the settings configured, go to `causal-rest-api/target` and you will find the jar file named `causal-rest-api.jar`. Then simply run 
