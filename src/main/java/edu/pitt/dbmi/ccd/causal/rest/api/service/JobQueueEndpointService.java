@@ -71,8 +71,93 @@ public class JobQueueEndpointService {
      * @param newJob
      * @return Job ID
      */
-    public void addFgsDiscreteNewJob(String username, FgsDiscreteNewJob newJob) {
+    public Long addFgsDiscreteNewJob(String username, FgsDiscreteNewJob newJob) {
+        // Right now, we only support "fgs" and "fgs-discrete"
+        String algorithm = "fgs-discrete";
+        Long[] dataFileIdList = newJob.getDataFileIdList();
+        // Not implimenting prior knowledge in API
+        String workspaceDir = causalRestProperties.getWorkspaceDir();
+        String libFolder = causalRestProperties.getLibFolder();
+        String tmpFolder = causalRestProperties.getTmpFolder();
+        String dataFolder = causalRestProperties.getDataFolder();
+        String resultsFolder = causalRestProperties.getResultsFolder();
+        String algorithmFolder = causalRestProperties.getAlgorithmFolder();
 
+        String algorithmJar = causalRestProperties.getAlgorithmJar();
+
+        Path userResultDir = Paths.get(workspaceDir, username, resultsFolder, algorithmFolder);
+        Path userTmpDir = Paths.get(workspaceDir, username, tmpFolder);
+
+        UserAccount userAccount = userAccountService.findByUsername(username);
+        if (userAccount == null) {
+            throw new UserNotFoundException(username);
+        }
+
+        // Building the command line
+        List<String> commands = new LinkedList<>();
+        commands.add("java");
+
+        // Add classpath
+        Path classPath = Paths.get(workspaceDir, libFolder, algorithmJar);
+        commands.add("-jar");
+        commands.add(classPath.toString());
+
+        // Add algorithm
+        commands.add("--algorithm");
+        commands.add(algorithm);
+
+        // Add dataset
+        List<String> datasetPath = new LinkedList<>();
+
+        for (Long dataFileId : dataFileIdList) {
+            // Get data file name by file id
+            DataFile dataFile = dataFileService.findByIdAndUserAccount(dataFileId, userAccount);
+            Path dataPath = Paths.get(workspaceDir, username, dataFolder, dataFile.getName());
+            datasetPath.add(dataPath.toAbsolutePath().toString());
+        }
+
+        String datasetList = listToSeparatedValues(datasetPath, ",");
+        commands.add("--data");
+        commands.add(datasetList);
+
+        // Don't create any validation files
+        commands.add("--no-validation-output");
+
+        long currentTime = System.currentTimeMillis();
+        // Algorithm result file name
+        String fileName;
+
+        if (dataFileIdList.length > 1) {
+            // FGS Image takes multi image files
+            fileName = String.format("%s_%s_%d", algorithm, "multi-dataset", currentTime);
+        } else {
+            Long id = dataFileIdList[0];
+            DataFile df = dataFileService.findByIdAndUserAccount(id, userAccount);
+            fileName = String.format("%s_%s_%d", algorithm, df.getName(), currentTime);
+        }
+
+        commands.add("--output-prefix");
+        commands.add(fileName);
+
+        // Then separate those commands with ; and store the whole string into database
+        // ccd-job-queue will assemble the command line again at
+        // https://github.com/bd2kccd/ccd-job-queue/blob/master/src/main/java/edu/pitt/dbmi/ccd/queue/service/AlgorithmQueueService.java#L79
+        String cmd = listToSeparatedValues(commands, ";");
+
+        // Insert to database table `job_queue_info`
+        JobQueueInfo jobQueueInfo = new JobQueueInfo();
+        jobQueueInfo.setAddedTime(new Date(System.currentTimeMillis()));
+        jobQueueInfo.setAlgorName(algorithm);
+        jobQueueInfo.setCommands(cmd);
+        jobQueueInfo.setFileName(fileName);
+        jobQueueInfo.setOutputDirectory(userResultDir.toAbsolutePath().toString());
+        jobQueueInfo.setStatus(0);
+        jobQueueInfo.setTmpDirectory(userTmpDir.toAbsolutePath().toString());
+        jobQueueInfo.setUserAccounts(Collections.singleton(userAccount));
+
+        jobQueueInfo = jobQueueInfoService.saveJobIntoQueue(jobQueueInfo);
+
+        return jobQueueInfo.getId();
     }
 
     public Long addFgsContinuousNewJob(String username, FgsContinuousNewJob newJob) {
