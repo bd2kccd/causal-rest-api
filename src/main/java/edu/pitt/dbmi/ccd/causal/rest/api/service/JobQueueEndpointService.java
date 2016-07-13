@@ -283,6 +283,8 @@ public class JobQueueEndpointService {
      * Record added to table `job_queue_info` when new job added and the record
      * will be gone once the job is done
      *
+     * Do we really care if a user can see the status of jobs created by others?
+     *
      * @param username
      * @param id
      * @return true on completed or false on running
@@ -300,12 +302,19 @@ public class JobQueueEndpointService {
     /**
      * Cancel a running job
      *
+     * We'll need to make sure this job is created by this user
+     *
      * @param username
      * @param id
      * @return true on canceled or false if job is already completed
      */
     public boolean cancelJob(String username, Long id) {
-        JobQueueInfo job = jobQueueInfoService.findOne(id);
+        UserAccount userAccount = userAccountService.findByUsername(username);
+        if (userAccount == null) {
+            throw new UserNotFoundException(username);
+        }
+
+        JobQueueInfo job = jobQueueInfoService.findByIdAndUseraccount(id, userAccount);
         // If can't find the job id from database, it's already completed
         // Then we are unable to cancel the job
         if (job == null) {
