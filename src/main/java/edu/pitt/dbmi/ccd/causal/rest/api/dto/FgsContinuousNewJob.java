@@ -24,6 +24,7 @@ package edu.pitt.dbmi.ccd.causal.rest.api.dto;
  */
 public class FgsContinuousNewJob extends NewJob {
 
+    // Algorithm parameters
     protected double penaltyDiscount;
 
     protected boolean ignoreLinearDependence;

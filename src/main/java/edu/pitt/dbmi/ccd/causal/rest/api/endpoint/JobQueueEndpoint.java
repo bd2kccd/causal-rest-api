@@ -21,8 +21,10 @@ package edu.pitt.dbmi.ccd.causal.rest.api.endpoint;
 import edu.pitt.dbmi.ccd.causal.rest.api.Role;
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.FgsContinuousNewJob;
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.FgsDiscreteNewJob;
+import edu.pitt.dbmi.ccd.causal.rest.api.dto.JobInfoDTO;
 import edu.pitt.dbmi.ccd.causal.rest.api.service.JobQueueEndpointService;
 import java.io.IOException;
+import java.util.List;
 import javax.annotation.security.RolesAllowed;
 import javax.validation.Valid;
 import javax.ws.rs.Consumes;
@@ -31,7 +33,10 @@ import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.GenericEntity;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
+import static javax.ws.rs.core.MediaType.APPLICATION_XML;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -89,8 +94,30 @@ public class JobQueueEndpoint {
     }
 
     /**
+     * List all running jobs associated with the user
+     *
+     * @param username
+     * @return
+     * @throws IOException
+     */
+    @GET
+    @Produces({APPLICATION_JSON, APPLICATION_XML})
+    @RolesAllowed(Role.USER)
+    public Response listAllRunningJobs(@PathParam("username") String username) throws IOException {
+        List<JobInfoDTO> jobInfoDTOs = jobQueueEndpointService.listAllRunningJobs(username);
+        GenericEntity<List<JobInfoDTO>> entity = new GenericEntity<List<JobInfoDTO>>(jobInfoDTOs) {
+        };
+
+        return Response.ok(entity).build();
+    }
+
+    /**
      * Checking job status for a given job ID
      *
+     * Note: job ID is not associated with user account at this moment that's
+     * why we don't have an endpoint that lists all the running jobs
+     *
+     * @param username
      * @param id
      * @return 200 OK status code with job status ("Pending" or "Completed")
      * @throws IOException
@@ -98,8 +125,8 @@ public class JobQueueEndpoint {
     @GET
     @Path("/{id}")
     @RolesAllowed(Role.USER)
-    public Response jobStatus(@PathParam("id") Long id) throws IOException {
-        boolean completed = jobQueueEndpointService.checkJobStatus(id);
+    public Response jobStatus(@PathParam("username") String username, @PathParam("id") Long id) throws IOException {
+        boolean completed = jobQueueEndpointService.checkJobStatus(username, id);
 
         if (completed) {
             return Response.ok("Job " + id + " has been completed.").build();
@@ -111,6 +138,7 @@ public class JobQueueEndpoint {
     /**
      * Cancel a running job
      *
+     * @param username
      * @param id
      * @return
      * @throws IOException
@@ -118,8 +146,8 @@ public class JobQueueEndpoint {
     @DELETE
     @Path("/{id}")
     @RolesAllowed(Role.USER)
-    public Response cancelJob(@PathParam("id") Long id) throws IOException {
-        boolean canceled = jobQueueEndpointService.cancelJob(id);
+    public Response cancelJob(@PathParam("username") String username, @PathParam("id") Long id) throws IOException {
+        boolean canceled = jobQueueEndpointService.cancelJob(username, id);
 
         if (canceled) {
             return Response.ok("Job " + id + " has been canceled").build();

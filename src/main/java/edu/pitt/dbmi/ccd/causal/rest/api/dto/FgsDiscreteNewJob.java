@@ -24,4 +24,36 @@ package edu.pitt.dbmi.ccd.causal.rest.api.dto;
  */
 public class FgsDiscreteNewJob extends NewJob {
 
+    // Algorithm parameters
+    private double structurePrior;
+
+    private double samplePrior;
+
+    // Data validation
+    private boolean limitNumOfCategory;
+
+    public double getStructurePrior() {
+        return structurePrior;
+    }
+
+    public void setStructurePrior(double structurePrior) {
+        this.structurePrior = structurePrior;
+    }
+
+    public double getSamplePrior() {
+        return samplePrior;
+    }
+
+    public void setSamplePrior(double samplePrior) {
+        this.samplePrior = samplePrior;
+    }
+
+    public boolean isLimitNumOfCategory() {
+        return limitNumOfCategory;
+    }
+
+    public void setLimitNumOfCategory(boolean limitNumOfCategory) {
+        this.limitNumOfCategory = limitNumOfCategory;
+    }
+
 }

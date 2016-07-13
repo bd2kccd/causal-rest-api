@@ -20,6 +20,7 @@ package edu.pitt.dbmi.ccd.causal.rest.api.service;
 
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.FgsContinuousNewJob;
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.FgsDiscreteNewJob;
+import edu.pitt.dbmi.ccd.causal.rest.api.dto.JobInfoDTO;
 import edu.pitt.dbmi.ccd.causal.rest.api.exception.UserNotFoundException;
 import edu.pitt.dbmi.ccd.causal.rest.api.prop.CausalRestProperties;
 import edu.pitt.dbmi.ccd.db.entity.DataFile;
@@ -250,13 +251,43 @@ public class JobQueueEndpointService {
     }
 
     /**
+     * List all running jobs of a certain user
+     *
+     * @param username
+     * @return
+     */
+    public List<JobInfoDTO> listAllRunningJobs(String username) {
+        List<JobInfoDTO> jobInfoDTOs = new LinkedList<>();
+
+        UserAccount userAccount = userAccountService.findByUsername(username);
+        if (userAccount == null) {
+            throw new UserNotFoundException(username);
+        }
+
+        List<JobQueueInfo> jobs = jobQueueInfoService.findByUserAccounts(Collections.singleton(userAccount));
+        jobs.forEach(job -> {
+            JobInfoDTO jobInfoDTO = new JobInfoDTO();
+
+            jobInfoDTO.setId(job.getId());
+            jobInfoDTO.setAlgorithmName(job.getAlgorName());
+            jobInfoDTO.setDataFileName(job.getFileName());
+            jobInfoDTO.setAddedTime(job.getAddedTime());
+
+            jobInfoDTOs.add(jobInfoDTO);
+        });
+
+        return jobInfoDTOs;
+    }
+
+    /**
      * Record added to table `job_queue_info` when new job added and the record
      * will be gone once the job is done
      *
+     * @param username
      * @param id
      * @return true on completed or false on running
      */
-    public boolean checkJobStatus(Long id) {
+    public boolean checkJobStatus(String username, Long id) {
         JobQueueInfo jobQueueInfo = jobQueueInfoService.findOne(id);
         // As long as there's database record, the job is pending
         return (jobQueueInfo == null);
@@ -269,10 +300,11 @@ public class JobQueueEndpointService {
     /**
      * Cancel a running job
      *
+     * @param username
      * @param id
      * @return true on canceled or false if job is already completed
      */
-    public boolean cancelJob(Long id) {
+    public boolean cancelJob(String username, Long id) {
         JobQueueInfo job = jobQueueInfoService.findOne(id);
         // If can't find the job id from database, it's already completed
         // Then we are unable to cancel the job

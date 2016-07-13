@@ -418,6 +418,40 @@ Currently we support "FGS continuous" and "FGS discrete".
 ]
 ````
 
+Currently we support "FGS continuous" and "FGS discrete" and below are the parameters that you can use for each algorithm.
+
+**FGS continuous** 
+
+Algorithm parameters:
+
+`depth` - search depth
+`penaltyDiscount` - Penalty discount. Default is 4.0
+`ignoreLinearDependence` - Ignore linear dependence. Default is true
+`heuristicSpeedup` - Heuristic speedup. All conditional independence relations that hold in the distribution are entailed by the Causal Markov Assumption. Default is true
+`verbose` - Print additional information. Default is true
+
+Data validation:
+
+`nonZeroVarianceValidation` - Non-zero Variance. Ensure that each variable has non-zero variance. Default is true
+`uniqueVarNameValidation` - Unique Variable Name. Ensure that there are no duplicated variable names. Default is true
+
+**FGS discrete** 
+
+Algorithm parameters:
+
+`depth` - search depth
+`structurePrior` - Structure prior. 
+`samplePrior` - Sample prior.
+`heuristicSpeedup` - Heuristic speedup. All conditional independence relations that hold in the distribution are entailed by the Causal Markov Assumption. Default is true
+`verbose` - Print additional information. Default is true
+
+Data validation:
+
+`nonZeroVarianceValidation` - Non-zero Variance. Ensure that each variable has non-zero variance. Default is true
+`uniqueVarNameValidation` - Unique Variable Name. Ensure that there are no duplicated variable names. Default is true
+`limitNumOfCategory` - Limit Number of Categories - ensure the number of categories of a variable does not exceed 10. Default is true
+
+
 #### Add a new job to run the desired algorithm on a given data file
 
 This is a POST request and the algorithm and data file id will need to be specified in the POST body as a JSON when you make the request.
@@ -448,12 +482,41 @@ Content-Type: application/json
 }
 ````
 
-#### Check the job status
+#### List all running jobs
+
+````
+GET /causal/api/v1/zhy19/jobs/ HTTP/1.1
+Host: localhost:9000
+Authorization: Basic emh5MTk6MTIzNDU2
+Content-Type: application/json
+
+````
+
+Then you'll see the information of all jobs that are currently running:
+
+````
+[
+  {
+    "id": 32,
+    "algorithmName": "fgs",
+    "dataFileName": "fgs_Lung-tetrad_hv.txt_1468436085100",
+    "addedTime": 1468436085000
+  },
+  {
+    "id": 33,
+    "algorithmName": "fgs",
+    "dataFileName": "fgs_data_small.txt_1468436087478",
+    "addedTime": 1468436087000
+  }
+]
+````
+
+#### Check the job status for a given job ID
 
 Once the new job is submitted, it takes time and resources to run the algorithm on the server. During the waiting, you can check the status of a given job ID:
 
 ````
-GET /causal/api/v1/zhy19/jobs/6 HTTP/1.1
+GET /causal/api/v1/zhy19/jobs/32 HTTP/1.1
 Host: localhost:9000
 Authorization: Basic emh5MTk6MTIzNDU2
 ````
@@ -465,15 +528,9 @@ This will either return "Pending" or "Completed".
 Sometimes you may want to cancel a submitted job.
 
 ````
-DELETE /causal/api/v1/zhy19/jobs/9 HTTP/1.1
+DELETE /causal/api/v1/zhy19/jobs/8 HTTP/1.1
 Host: localhost:9000
 Authorization: Basic emh5MTk6MTIzNDU2
-Content-Type: application/json
-
-{
-    "algorithm": "fgs",
-    "dataFileIdList": [8]
-}
 ````
 
 This call will response either "Job 8 has been canceled" or "Unable to cancel job 8". It's not guranteed that the system can always cencal a job successfully.
