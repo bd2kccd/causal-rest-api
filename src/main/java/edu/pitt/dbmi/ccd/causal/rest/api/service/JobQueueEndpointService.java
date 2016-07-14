@@ -21,9 +21,12 @@ package edu.pitt.dbmi.ccd.causal.rest.api.service;
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.FgsContinuousNewJob;
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.FgsDiscreteNewJob;
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.JobInfoDTO;
+import edu.pitt.dbmi.ccd.causal.rest.api.exception.NotFoundByIdException;
 import edu.pitt.dbmi.ccd.causal.rest.api.exception.UserNotFoundException;
 import edu.pitt.dbmi.ccd.causal.rest.api.prop.CausalRestProperties;
 import edu.pitt.dbmi.ccd.db.entity.DataFile;
+import edu.pitt.dbmi.ccd.db.entity.DataFileInfo;
+import edu.pitt.dbmi.ccd.db.entity.FileDelimiter;
 import edu.pitt.dbmi.ccd.db.entity.JobQueueInfo;
 import edu.pitt.dbmi.ccd.db.entity.UserAccount;
 import edu.pitt.dbmi.ccd.db.service.DataFileService;
@@ -66,7 +69,7 @@ public class JobQueueEndpointService {
     }
 
     /**
-     * Add a new job to the job queue and run the algorithm
+     * Add a new job to the job queue and run the FGS Discrete algorithm
      *
      * @param username
      * @param newJob
@@ -75,7 +78,7 @@ public class JobQueueEndpointService {
     public Long addFgsDiscreteNewJob(String username, FgsDiscreteNewJob newJob) {
         // Right now, we only support "fgs" and "fgs-discrete"
         String algorithm = "fgs-discrete";
-        Long[] dataFileIdList = newJob.getDataFileIdList();
+        Long dataFileId = newJob.getDataFileId();
         // Not implimenting prior knowledge in API
         String workspaceDir = causalRestProperties.getWorkspaceDir();
         String libFolder = causalRestProperties.getLibFolder();
@@ -107,19 +110,49 @@ public class JobQueueEndpointService {
         commands.add("--algorithm");
         commands.add(algorithm);
 
-        // Add dataset
-        List<String> datasetPath = new LinkedList<>();
+        // Get data file name by file id
+        DataFile dataFile = dataFileService.findByIdAndUserAccount(dataFileId, userAccount);
+        if (dataFile == null) {
+            throw new NotFoundByIdException(dataFileId);
+        }
+        Path dataPath = Paths.get(workspaceDir, username, dataFolder, dataFile.getName());
 
-        for (Long dataFileId : dataFileIdList) {
-            // Get data file name by file id
-            DataFile dataFile = dataFileService.findByIdAndUserAccount(dataFileId, userAccount);
-            Path dataPath = Paths.get(workspaceDir, username, dataFolder, dataFile.getName());
-            datasetPath.add(dataPath.toAbsolutePath().toString());
+        commands.add("--data");
+        commands.add(dataPath.toAbsolutePath().toString());
+
+        // Parameters
+        commands.add("--delimiter");
+        commands.add(getFileDelimiter(newJob.getDataFileId()));
+
+        commands.add("--structure-prior");
+        commands.add(Double.toString(newJob.getStructurePrior()));
+
+        commands.add("--sample-prior");
+        commands.add(Double.toString(newJob.getSamplePrior()));
+
+        commands.add("--depth");
+        commands.add(Integer.toString(newJob.getDepth()));
+
+        if (newJob.isVerbose()) {
+            commands.add("--verbose");
         }
 
-        String datasetList = listToSeparatedValues(datasetPath, ",");
-        commands.add("--data");
-        commands.add(datasetList);
+        if (!newJob.isHeuristicSpeedup()) {
+            commands.add("--disable-heuristic-speedup");
+        }
+
+        // Data validation
+        if (!newJob.isLimitNumOfCategory()) {
+            commands.add("--skip-category-limit");
+        }
+
+        if (!newJob.isNonZeroVarianceValidation()) {
+            commands.add("--skip-non-zero-variance");
+        }
+
+        if (!newJob.isUniqueVarNameValidation()) {
+            commands.add("--skip-unique-var-name");
+        }
 
         // Don't create any validation files
         commands.add("--no-validation-output");
@@ -128,14 +161,8 @@ public class JobQueueEndpointService {
         // Algorithm result file name
         String fileName;
 
-        if (dataFileIdList.length > 1) {
-            // FGS Image takes multi image files
-            fileName = String.format("%s_%s_%d", algorithm, "multi-dataset", currentTime);
-        } else {
-            Long id = dataFileIdList[0];
-            DataFile df = dataFileService.findByIdAndUserAccount(id, userAccount);
-            fileName = String.format("%s_%s_%d", algorithm, df.getName(), currentTime);
-        }
+        DataFile df = dataFileService.findByIdAndUserAccount(dataFileId, userAccount);
+        fileName = String.format("%s_%s_%d", algorithm, df.getName(), currentTime);
 
         commands.add("--output-prefix");
         commands.add(fileName);
@@ -161,10 +188,18 @@ public class JobQueueEndpointService {
         return jobQueueInfo.getId();
     }
 
+    /**
+     * Add a new job to the job queue and run the FGS Continuous algorithm
+     *
+     * @param username
+     * @param newJob
+     * @return
+     */
     public Long addFgsContinuousNewJob(String username, FgsContinuousNewJob newJob) {
         // Right now, we only support "fgs" and "fgs-discrete"
         String algorithm = "fgs";
-        Long[] dataFileIdList = newJob.getDataFileIdList();
+        Long dataFileId = newJob.getDataFileId();
+
         // Not implimenting prior knowledge in API
         String workspaceDir = causalRestProperties.getWorkspaceDir();
         String libFolder = causalRestProperties.getLibFolder();
@@ -196,19 +231,46 @@ public class JobQueueEndpointService {
         commands.add("--algorithm");
         commands.add(algorithm);
 
-        // Add dataset
-        List<String> datasetPath = new LinkedList<>();
+        // Get data file name by file id
+        DataFile dataFile = dataFileService.findByIdAndUserAccount(dataFileId, userAccount);
+        if (dataFile == null) {
+            throw new NotFoundByIdException(dataFileId);
+        }
+        Path dataPath = Paths.get(workspaceDir, username, dataFolder, dataFile.getName());
 
-        for (Long dataFileId : dataFileIdList) {
-            // Get data file name by file id
-            DataFile dataFile = dataFileService.findByIdAndUserAccount(dataFileId, userAccount);
-            Path dataPath = Paths.get(workspaceDir, username, dataFolder, dataFile.getName());
-            datasetPath.add(dataPath.toAbsolutePath().toString());
+        commands.add("--data");
+        commands.add(dataPath.toAbsolutePath().toString());
+
+        // Parameters
+        commands.add("--delimiter");
+        commands.add(getFileDelimiter(newJob.getDataFileId()));
+
+        commands.add("--penalty-discount");
+        commands.add(Double.toString(newJob.getPenaltyDiscount()));
+
+        commands.add("--depth");
+        commands.add(Integer.toString(newJob.getDepth()));
+
+        if (newJob.isVerbose()) {
+            commands.add("--verbose");
         }
 
-        String datasetList = listToSeparatedValues(datasetPath, ",");
-        commands.add("--data");
-        commands.add(datasetList);
+        if (!newJob.isHeuristicSpeedup()) {
+            commands.add("--disable-heuristic-speedup");
+        }
+
+        if (newJob.isIgnoreLinearDependence()) {
+            commands.add("--ignore-linear-dependence");
+        }
+
+        // Data validation
+        if (!newJob.isNonZeroVarianceValidation()) {
+            commands.add("--skip-non-zero-variance");
+        }
+
+        if (!newJob.isUniqueVarNameValidation()) {
+            commands.add("--skip-unique-var-name");
+        }
 
         // Don't create any validation files
         commands.add("--no-validation-output");
@@ -217,14 +279,8 @@ public class JobQueueEndpointService {
         // Algorithm result file name
         String fileName;
 
-        if (dataFileIdList.length > 1) {
-            // FGS Image takes multi image files
-            fileName = String.format("%s_%s_%d", algorithm, "multi-dataset", currentTime);
-        } else {
-            Long id = dataFileIdList[0];
-            DataFile df = dataFileService.findByIdAndUserAccount(id, userAccount);
-            fileName = String.format("%s_%s_%d", algorithm, df.getName(), currentTime);
-        }
+        DataFile df = dataFileService.findByIdAndUserAccount(dataFileId, userAccount);
+        fileName = String.format("%s_%s_%d", algorithm, df.getName(), currentTime);
 
         commands.add("--output-prefix");
         commands.add(fileName);
@@ -327,6 +383,29 @@ public class JobQueueEndpointService {
         jobQueueInfoService.saveJobIntoQueue(job);
 
         return true;
+    }
+
+    /**
+     * Get file delimiter for a given data file ID
+     *
+     * @param id
+     * @return
+     */
+    private String getFileDelimiter(Long id) {
+        String delimiter = null;
+
+        DataFile dataFile = dataFileService.findById(id);
+        if (dataFile != null) {
+            DataFileInfo dataFileInfo = dataFile.getDataFileInfo();
+            if (dataFileInfo != null) {
+                FileDelimiter fileDelimiter = dataFileInfo.getFileDelimiter();
+                if (fileDelimiter != null) {
+                    delimiter = fileDelimiter.getName();
+                }
+            }
+        }
+
+        return delimiter;
     }
 
     /**

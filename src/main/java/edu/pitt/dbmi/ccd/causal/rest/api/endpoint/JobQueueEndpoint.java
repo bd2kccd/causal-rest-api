@@ -66,6 +66,7 @@ public class JobQueueEndpoint {
     @POST
     @Path("/fgs")
     @Consumes(APPLICATION_JSON)
+    @Produces({APPLICATION_JSON, APPLICATION_XML})
     @RolesAllowed(Role.USER)
     public Response addFgsContinuousNewJob(@PathParam("username") String username, @Valid FgsContinuousNewJob newJob) throws IOException {
         Long id = jobQueueEndpointService.addFgsContinuousNewJob(username, newJob);
@@ -85,6 +86,7 @@ public class JobQueueEndpoint {
     @POST
     @Path("/fgs-discrete")
     @Consumes(APPLICATION_JSON)
+    @Produces({APPLICATION_JSON, APPLICATION_XML})
     @RolesAllowed(Role.USER)
     public Response addFgsDiscreteNewJob(@PathParam("username") String username, @Valid FgsDiscreteNewJob newJob) throws IOException {
         Long id = jobQueueEndpointService.addFgsDiscreteNewJob(username, newJob);

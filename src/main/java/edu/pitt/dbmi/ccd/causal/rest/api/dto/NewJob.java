@@ -18,7 +18,9 @@
  */
 package edu.pitt.dbmi.ccd.causal.rest.api.dto;
 
-import org.hibernate.validator.constraints.NotEmpty;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Value;
 
 /**
@@ -27,14 +29,16 @@ import org.springframework.beans.factory.annotation.Value;
  */
 public class NewJob {
 
-    @NotEmpty(message = "Please specify the id of the data file.")
-    protected Long[] dataFileIdList;
+    @NotNull
+    @Min(1)
+    @Max(Long.MAX_VALUE)
+    protected Long dataFileId;
 
     // Algorithm parameters
     protected int depth;
 
     @Value("true")
-    private boolean heuristicSpeedup;
+    protected boolean heuristicSpeedup;
 
     @Value("true")
     protected boolean verbose;
@@ -49,12 +53,12 @@ public class NewJob {
     public NewJob() {
     }
 
-    public Long[] getDataFileIdList() {
-        return dataFileIdList;
+    public Long getDataFileId() {
+        return dataFileId;
     }
 
-    public void setDataFileIdList(Long[] dataFileIdList) {
-        this.dataFileIdList = dataFileIdList;
+    public void setDataFileId(Long dataFileId) {
+        this.dataFileId = dataFileId;
     }
 
     public int getDepth() {

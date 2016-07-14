@@ -463,7 +463,9 @@ Authorization: Basic emh5MTk6MTIzNDU2
 Content-Type: application/json
 
 {
-    "dataFileIdList": "[8]"
+    "dataFileId": 8,
+    "depth": 3,
+    "penaltyDiscount": 4.0
 }
 ````
 
@@ -478,7 +480,10 @@ Authorization: Basic emh5MTk6MTIzNDU2
 Content-Type: application/json
 
 {
-    "dataFileIdList": "[9]"
+    "dataFileId": 9,
+    "depth": 3,
+    "structurePrior": 1.0,
+    "samplePrior": 1.0
 }
 ````
 
