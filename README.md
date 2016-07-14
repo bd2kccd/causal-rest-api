@@ -424,32 +424,32 @@ Currently we support "FGS continuous" and "FGS discrete" and below are the param
 
 Algorithm parameters:
 
-`depth` - search depth
-`penaltyDiscount` - Penalty discount. Default is 4.0
-`ignoreLinearDependence` - Ignore linear dependence. Default is true
-`heuristicSpeedup` - Heuristic speedup. All conditional independence relations that hold in the distribution are entailed by the Causal Markov Assumption. Default is true
-`verbose` - Print additional information. Default is true
+- `depth` - search depth
+- `penaltyDiscount` - Penalty discount. Default is 4.0
+- `ignoreLinearDependence` - Ignore linear dependence. Default is true
+- `heuristicSpeedup` - Heuristic speedup. All conditional independence relations that hold in the distribution are entailed by the Causal Markov Assumption. Default is true
+- `verbose` - Print additional information. Default is true
 
 Data validation:
 
-`nonZeroVarianceValidation` - Non-zero Variance. Ensure that each variable has non-zero variance. Default is true
-`uniqueVarNameValidation` - Unique Variable Name. Ensure that there are no duplicated variable names. Default is true
+- `nonZeroVarianceValidation` - Non-zero Variance. Ensure that each variable has non-zero variance. Default is true
+- `uniqueVarNameValidation` - Unique Variable Name. Ensure that there are no duplicated variable names. Default is true
 
 **FGS discrete** 
 
 Algorithm parameters:
 
-`depth` - search depth
-`structurePrior` - Structure prior. 
-`samplePrior` - Sample prior.
-`heuristicSpeedup` - Heuristic speedup. All conditional independence relations that hold in the distribution are entailed by the Causal Markov Assumption. Default is true
-`verbose` - Print additional information. Default is true
+- `depth` - search depth
+- `structurePrior` - Structure prior. 
+- `samplePrior` - Sample prior.
+- `heuristicSpeedup` - Heuristic speedup. All conditional independence relations that hold in the distribution are entailed by the Causal Markov Assumption. Default is true
+- `verbose` - Print additional information. Default is true
 
 Data validation:
 
-`nonZeroVarianceValidation` - Non-zero Variance. Ensure that each variable has non-zero variance. Default is true
-`uniqueVarNameValidation` - Unique Variable Name. Ensure that there are no duplicated variable names. Default is true
-`limitNumOfCategory` - Limit Number of Categories - ensure the number of categories of a variable does not exceed 10. Default is true
+- `nonZeroVarianceValidation` - Non-zero Variance. Ensure that each variable has non-zero variance. Default is true
+- `uniqueVarNameValidation` - Unique Variable Name. Ensure that there are no duplicated variable names. Default is true
+- `limitNumOfCategory` - Limit Number of Categories - ensure the number of categories of a variable does not exceed 10. Default is true
 
 
 #### Add a new job to run the desired algorithm on a given data file
