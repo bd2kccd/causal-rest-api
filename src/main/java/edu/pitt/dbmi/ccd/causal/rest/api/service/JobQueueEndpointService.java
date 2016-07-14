@@ -251,12 +251,12 @@ public class JobQueueEndpointService {
     }
 
     /**
-     * List all running jobs of a certain user
+     * List all Queued or Running jobs of a certain user
      *
      * @param username
      * @return
      */
-    public List<JobInfoDTO> listAllRunningJobs(String username) {
+    public List<JobInfoDTO> listAllJobs(String username) {
         List<JobInfoDTO> jobInfoDTOs = new LinkedList<>();
 
         UserAccount userAccount = userAccountService.findByUsername(username);
@@ -270,6 +270,8 @@ public class JobQueueEndpointService {
 
             jobInfoDTO.setId(job.getId());
             jobInfoDTO.setAlgorithmName(job.getAlgorName());
+            // This data file name is the origional file name
+            // E.g. fgs_Lung-tetrad_hv.txt_1468499246916
             jobInfoDTO.setDataFileName(job.getFileName());
             jobInfoDTO.setAddedTime(job.getAddedTime());
 

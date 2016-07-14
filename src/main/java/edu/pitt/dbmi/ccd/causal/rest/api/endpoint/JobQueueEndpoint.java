@@ -94,7 +94,7 @@ public class JobQueueEndpoint {
     }
 
     /**
-     * List all running jobs associated with the user
+     * List all Queued or Running jobs associated with the user
      *
      * @param username
      * @return
@@ -103,8 +103,8 @@ public class JobQueueEndpoint {
     @GET
     @Produces({APPLICATION_JSON, APPLICATION_XML})
     @RolesAllowed(Role.USER)
-    public Response listAllRunningJobs(@PathParam("username") String username) throws IOException {
-        List<JobInfoDTO> jobInfoDTOs = jobQueueEndpointService.listAllRunningJobs(username);
+    public Response listAllJobs(@PathParam("username") String username) throws IOException {
+        List<JobInfoDTO> jobInfoDTOs = jobQueueEndpointService.listAllJobs(username);
         GenericEntity<List<JobInfoDTO>> entity = new GenericEntity<List<JobInfoDTO>>(jobInfoDTOs) {
         };
 
@@ -136,7 +136,7 @@ public class JobQueueEndpoint {
     }
 
     /**
-     * Cancel a running job
+     * Cancel a job (job status can be Queued or Running)
      *
      * @param username
      * @param id
