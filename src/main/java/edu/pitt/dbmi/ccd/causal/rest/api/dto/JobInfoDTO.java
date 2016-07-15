@@ -39,9 +39,6 @@ public class JobInfoDTO {
     private String algorithmName;
 
     @XmlElement
-    private String dataFileName;
-
-    @XmlElement
     private Date addedTime;
 
     public JobInfoDTO() {
@@ -61,14 +58,6 @@ public class JobInfoDTO {
 
     public void setAlgorithmName(String algorithmName) {
         this.algorithmName = algorithmName;
-    }
-
-    public String getDataFileName() {
-        return dataFileName;
-    }
-
-    public void setDataFileName(String dataFileName) {
-        this.dataFileName = dataFileName;
     }
 
     public Date getAddedTime() {

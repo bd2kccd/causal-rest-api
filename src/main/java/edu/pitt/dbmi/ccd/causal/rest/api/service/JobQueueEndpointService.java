@@ -326,9 +326,6 @@ public class JobQueueEndpointService {
 
             jobInfoDTO.setId(job.getId());
             jobInfoDTO.setAlgorithmName(job.getAlgorName());
-            // This data file name is the origional file name
-            // E.g. fgs_Lung-tetrad_hv.txt_1468499246916
-            jobInfoDTO.setDataFileName(job.getFileName());
             jobInfoDTO.setAddedTime(job.getAddedTime());
 
             jobInfoDTOs.add(jobInfoDTO);

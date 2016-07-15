@@ -504,13 +504,11 @@ Then you'll see the information of all jobs that are currently running:
   {
     "id": 32,
     "algorithmName": "fgs",
-    "dataFileName": "fgs_Lung-tetrad_hv.txt_1468436085100",
     "addedTime": 1468436085000
   },
   {
     "id": 33,
     "algorithmName": "fgs",
-    "dataFileName": "fgs_data_small.txt_1468436087478",
     "addedTime": 1468436087000
   }
 ]
