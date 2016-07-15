@@ -18,7 +18,6 @@
  */
 package edu.pitt.dbmi.ccd.causal.rest.api.dto;
 
-import java.util.Date;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -26,43 +25,32 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  *
- * Jun 3, 2016 4:23:25 PM
- *
- * @author Kevin V. Bui (kvb2@pitt.edu)
+ * @author Zhou Yuan (zhy19@pitt.edu)
  */
-@XmlRootElement(name = "dataFile")
+@XmlRootElement(name = "AlgorithmResult")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class DataFileDTO {
-
-    @XmlElement
-    private Long id;
-
+public class ResultFileDTO {
     @XmlElement
     private String name;
 
+    /*
+    * We use long type since BasicFileInfo.getCreationTime() returns long
+    */
     @XmlElement
-    private Date creationTime;
+    private long creationTime;
 
+    /*
+    * We use long type since BasicFileInfo.getLastModifiedTime() returns long
+    */
     @XmlElement
-    private Date lastModifiedTime;
+    private long lastModifiedTime;
 
     @XmlElement
     private long fileSize;
-
-    @XmlElement
-    private DataFileSummaryDTO fileSummary;
-
-    public DataFileDTO() {
+    
+    public ResultFileDTO() {
     }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
+    
     public String getName() {
         return name;
     }
@@ -71,19 +59,19 @@ public class DataFileDTO {
         this.name = name;
     }
 
-    public Date getCreationTime() {
+    public long getCreationTime() {
         return creationTime;
     }
 
-    public void setCreationTime(Date creationTime) {
+    public void setCreationTime(long creationTime) {
         this.creationTime = creationTime;
     }
 
-    public Date getLastModifiedTime() {
+    public long getLastModifiedTime() {
         return lastModifiedTime;
     }
 
-    public void setLastModifiedTime(Date lastModifiedTime) {
+    public void setLastModifiedTime(long lastModifiedTime) {
         this.lastModifiedTime = lastModifiedTime;
     }
 
@@ -93,13 +81,5 @@ public class DataFileDTO {
 
     public void setFileSize(long fileSize) {
         this.fileSize = fileSize;
-    }
-
-    public DataFileSummaryDTO getFileSummary() {
-        return fileSummary;
-    }
-
-    public void setFileSummary(DataFileSummaryDTO fileSummary) {
-        this.fileSummary = fileSummary;
     }
 }

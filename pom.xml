@@ -44,13 +44,25 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-jetty</artifactId>
         </dependency>
-
+        
         <dependency>
             <groupId>edu.pitt.dbmi</groupId>
             <artifactId>ccd-db</artifactId>
-            <version>0.6.1</version>
+            <version>0.6.2</version>
+        </dependency>
+        
+        <dependency>
+            <groupId>edu.pitt.dbmi</groupId>
+            <artifactId>ccd-commons</artifactId>
+            <version>0.3.1</version>
         </dependency>
 
+        <dependency>
+            <groupId>edu.pitt.dbmi</groupId>
+            <artifactId>ccd-job-queue</artifactId>
+            <version>0.1.4</version>
+        </dependency>
+        
         <dependency>
             <groupId>org.apache.shiro</groupId>
             <artifactId>shiro-core</artifactId>
@@ -62,6 +74,14 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
+        
+        <dependency>
+            <groupId>org.glassfish.jersey.media</groupId>
+            <artifactId>jersey-media-multipart</artifactId>
+            <version>2.23.1</version>
+            <type>jar</type>
+        </dependency>
+
     </dependencies>
 
     <build>

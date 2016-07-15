@@ -16,29 +16,26 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301  USA
  */
-package edu.pitt.dbmi.ccd.causal.rest.api;
+package edu.pitt.dbmi.ccd.causal.rest.api.exception;
 
-import edu.pitt.dbmi.ccd.db.CCDDatabaseApplication;
-
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.Import;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Response;
 
 /**
  *
- * Jun 3, 2016 3:05:13 PM
+ * Jun 10, 2016 4:17:16 PM
  *
  * @author Kevin V. Bui (kvb2@pitt.edu)
  */
-@SpringBootApplication
-@Import({CCDDatabaseApplication.class})
-public class CausalRestApiApplication {
+public class InternalErrorException extends WebApplicationException {
 
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String[] args) {
-        SpringApplication.run(CausalRestApiApplication.class, args);
+    private static final long serialVersionUID = 4206999110807572726L;
+
+    public InternalErrorException() {
+    }
+
+    public InternalErrorException(String message) {
+        super(message, Response.Status.INTERNAL_SERVER_ERROR);
     }
 
 }

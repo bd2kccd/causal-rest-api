@@ -26,33 +26,25 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  *
- * Jun 3, 2016 4:23:25 PM
- *
- * @author Kevin V. Bui (kvb2@pitt.edu)
+ * @author Zhou Yuan (zhy19@pitt.edu)
  */
-@XmlRootElement(name = "dataFile")
+@XmlRootElement(name = "jobInfo")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class DataFileDTO {
+public class JobInfoDTO {
 
     @XmlElement
     private Long id;
 
     @XmlElement
-    private String name;
+    private String algorithmName;
 
     @XmlElement
-    private Date creationTime;
+    private String dataFileName;
 
     @XmlElement
-    private Date lastModifiedTime;
+    private Date addedTime;
 
-    @XmlElement
-    private long fileSize;
-
-    @XmlElement
-    private DataFileSummaryDTO fileSummary;
-
-    public DataFileDTO() {
+    public JobInfoDTO() {
     }
 
     public Long getId() {
@@ -63,43 +55,28 @@ public class DataFileDTO {
         this.id = id;
     }
 
-    public String getName() {
-        return name;
+    public String getAlgorithmName() {
+        return algorithmName;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setAlgorithmName(String algorithmName) {
+        this.algorithmName = algorithmName;
     }
 
-    public Date getCreationTime() {
-        return creationTime;
+    public String getDataFileName() {
+        return dataFileName;
     }
 
-    public void setCreationTime(Date creationTime) {
-        this.creationTime = creationTime;
+    public void setDataFileName(String dataFileName) {
+        this.dataFileName = dataFileName;
     }
 
-    public Date getLastModifiedTime() {
-        return lastModifiedTime;
+    public Date getAddedTime() {
+        return addedTime;
     }
 
-    public void setLastModifiedTime(Date lastModifiedTime) {
-        this.lastModifiedTime = lastModifiedTime;
+    public void setAddedTime(Date addedTime) {
+        this.addedTime = addedTime;
     }
 
-    public long getFileSize() {
-        return fileSize;
-    }
-
-    public void setFileSize(long fileSize) {
-        this.fileSize = fileSize;
-    }
-
-    public DataFileSummaryDTO getFileSummary() {
-        return fileSummary;
-    }
-
-    public void setFileSummary(DataFileSummaryDTO fileSummary) {
-        this.fileSummary = fileSummary;
-    }
 }

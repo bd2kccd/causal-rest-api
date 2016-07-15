@@ -18,7 +18,9 @@
  */
 package edu.pitt.dbmi.ccd.causal.rest.api.conf;
 
+import org.glassfish.jersey.media.multipart.MultiPartFeature;
 import org.glassfish.jersey.server.ResourceConfig;
+import org.glassfish.jersey.server.ServerProperties;
 import org.glassfish.jersey.server.filter.RolesAllowedDynamicFeature;
 import org.springframework.stereotype.Component;
 
@@ -32,6 +34,8 @@ import org.springframework.stereotype.Component;
 public class JerseyConfig extends ResourceConfig {
 
     public JerseyConfig() {
+        // Register resources and providers using package-scanning
+        // Adds array of package names which will be used to scan for components.
         packages(
                 "edu.pitt.dbmi.ccd.causal.rest.api.endpoint",
                 "edu.pitt.dbmi.ccd.causal.rest.api.exception.mapper",
@@ -39,6 +43,15 @@ public class JerseyConfig extends ResourceConfig {
         );
 
         register(RolesAllowedDynamicFeature.class);
+
+        // https://jersey.java.net/documentation/latest/media.html 9.3. Multipart
+        // http://stackoverflow.com/questions/30653012/multipart-form-data-no-injection-source-found-for-a-parameter-of-type-public-ja
+        register(MultiPartFeature.class);
+
+        // By default, Jersey doesn't return any entities that would include validation errors to the client.
+        // Enable Jersey bean validation errors to users
+        property(ServerProperties.BV_SEND_ERROR_IN_RESPONSE, true);
+
     }
 
 }

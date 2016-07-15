@@ -16,29 +16,32 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301  USA
  */
-package edu.pitt.dbmi.ccd.causal.rest.api;
-
-import edu.pitt.dbmi.ccd.db.CCDDatabaseApplication;
-
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.Import;
+package edu.pitt.dbmi.ccd.causal.rest.api.dto;
 
 /**
  *
- * Jun 3, 2016 3:05:13 PM
- *
- * @author Kevin V. Bui (kvb2@pitt.edu)
+ * @author Zhou Yuan (zhy19@pitt.edu)
  */
-@SpringBootApplication
-@Import({CCDDatabaseApplication.class})
-public class CausalRestApiApplication {
+public class FgsContinuousNewJob extends NewJob {
 
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String[] args) {
-        SpringApplication.run(CausalRestApiApplication.class, args);
+    // Algorithm parameters
+    private double penaltyDiscount;
+
+    private boolean ignoreLinearDependence;
+
+    public double getPenaltyDiscount() {
+        return penaltyDiscount;
     }
 
+    public void setPenaltyDiscount(double penaltyDiscount) {
+        this.penaltyDiscount = penaltyDiscount;
+    }
+
+    public boolean isIgnoreLinearDependence() {
+        return ignoreLinearDependence;
+    }
+
+    public void setIgnoreLinearDependence(boolean ignoreLinearDependence) {
+        this.ignoreLinearDependence = ignoreLinearDependence;
+    }
 }

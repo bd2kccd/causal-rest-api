@@ -16,29 +16,33 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301  USA
  */
-package edu.pitt.dbmi.ccd.causal.rest.api;
+package edu.pitt.dbmi.ccd.causal.rest.api.dto;
 
-import edu.pitt.dbmi.ccd.db.CCDDatabaseApplication;
-
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.Import;
+import java.io.File;
 
 /**
  *
- * Jun 3, 2016 3:05:13 PM
- *
- * @author Kevin V. Bui (kvb2@pitt.edu)
+ * @author Zhou Yuan (zhy19@pitt.edu)
  */
-@SpringBootApplication
-@Import({CCDDatabaseApplication.class})
-public class CausalRestApiApplication {
+public class ResultComparisonFileDTO {
 
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String[] args) {
-        SpringApplication.run(CausalRestApiApplication.class, args);
+    private String fileName;
+
+    private File file;
+
+    public String getFileName() {
+        return fileName;
     }
 
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
+    }
+
+    public File getFile() {
+        return file;
+    }
+
+    public void setFile(File file) {
+        this.file = file;
+    }
 }
