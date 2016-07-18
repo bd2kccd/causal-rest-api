@@ -21,6 +21,7 @@ package edu.pitt.dbmi.ccd.causal.rest.api.service;
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.FgsContinuousNewJob;
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.FgsDiscreteNewJob;
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.JobInfoDTO;
+import edu.pitt.dbmi.ccd.causal.rest.api.dto.JvmOptions;
 import edu.pitt.dbmi.ccd.causal.rest.api.exception.NotFoundByIdException;
 import edu.pitt.dbmi.ccd.causal.rest.api.exception.UserNotFoundException;
 import edu.pitt.dbmi.ccd.causal.rest.api.prop.CausalRestProperties;
@@ -96,6 +97,12 @@ public class JobQueueEndpointService {
 
         // The first command
         commands.add("java");
+
+        // Add JVM options
+        if (newJob.getJvmOptions() != null) {
+            JvmOptions jvmOptions = newJob.getJvmOptions();
+            commands.add(String.format("-Xmx%dG", jvmOptions.getMaxHeapSize()));
+        }
 
         // Add algorithm jar file path
         commands.add("-jar");
@@ -210,6 +217,12 @@ public class JobQueueEndpointService {
 
         // The first command
         commands.add("java");
+
+        // Add JVM options
+        if (newJob.getJvmOptions() != null) {
+            JvmOptions jvmOptions = newJob.getJvmOptions();
+            commands.add(String.format("-Xmx%dG", jvmOptions.getMaxHeapSize()));
+        }
 
         // Add causal-cmd jar path
         commands.add("-jar");

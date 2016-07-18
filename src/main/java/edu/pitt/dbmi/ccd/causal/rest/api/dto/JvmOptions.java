@@ -18,45 +18,26 @@
  */
 package edu.pitt.dbmi.ccd.causal.rest.api.dto;
 
-import org.springframework.beans.factory.annotation.Value;
+import javax.validation.constraints.Size;
 
 /**
  *
  * @author Zhou Yuan (zhy19@pitt.edu)
  */
-public class FgsDiscreteNewJob extends NewJob {
+public class JvmOptions {
 
-    // Algorithm parameters
-    private double structurePrior;
+    @Size(min = 0, max = 100, message = "JVM maxmium heap size must be between 0 and 100 (Gigabyte)")
+    private int maxHeapSize;
 
-    private double samplePrior;
-
-    // Data validation flag
-    @Value("true")
-    private boolean limitNumOfCategory;
-
-    public double getStructurePrior() {
-        return structurePrior;
+    public JvmOptions() {
     }
 
-    public void setStructurePrior(double structurePrior) {
-        this.structurePrior = structurePrior;
+    public int getMaxHeapSize() {
+        return maxHeapSize;
     }
 
-    public double getSamplePrior() {
-        return samplePrior;
-    }
-
-    public void setSamplePrior(double samplePrior) {
-        this.samplePrior = samplePrior;
-    }
-
-    public boolean isLimitNumOfCategory() {
-        return limitNumOfCategory;
-    }
-
-    public void setLimitNumOfCategory(boolean limitNumOfCategory) {
-        this.limitNumOfCategory = limitNumOfCategory;
+    public void setMaxHeapSize(int maxHeapSize) {
+        this.maxHeapSize = maxHeapSize;
     }
 
 }

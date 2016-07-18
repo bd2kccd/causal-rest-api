@@ -50,6 +50,8 @@ public class NewJob {
     @Value("true")
     protected boolean uniqueVarNameValidation;
 
+    protected JvmOptions jvmOptions;
+
     public NewJob() {
     }
 
@@ -99,6 +101,14 @@ public class NewJob {
 
     public void setUniqueVarNameValidation(boolean uniqueVarNameValidation) {
         this.uniqueVarNameValidation = uniqueVarNameValidation;
+    }
+
+    public JvmOptions getJvmOptions() {
+        return jvmOptions;
+    }
+
+    public void setJvmOptions(JvmOptions jvmOptions) {
+        this.jvmOptions = jvmOptions;
     }
 
 }
