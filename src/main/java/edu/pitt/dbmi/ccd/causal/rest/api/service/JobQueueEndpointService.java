@@ -36,8 +36,10 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -77,45 +79,39 @@ public class JobQueueEndpointService {
      */
     public Long addFgsDiscreteNewJob(String username, FgsDiscreteNewJob newJob) {
         // Right now, we only support "fgs" and "fgs-discrete"
-        String algorithm = "fgs-discrete";
-        Long dataFileId = newJob.getDataFileId();
         // Not implimenting prior knowledge in API
-        String workspaceDir = causalRestProperties.getWorkspaceDir();
-        String libFolder = causalRestProperties.getLibFolder();
-        String tmpFolder = causalRestProperties.getTmpFolder();
-        String dataFolder = causalRestProperties.getDataFolder();
-        String resultsFolder = causalRestProperties.getResultsFolder();
-        String algorithmFolder = causalRestProperties.getAlgorithmFolder();
-
-        String algorithmJar = causalRestProperties.getAlgorithmJar();
-
-        Path userResultDir = Paths.get(workspaceDir, username, resultsFolder, algorithmFolder);
-        Path userTmpDir = Paths.get(workspaceDir, username, tmpFolder);
+        String algorithm = "fgs-discrete";
 
         UserAccount userAccount = userAccountService.findByUsername(username);
         if (userAccount == null) {
             throw new UserNotFoundException(username);
         }
 
+        // algorithmJarPath, dataDir, tmpDir, resultDir
+        // will be used in both "fgs" and "fgs-discrete"
+        Map<String, String> map = getKeyValueMapping(username);
+
         // Building the command line
         List<String> commands = new LinkedList<>();
+
+        // The first command
         commands.add("java");
 
-        // Add classpath
-        Path classPath = Paths.get(workspaceDir, libFolder, algorithmJar);
+        // Add algorithm jar file path
         commands.add("-jar");
-        commands.add(classPath.toString());
+        commands.add(map.get("algorithmJarPath"));
 
         // Add algorithm
         commands.add("--algorithm");
         commands.add(algorithm);
 
         // Get data file name by file id
+        Long dataFileId = newJob.getDataFileId();
         DataFile dataFile = dataFileService.findByIdAndUserAccount(dataFileId, userAccount);
         if (dataFile == null) {
             throw new NotFoundByIdException(dataFileId);
         }
-        Path dataPath = Paths.get(workspaceDir, username, dataFolder, dataFile.getName());
+        Path dataPath = Paths.get(map.get("dataDir"), dataFile.getName());
 
         commands.add("--data");
         commands.add(dataPath.toAbsolutePath().toString());
@@ -178,9 +174,9 @@ public class JobQueueEndpointService {
         jobQueueInfo.setAlgorName(algorithm);
         jobQueueInfo.setCommands(cmd);
         jobQueueInfo.setFileName(fileName);
-        jobQueueInfo.setOutputDirectory(userResultDir.toAbsolutePath().toString());
+        jobQueueInfo.setOutputDirectory(map.get("resultDir"));
         jobQueueInfo.setStatus(0);
-        jobQueueInfo.setTmpDirectory(userTmpDir.toAbsolutePath().toString());
+        jobQueueInfo.setTmpDirectory(map.get("tmpDir"));
         jobQueueInfo.setUserAccounts(Collections.singleton(userAccount));
 
         jobQueueInfo = jobQueueInfoService.saveJobIntoQueue(jobQueueInfo);
@@ -197,46 +193,39 @@ public class JobQueueEndpointService {
      */
     public Long addFgsContinuousNewJob(String username, FgsContinuousNewJob newJob) {
         // Right now, we only support "fgs" and "fgs-discrete"
-        String algorithm = "fgs";
-        Long dataFileId = newJob.getDataFileId();
-
         // Not implimenting prior knowledge in API
-        String workspaceDir = causalRestProperties.getWorkspaceDir();
-        String libFolder = causalRestProperties.getLibFolder();
-        String tmpFolder = causalRestProperties.getTmpFolder();
-        String dataFolder = causalRestProperties.getDataFolder();
-        String resultsFolder = causalRestProperties.getResultsFolder();
-        String algorithmFolder = causalRestProperties.getAlgorithmFolder();
-
-        String algorithmJar = causalRestProperties.getAlgorithmJar();
-
-        Path userResultDir = Paths.get(workspaceDir, username, resultsFolder, algorithmFolder);
-        Path userTmpDir = Paths.get(workspaceDir, username, tmpFolder);
+        String algorithm = "fgs";
 
         UserAccount userAccount = userAccountService.findByUsername(username);
         if (userAccount == null) {
             throw new UserNotFoundException(username);
         }
 
+        // algorithmJarPath, dataDir, tmpDir, resultDir
+        // will be used in both "fgs" and "fgs-discrete"
+        Map<String, String> map = getKeyValueMapping(username);
+
         // Building the command line
         List<String> commands = new LinkedList<>();
+
+        // The first command
         commands.add("java");
 
-        // Add classpath
-        Path classPath = Paths.get(workspaceDir, libFolder, algorithmJar);
+        // Add causal-cmd jar path
         commands.add("-jar");
-        commands.add(classPath.toString());
+        commands.add(map.get("algorithmJarPath"));
 
         // Add algorithm
         commands.add("--algorithm");
         commands.add(algorithm);
 
         // Get data file name by file id
+        Long dataFileId = newJob.getDataFileId();
         DataFile dataFile = dataFileService.findByIdAndUserAccount(dataFileId, userAccount);
         if (dataFile == null) {
             throw new NotFoundByIdException(dataFileId);
         }
-        Path dataPath = Paths.get(workspaceDir, username, dataFolder, dataFile.getName());
+        Path dataPath = Paths.get(map.get("dataDir"), dataFile.getName());
 
         commands.add("--data");
         commands.add(dataPath.toAbsolutePath().toString());
@@ -296,14 +285,44 @@ public class JobQueueEndpointService {
         jobQueueInfo.setAlgorName(algorithm);
         jobQueueInfo.setCommands(cmd);
         jobQueueInfo.setFileName(fileName);
-        jobQueueInfo.setOutputDirectory(userResultDir.toAbsolutePath().toString());
+        jobQueueInfo.setOutputDirectory(map.get("resultDir"));
         jobQueueInfo.setStatus(0);
-        jobQueueInfo.setTmpDirectory(userTmpDir.toAbsolutePath().toString());
+        jobQueueInfo.setTmpDirectory(map.get("tmpDir"));
         jobQueueInfo.setUserAccounts(Collections.singleton(userAccount));
 
         jobQueueInfo = jobQueueInfoService.saveJobIntoQueue(jobQueueInfo);
 
         return jobQueueInfo.getId();
+    }
+
+    /**
+     * Shared values to be used in both algorithms
+     *
+     * @param username
+     * @return key-value mapping
+     */
+    private Map<String, String> getKeyValueMapping(String username) {
+        Map<String, String> map = new HashMap<>();
+
+        String workspaceDir = causalRestProperties.getWorkspaceDir();
+        String libFolder = causalRestProperties.getLibFolder();
+        String tmpFolder = causalRestProperties.getTmpFolder();
+        String dataFolder = causalRestProperties.getDataFolder();
+        String resultsFolder = causalRestProperties.getResultsFolder();
+        String algorithmFolder = causalRestProperties.getAlgorithmFolder();
+        String algorithmJar = causalRestProperties.getAlgorithmJar();
+
+        Path algorithmJarPath = Paths.get(workspaceDir, libFolder, algorithmJar);
+        Path dataDir = Paths.get(workspaceDir, username, dataFolder);
+        Path tmpDir = Paths.get(workspaceDir, username, tmpFolder);
+        Path resultDir = Paths.get(workspaceDir, username, resultsFolder, algorithmFolder);
+
+        map.put("algorithmJarPath", algorithmJarPath.toString());
+        map.put("dataDir", dataDir.toAbsolutePath().toString());
+        map.put("tmpDir", tmpDir.toAbsolutePath().toString());
+        map.put("resultDir", resultDir.toAbsolutePath().toString());
+
+        return map;
     }
 
     /**
