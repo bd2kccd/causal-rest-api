@@ -1,10 +1,8 @@
 # Causal REST API V1
---------------------
 
 This RESTful API is designed for causal web. And it implements the [JAX-RS](https://en.wikipedia.org/wiki/Java_API_for_RESTful_Web_Services) specifications using Jersey.
 
 ## Installation
----------------
 
 ### Dependencies
 
@@ -67,7 +65,6 @@ java -jar causal-rest-api.jar
 This will start the API server, and you'll be able to access the API endpoints via the URL of `http://localhost:[port]/causal/api/v1/`
 
 ## API Usage and Examples
--------------------------
 
 This API requires user to be authenticated. Before using this API, the user will need to go to [Causal-Web App](https://dxcvm26.psc.edu/ccd/login) and create an account. After that, the username and password can be used to authenticate against the REST API via HTTP Basic Auth. The username will need to be specified in the requesting URI and password provided in the HTTP request `Authorization` header.
 
