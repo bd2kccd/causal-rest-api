@@ -1,8 +1,12 @@
-# Causal-Web REST API V1
+# Causal REST API V1
+--------------------
 
 This RESTful API is designed for causal web. And it implements the [JAX-RS](https://en.wikipedia.org/wiki/Java_API_for_RESTful_Web_Services) specifications using Jersey.
 
-## Dependencies
+## Installation
+---------------
+
+### Dependencies
 
 If you want to run this API server and expose the API to your users, you'll first need to have the [Causal Web Application](https://github.com/bd2kccd/causal-web) installed and running. Your API users will use this web app to create their user accounts before they can consume the API.
 
@@ -43,7 +47,7 @@ cd causal-rest-api
 mvn clean package
 ````
 
-## Configuration
+### Configuration
 
 There are 4 configuration files to configure located at `causal-rest-api/src/main/resources`:
 - **application-hsqldb.properties**: HSQLDB database configurations (for testing only).
@@ -53,20 +57,27 @@ There are 4 configuration files to configure located at `causal-rest-api/src/mai
 
 Befor editing the `causal.properties` file, you need to create a workspace for the application to work in. Create a directory called workspace, for an example `/home/zhy19/ccd/workspace`. Inside the workspace directory, create another folder called `lib`. Then build the jar file of Tetred using the [tetrad-5.3.0-20160624](https://github.com/cmu-phil/tetrad/releases/tag/v5.3.0-20160624) pre-release version. After that, copy the jar file to the `lib` folder created earlier.
 
-## Start the API Server
+### Start the API Server
 
 Once you have all the settings configured, go to `causal-rest-api/target` and you will find the jar file named `causal-rest-api.jar`. Then simply run 
 
-```java
+```
 java -jar causal-rest-api.jar
 ```
 This will start the API server, and you'll be able to access the API endpoints via the URL of `http://localhost:[port]/causal/api/v1/`
 
-## Usage and Examples
+## API Usage and Examples
+-------------------------
 
 This API requires user to be authenticated. Before using this API, the user will need to go to [Causal-Web App](https://dxcvm26.psc.edu/ccd/login) and create an account. After that, the username and password can be used to authenticate against the REST API via HTTP Basic Auth. The username will need to be specified in the requesting URI and password provided in the HTTP request `Authorization` header.
 
 Since this API is developed with Jersey, which supports [WADL](https://en.wikipedia.org/wiki/Web_Application_Description_Language). So you can view the generated WADL by going to `http://localhost:9000/causal/api/v1/application.wadl?detail=true` and see all resource available in the application. And below are some examples.
+
+Basically, all the API usage examples are grouped into three categories: 
+
+1. Data Management
+2. Causal Discovery
+3. Result Management
 
 ### 1. Data Management
 
