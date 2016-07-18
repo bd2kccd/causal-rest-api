@@ -18,6 +18,8 @@
  */
 package edu.pitt.dbmi.ccd.causal.rest.api.dto;
 
+import org.springframework.beans.factory.annotation.Value;
+
 /**
  *
  * @author Zhou Yuan (zhy19@pitt.edu)
@@ -30,6 +32,7 @@ public class FgsDiscreteNewJob extends NewJob {
     private double samplePrior;
 
     // Data validation
+    @Value("true")
     private boolean limitNumOfCategory;
 
     public double getStructurePrior() {

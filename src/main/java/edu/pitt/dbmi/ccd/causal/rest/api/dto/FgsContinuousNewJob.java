@@ -18,6 +18,8 @@
  */
 package edu.pitt.dbmi.ccd.causal.rest.api.dto;
 
+import org.springframework.beans.factory.annotation.Value;
+
 /**
  *
  * @author Zhou Yuan (zhy19@pitt.edu)
@@ -25,8 +27,10 @@ package edu.pitt.dbmi.ccd.causal.rest.api.dto;
 public class FgsContinuousNewJob extends NewJob {
 
     // Algorithm parameters
+    @Value("4.0")
     private double penaltyDiscount;
 
+    @Value("true")
     private boolean ignoreLinearDependence;
 
     public double getPenaltyDiscount() {
