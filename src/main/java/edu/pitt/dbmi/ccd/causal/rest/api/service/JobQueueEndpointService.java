@@ -89,7 +89,7 @@ public class JobQueueEndpointService {
 
         // algorithmJarPath, dataDir, tmpDir, resultDir
         // will be used in both "fgs" and "fgs-discrete"
-        Map<String, String> map = getKeyValueMapping(username);
+        Map<String, String> map = createSharedMapping(username);
 
         // Building the command line
         List<String> commands = new LinkedList<>();
@@ -203,7 +203,7 @@ public class JobQueueEndpointService {
 
         // algorithmJarPath, dataDir, tmpDir, resultDir
         // will be used in both "fgs" and "fgs-discrete"
-        Map<String, String> map = getKeyValueMapping(username);
+        Map<String, String> map = createSharedMapping(username);
 
         // Building the command line
         List<String> commands = new LinkedList<>();
@@ -301,7 +301,7 @@ public class JobQueueEndpointService {
      * @param username
      * @return key-value mapping
      */
-    private Map<String, String> getKeyValueMapping(String username) {
+    private Map<String, String> createSharedMapping(String username) {
         Map<String, String> map = new HashMap<>();
 
         String workspaceDir = causalRestProperties.getWorkspaceDir();
@@ -317,6 +317,7 @@ public class JobQueueEndpointService {
         Path tmpDir = Paths.get(workspaceDir, username, tmpFolder);
         Path resultDir = Paths.get(workspaceDir, username, resultsFolder, algorithmFolder);
 
+        // The following keys will be shared when running each algorithm
         map.put("algorithmJarPath", algorithmJarPath.toString());
         map.put("dataDir", dataDir.toAbsolutePath().toString());
         map.put("tmpDir", tmpDir.toAbsolutePath().toString());
@@ -343,7 +344,8 @@ public class JobQueueEndpointService {
         jobs.forEach(job -> {
             JobInfoDTO jobInfoDTO = new JobInfoDTO();
 
-            jobInfoDTO.setId(job.getId());
+            // Not listing data file name nor ID in response at this moment
+            jobInfoDTO.setId(job.getId()); // Job ID
             jobInfoDTO.setAlgorithmName(job.getAlgorName());
             jobInfoDTO.setAddedTime(job.getAddedTime());
 
