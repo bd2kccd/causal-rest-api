@@ -59,7 +59,7 @@ Befor editing the `causal.properties` file, you need to create a workspace for t
 
 Once you have all the settings configured, go to `causal-rest-api/target` and you will find the jar file named `causal-rest-api.jar`. Then simply run 
 
-```
+```bash
 java -jar causal-rest-api.jar
 ```
 This will start the API server, and you'll be able to access the API endpoints via the URL of `http://localhost:[port]/causal/api/v1/`
@@ -80,7 +80,7 @@ Basically, all the API usage examples are grouped into three categories:
 
 #### Upload small data file
 
-This is a multipart file upload, and the client is required to use `name="file"` to name their file upload field in their form.
+This is a multipart file upload via an HTML form, and the client is required to use `name="file"` to name their file upload field in their form.
 
 ````
 POST /causal/api/v1/zhy19/data/upload HTTP/1.1
@@ -98,7 +98,7 @@ Content-Type:
 
 If the Authorization header is not provided, the response will look like this:
 
-````
+````javascript
 {
   "timestamp": 1465414501443,
   "status": 401,
@@ -110,7 +110,7 @@ If the Authorization header is not provided, the response will look like this:
 
 This POST request will upload the data file to the target server location and add corresponding records into database. And the response will contain the following pieces:
 
-````
+````javascript
 {
   "id": 6,
   "name": "Lung-tetrad_hv.txt",
@@ -206,7 +206,7 @@ Accept: application/json
 
 This `GET` request to the endpoint `http://localhost:9000/causal/api/v1/zhy19/data` with `Basic Auth` will return a `JSON` formatted list of all the input data files that are associated with user `zhy19`
 
-````
+````javascript
 [
   {
     "id": 8,
@@ -264,7 +264,7 @@ Accept: application/xml
 
 And the response will look like this:
 
-````
+````xml
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <dataFileDTOes>
     <dataFile>
@@ -326,7 +326,7 @@ Authorization: Basic emh5MTk6MTIzNDU2
 
 And the resulting response looks like this:
 
-````
+````javascript
 {
   "id": 8,
   "name": "data_small.txt",
@@ -381,7 +381,7 @@ Content-Type: application/json
 
 This POST request will summarize the data file and generate a response (JSON or XML) like below:
 
-````
+````javascript
 {
   "id": 10,
   "name": "large-data.txt",
@@ -411,7 +411,7 @@ Authorization: Basic emh5MTk6MTIzNDU2
 ````
 Currently we support "FGS continuous" and "FGS discrete".
 
-````
+````javascript
 [
   {
     "id": 1,
@@ -432,33 +432,40 @@ Currently we support "FGS continuous" and "FGS discrete" and below are the param
 
 Algorithm parameters:
 
-- `depth` - search depth
-- `penaltyDiscount` - Penalty discount. Default is 4.0
-- `ignoreLinearDependence` - Ignore linear dependence. Default is true
-- `heuristicSpeedup` - Heuristic speedup. All conditional independence relations that hold in the distribution are entailed by the Causal Markov Assumption. Default is true
-- `verbose` - Print additional information. Default is true
+| Parameters        | Description           | Default Value  |
+| ------------- | ------------- | ----- |
+| `depth`      | Search depth. Integer value |  |
+| `penaltyDiscount`      | Penalty discount      |   4.0 |
+| `ignoreLinearDependence` | Ignore linear dependence      |    true |
+| `heuristicSpeedup` | Heuristic speedup. All conditional independence relations that hold in the distribution are entailed by the Causal Markov Assumption      |    true |
+| `verbose` | Print additional information      |    true |
 
 Data validation:
 
-- `nonZeroVarianceValidation` - Non-zero Variance. Ensure that each variable has non-zero variance. Default is true
-- `uniqueVarNameValidation` - Unique Variable Name. Ensure that there are no duplicated variable names. Default is true
+| Parameters        | Description           | Default Value  |
+| ------------- | ------------- | ----- |
+| `nonZeroVarianceValidation`      | Non-zero Variance. Ensure that each variable has non-zero variance | true |
+| `uniqueVarNameValidation`      | Unique Variable Name. Ensure that there are no duplicated variable names      |  true |
 
 **FGS discrete** 
 
 Algorithm parameters:
 
-- `depth` - search depth
-- `structurePrior` - Structure prior. 
-- `samplePrior` - Sample prior.
-- `heuristicSpeedup` - Heuristic speedup. All conditional independence relations that hold in the distribution are entailed by the Causal Markov Assumption. Default is true
-- `verbose` - Print additional information. Default is true
+| Parameters        | Description           | Default Value  |
+| ------------- | ------------- | ----- |
+| `depth`      | Search depth. Integer value |  |
+| `structurePrior`      | Penalty discount      |  |
+| `samplePrior` | Sample prior      |  |
+| `heuristicSpeedup` | Heuristic speedup. All conditional independence relations that hold in the distribution are entailed by the Causal Markov Assumption      |    true |
+| `verbose` | Print additional information      |    true |
 
 Data validation:
 
-- `nonZeroVarianceValidation` - Non-zero Variance. Ensure that each variable has non-zero variance. Default is true
-- `uniqueVarNameValidation` - Unique Variable Name. Ensure that there are no duplicated variable names. Default is true
-- `limitNumOfCategory` - Limit Number of Categories - ensure the number of categories of a variable does not exceed 10. Default is true
-
+| Parameters        | Description           | Default Value  |
+| ------------- | ------------- | ----- |
+| `nonZeroVarianceValidation`      | Non-zero Variance. Ensure that each variable has non-zero variance | true |
+| `uniqueVarNameValidation`      | Unique Variable Name. Ensure that there are no duplicated variable names      |  true |
+| `limitNumOfCategory`      | Limit Number of Categories - ensure the number of categories of a variable does not exceed 10 | true |
 
 #### Add a new job to run the desired algorithm on a given data file
 
@@ -507,7 +514,7 @@ Content-Type: application/json
 
 Then you'll see the information of all jobs that are currently running:
 
-````
+````javascript
 [
   {
     "id": 32,
@@ -558,7 +565,7 @@ Authorization: Basic emh5MTk6MTIzNDU2
 
 The response to this request will look like this:
 
-````
+````javascript
 [
   {
     "name": "fgs_sim_data_20vars_100cases.csv_1466171729046.txt",
@@ -586,7 +593,7 @@ On success, you will get the result file back as text file content. If there's a
 
 The response to this request will look like this:
 
-````
+````javascript
 {
   "timestamp": 1467210996233,
   "status": 404,
@@ -637,7 +644,7 @@ Authorization: Basic emh5MTk6MTIzNDU2
 
 The response will show a list of comparison files:
 
-````
+````javascript
 [
   {
     "name": "result_comparison_1467385923407.txt",
