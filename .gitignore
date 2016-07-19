@@ -4,3 +4,4 @@ target
 ## Ignore files for Netbeans
 causal-rest-api-license.txt
 nb-configuration.xml
+causal_rest_api.log

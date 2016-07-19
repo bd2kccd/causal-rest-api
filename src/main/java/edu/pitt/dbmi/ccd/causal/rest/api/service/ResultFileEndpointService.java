@@ -18,10 +18,10 @@
  */
 package edu.pitt.dbmi.ccd.causal.rest.api.service;
 
-import edu.pitt.dbmi.ccd.causal.rest.api.dto.ResultFileDTO;
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.ResultComparison;
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.ResultComparisonData;
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.ResultComparisonFileDTO;
+import edu.pitt.dbmi.ccd.causal.rest.api.dto.ResultFileDTO;
 import edu.pitt.dbmi.ccd.causal.rest.api.exception.ResourceNotFoundException;
 import edu.pitt.dbmi.ccd.causal.rest.api.prop.CausalRestProperties;
 import edu.pitt.dbmi.ccd.commons.file.info.BasicFileInfo;
@@ -256,6 +256,7 @@ public class ResultFileEndpointService {
                         comparison.isInAll() ? "1" : "0",
                         comparison.isSameEdgeType() ? "1" : "0"));
             }
+            LOGGER.info(String.format("Result file '%s' has been created.", resultFileName));
         } catch (IOException exception) {
             LOGGER.error(String.format("Unable to write file '%s'.", resultFileName), exception);
         }

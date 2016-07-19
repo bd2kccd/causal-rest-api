@@ -45,6 +45,8 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -54,6 +56,8 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class JobQueueEndpointService {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(JobQueueEndpointService.class);
 
     private final CausalRestProperties causalRestProperties;
 
@@ -196,7 +200,11 @@ public class JobQueueEndpointService {
 
         jobQueueInfo = jobQueueInfoService.saveJobIntoQueue(jobQueueInfo);
 
-        return jobQueueInfo.getId();
+        Long newJobId = jobQueueInfo.getId();
+
+        LOGGER.info(String.format("New FGS Discrete job submitted. Job ID: %d", newJobId));
+
+        return newJobId;
     }
 
     /**
@@ -317,7 +325,11 @@ public class JobQueueEndpointService {
 
         jobQueueInfo = jobQueueInfoService.saveJobIntoQueue(jobQueueInfo);
 
-        return jobQueueInfo.getId();
+        Long newJobId = jobQueueInfo.getId();
+
+        LOGGER.info(String.format("New FGS Continuous job submitted. Job ID: %d", newJobId));
+
+        return newJobId;
     }
 
     /**
@@ -419,11 +431,14 @@ public class JobQueueEndpointService {
         // If can't find the job id from database, it's already completed
         // Then we are unable to cancel the job
         if (job == null) {
+            LOGGER.warn(String.format("Unable to cancel job from queue. Job ID: %d", id));
             return false;
         }
         // Set status to 2 in database so the job queue knows it's a flag to kill the job
         job.setStatus(2);
         jobQueueInfoService.saveJobIntoQueue(job);
+
+        LOGGER.info(String.format("Job canceled from queue. Job ID: %d", id));
 
         return true;
     }

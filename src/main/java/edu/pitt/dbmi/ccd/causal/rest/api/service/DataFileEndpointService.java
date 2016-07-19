@@ -120,6 +120,7 @@ public class DataFileEndpointService {
             dataFileService.deleteDataFile(dataFile);
             // Delete the physical file from workspace folder
             Files.deleteIfExists(Paths.get(dataFile.getAbsolutePath(), dataFile.getName()));
+            LOGGER.info(String.format("Data file '%s' (id=%d) has been deleted.", dataFile.getName(), id));
         } catch (Exception exception) {
             String errMsg = String.format("Unable to delete data file id=%d.", id);
             LOGGER.error(errMsg, exception);
@@ -142,6 +143,7 @@ public class DataFileEndpointService {
 
         DataFile dataFile = dataFileService.findByIdAndUserAccount(id, userAccount);
         if (dataFile == null) {
+            LOGGER.warn(String.format("Can not find data file id=%d.", id));
             throw new NotFoundByIdException(id);
         }
 
@@ -335,6 +337,8 @@ public class DataFileEndpointService {
         dataFileDTO.setFileSize(newDataFile.getFileSize());
         dataFileDTO.setLastModifiedTime(newDataFile.getLastModifiedTime());
         dataFileDTO.setFileSummary(dataFileSummaryDTO);
+
+        LOGGER.info(String.format("New data file '%s' (id=%d) has been uploaded successfully.", newDataFile.getName(), newDataFile.getId()));
 
         return dataFileDTO;
     }
@@ -628,30 +632,9 @@ public class DataFileEndpointService {
         dataFileDTO.setName(dataFile.getName());
         dataFileDTO.setFileSummary(dataFileSummaryDTO);
 
+        LOGGER.info(String.format("Data file '%s' (id=%d) has been summarized successfully.", dataFile.getName(), dataFile.getId()));
+
         return dataFileDTO;
     }
 
-    /*
-    private void synchronizeDataFiles(UserAccount userAccount) {
-        // get all the user's dataset from the database
-        List<DataFile> dataFiles = dataFileRestService.findByUserAccount(userAccount);
-        Map<String, DataFile> dbDataFile = new HashMap<>();
-        dataFiles.forEach(file -> {
-            dbDataFile.put(file.getName(), file);
-        });
-
-        String workspaceDir = causalRestProperties.getWorkspaceDir();
-        String dataFolder = causalRestProperties.getDataFolder();
-        Path dataDir = Paths.get(workspaceDir, userAccount.getUsername(), dataFolder);
-
-        Map<String, DataFile> saveFiles = new HashMap<>();
-        try {
-            List<Path> localFiles = FileInfos.listDirectory(dataDir, false);
-            localFiles.forEach(localFile -> {
-            });
-        } catch (IOException exception) {
-            LOGGER.error(exception.getMessage());
-        }
-    }
-     */
 }
