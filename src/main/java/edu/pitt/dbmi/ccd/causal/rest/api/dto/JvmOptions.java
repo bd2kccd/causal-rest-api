@@ -18,7 +18,7 @@
  */
 package edu.pitt.dbmi.ccd.causal.rest.api.dto;
 
-import javax.validation.constraints.Size;
+import org.hibernate.validator.constraints.Range;
 
 /**
  *
@@ -26,7 +26,8 @@ import javax.validation.constraints.Size;
  */
 public class JvmOptions {
 
-    @Size(min = 0, max = 100, message = "JVM maxmium heap size must be between 0 and 100 (Gigabyte)")
+    // @Size(min = 0, max = 100) won't work
+    @Range(min = 0, max = 100, message = "JVM maxmium heap size must be between 0 and 100 (Gigabyte)")
     private int maxHeapSize;
 
     public JvmOptions() {

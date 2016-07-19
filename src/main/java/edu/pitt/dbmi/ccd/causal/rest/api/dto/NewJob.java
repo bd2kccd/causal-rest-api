@@ -18,6 +18,7 @@
  */
 package edu.pitt.dbmi.ccd.causal.rest.api.dto;
 
+import javax.validation.Valid;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
@@ -33,6 +34,10 @@ public class NewJob {
     @Max(Long.MAX_VALUE)
     protected Long dataFileId;
 
+    // We must ues @Valid annoation here again to enable the bean validation in JvmOptions,
+    // because the @Valid annoation used in endpopint only works on this NewJob bean,
+    // the validation won't populate to the nested bean without this @Valid here
+    @Valid
     protected JvmOptions jvmOptions;
 
     public NewJob() {
