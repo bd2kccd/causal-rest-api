@@ -26,7 +26,7 @@ import org.hibernate.validator.constraints.Range;
  *
  * @author Zhou Yuan (zhy19@pitt.edu)
  */
-public class NewJob {
+public abstract class NewJob {
 
     @NotNull
     @Range(min = 1, max = Long.MAX_VALUE)

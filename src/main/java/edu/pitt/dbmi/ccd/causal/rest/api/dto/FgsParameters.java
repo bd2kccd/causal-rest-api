@@ -24,7 +24,7 @@ import org.springframework.beans.factory.annotation.Value;
  *
  * @author Zhou Yuan (zhy19@pitt.edu)
  */
-public class FgsParameters {
+public abstract class FgsParameters {
 
     protected int depth;
 
