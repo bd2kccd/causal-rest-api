@@ -18,35 +18,39 @@
  */
 package edu.pitt.dbmi.ccd.causal.rest.api.dto;
 
+import org.springframework.beans.factory.annotation.Value;
+
 /**
  *
  * @author Zhou Yuan (zhy19@pitt.edu)
  */
-public class FgsContinuousNewJob extends NewJob {
+public class FgsDataValidation {
 
-    // Algorithm parameters
-    private FgsContinuousParameters algorithmParameters;
+    // Non-zero Variance - ensure that each variable has non-zero variance
+    @Value("true")
+    protected boolean nonZeroVariance;
 
-    // Data validation flag
-    private FgsContinuousDataValidation dataValidation;
+    // Unique Variable Name - ensure that there are no duplicated variable names
+    @Value("true")
+    protected boolean uniqueVarName;
 
-    public FgsContinuousNewJob() {
+    public FgsDataValidation() {
     }
 
-    public FgsContinuousParameters getAlgorithmParameters() {
-        return algorithmParameters;
+    public boolean isNonZeroVariance() {
+        return nonZeroVariance;
     }
 
-    public void setAlgorithmParameters(FgsContinuousParameters algorithmParameters) {
-        this.algorithmParameters = algorithmParameters;
+    public void setNonZeroVariance(boolean nonZeroVariance) {
+        this.nonZeroVariance = nonZeroVariance;
     }
 
-    public FgsContinuousDataValidation getDataValidation() {
-        return dataValidation;
+    public boolean isUniqueVarName() {
+        return uniqueVarName;
     }
 
-    public void setDataValidation(FgsContinuousDataValidation dataValidation) {
-        this.dataValidation = dataValidation;
+    public void setUniqueVarName(boolean uniqueVarName) {
+        this.uniqueVarName = uniqueVarName;
     }
 
 }

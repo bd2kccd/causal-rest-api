@@ -18,35 +18,27 @@
  */
 package edu.pitt.dbmi.ccd.causal.rest.api.dto;
 
+import org.springframework.beans.factory.annotation.Value;
+
 /**
  *
  * @author Zhou Yuan (zhy19@pitt.edu)
  */
-public class FgsContinuousNewJob extends NewJob {
+public class FgsDiscreteDataValidation extends FgsDataValidation {
 
-    // Algorithm parameters
-    private FgsContinuousParameters algorithmParameters;
+    // Limit Number of Categories - ensure the number of categories of a variable does not exceed 10.
+    @Value("true")
+    private boolean limitNumOfCategory;
 
-    // Data validation flag
-    private FgsContinuousDataValidation dataValidation;
-
-    public FgsContinuousNewJob() {
+    public FgsDiscreteDataValidation() {
     }
 
-    public FgsContinuousParameters getAlgorithmParameters() {
-        return algorithmParameters;
+    public boolean isLimitNumOfCategory() {
+        return limitNumOfCategory;
     }
 
-    public void setAlgorithmParameters(FgsContinuousParameters algorithmParameters) {
-        this.algorithmParameters = algorithmParameters;
-    }
-
-    public FgsContinuousDataValidation getDataValidation() {
-        return dataValidation;
-    }
-
-    public void setDataValidation(FgsContinuousDataValidation dataValidation) {
-        this.dataValidation = dataValidation;
+    public void setLimitNumOfCategory(boolean limitNumOfCategory) {
+        this.limitNumOfCategory = limitNumOfCategory;
     }
 
 }

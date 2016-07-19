@@ -18,8 +18,12 @@
  */
 package edu.pitt.dbmi.ccd.causal.rest.api.service;
 
+import edu.pitt.dbmi.ccd.causal.rest.api.dto.FgsContinuousDataValidation;
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.FgsContinuousNewJob;
+import edu.pitt.dbmi.ccd.causal.rest.api.dto.FgsContinuousParameters;
+import edu.pitt.dbmi.ccd.causal.rest.api.dto.FgsDiscreteDataValidation;
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.FgsDiscreteNewJob;
+import edu.pitt.dbmi.ccd.causal.rest.api.dto.FgsDiscreteParameters;
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.JobInfoDTO;
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.JvmOptions;
 import edu.pitt.dbmi.ccd.causal.rest.api.exception.NotFoundByIdException;
@@ -123,37 +127,41 @@ public class JobQueueEndpointService {
         commands.add("--data");
         commands.add(dataPath.toAbsolutePath().toString());
 
-        // Parameters
+        // Algorithm parameters
+        FgsDiscreteParameters algorithmParameters = newJob.getAlgorithmParameters();
+
         commands.add("--delimiter");
         commands.add(getFileDelimiter(newJob.getDataFileId()));
 
         commands.add("--structure-prior");
-        commands.add(Double.toString(newJob.getStructurePrior()));
+        commands.add(Double.toString(algorithmParameters.getStructurePrior()));
 
         commands.add("--sample-prior");
-        commands.add(Double.toString(newJob.getSamplePrior()));
+        commands.add(Double.toString(algorithmParameters.getSamplePrior()));
 
         commands.add("--depth");
-        commands.add(Integer.toString(newJob.getDepth()));
+        commands.add(Integer.toString(algorithmParameters.getDepth()));
 
-        if (newJob.isVerbose()) {
+        if (algorithmParameters.isVerbose()) {
             commands.add("--verbose");
         }
 
-        if (!newJob.isHeuristicSpeedup()) {
+        if (!algorithmParameters.isHeuristicSpeedup()) {
             commands.add("--disable-heuristic-speedup");
         }
 
         // Data validation
-        if (!newJob.isLimitNumOfCategory()) {
+        FgsDiscreteDataValidation dataValidation = newJob.getDataValidation();
+
+        if (!dataValidation.isLimitNumOfCategory()) {
             commands.add("--skip-category-limit");
         }
 
-        if (!newJob.isNonZeroVarianceValidation()) {
+        if (!dataValidation.isNonZeroVariance()) {
             commands.add("--skip-non-zero-variance");
         }
 
-        if (!newJob.isUniqueVarNameValidation()) {
+        if (!dataValidation.isUniqueVarName()) {
             commands.add("--skip-unique-var-name");
         }
 
@@ -243,34 +251,38 @@ public class JobQueueEndpointService {
         commands.add("--data");
         commands.add(dataPath.toAbsolutePath().toString());
 
-        // Parameters
+        // Algorithm parameters
+        FgsContinuousParameters algorithmParameters = newJob.getAlgorithmParameters();
+
         commands.add("--delimiter");
         commands.add(getFileDelimiter(newJob.getDataFileId()));
 
         commands.add("--penalty-discount");
-        commands.add(Double.toString(newJob.getPenaltyDiscount()));
+        commands.add(Double.toString(algorithmParameters.getPenaltyDiscount()));
 
         commands.add("--depth");
-        commands.add(Integer.toString(newJob.getDepth()));
+        commands.add(Integer.toString(algorithmParameters.getDepth()));
 
-        if (newJob.isVerbose()) {
+        if (algorithmParameters.isVerbose()) {
             commands.add("--verbose");
         }
 
-        if (!newJob.isHeuristicSpeedup()) {
+        if (!algorithmParameters.isHeuristicSpeedup()) {
             commands.add("--disable-heuristic-speedup");
         }
 
-        if (newJob.isIgnoreLinearDependence()) {
+        if (algorithmParameters.isIgnoreLinearDependence()) {
             commands.add("--ignore-linear-dependence");
         }
 
         // Data validation
-        if (!newJob.isNonZeroVarianceValidation()) {
+        FgsContinuousDataValidation dataValidation = newJob.getDataValidation();
+
+        if (!dataValidation.isNonZeroVariance()) {
             commands.add("--skip-non-zero-variance");
         }
 
-        if (!newJob.isUniqueVarNameValidation()) {
+        if (!dataValidation.isUniqueVarName()) {
             commands.add("--skip-unique-var-name");
         }
 

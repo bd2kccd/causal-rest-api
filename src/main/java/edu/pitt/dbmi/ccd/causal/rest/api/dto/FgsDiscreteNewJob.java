@@ -18,8 +18,6 @@
  */
 package edu.pitt.dbmi.ccd.causal.rest.api.dto;
 
-import org.springframework.beans.factory.annotation.Value;
-
 /**
  *
  * @author Zhou Yuan (zhy19@pitt.edu)
@@ -27,36 +25,28 @@ import org.springframework.beans.factory.annotation.Value;
 public class FgsDiscreteNewJob extends NewJob {
 
     // Algorithm parameters
-    private double structurePrior;
-
-    private double samplePrior;
+    private FgsDiscreteParameters algorithmParameters;
 
     // Data validation flag
-    @Value("true")
-    private boolean limitNumOfCategory;
+    private FgsDiscreteDataValidation dataValidation;
 
-    public double getStructurePrior() {
-        return structurePrior;
+    public FgsDiscreteNewJob() {
     }
 
-    public void setStructurePrior(double structurePrior) {
-        this.structurePrior = structurePrior;
+    public FgsDiscreteParameters getAlgorithmParameters() {
+        return algorithmParameters;
     }
 
-    public double getSamplePrior() {
-        return samplePrior;
+    public void setAlgorithmParameters(FgsDiscreteParameters algorithmParameters) {
+        this.algorithmParameters = algorithmParameters;
     }
 
-    public void setSamplePrior(double samplePrior) {
-        this.samplePrior = samplePrior;
+    public FgsDiscreteDataValidation getDataValidation() {
+        return dataValidation;
     }
 
-    public boolean isLimitNumOfCategory() {
-        return limitNumOfCategory;
-    }
-
-    public void setLimitNumOfCategory(boolean limitNumOfCategory) {
-        this.limitNumOfCategory = limitNumOfCategory;
+    public void setDataValidation(FgsDiscreteDataValidation dataValidation) {
+        this.dataValidation = dataValidation;
     }
 
 }

@@ -21,7 +21,6 @@ package edu.pitt.dbmi.ccd.causal.rest.api.dto;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
-import org.springframework.beans.factory.annotation.Value;
 
 /**
  *
@@ -34,22 +33,6 @@ public class NewJob {
     @Max(Long.MAX_VALUE)
     protected Long dataFileId;
 
-    // Algorithm parameters
-    protected int depth;
-
-    @Value("true")
-    protected boolean heuristicSpeedup;
-
-    @Value("true")
-    protected boolean verbose;
-
-    // Data validation
-    @Value("true")
-    protected boolean nonZeroVarianceValidation;
-
-    @Value("true")
-    protected boolean uniqueVarNameValidation;
-
     protected JvmOptions jvmOptions;
 
     public NewJob() {
@@ -61,46 +44,6 @@ public class NewJob {
 
     public void setDataFileId(Long dataFileId) {
         this.dataFileId = dataFileId;
-    }
-
-    public int getDepth() {
-        return depth;
-    }
-
-    public void setDepth(int depth) {
-        this.depth = depth;
-    }
-
-    public boolean isHeuristicSpeedup() {
-        return heuristicSpeedup;
-    }
-
-    public void setHeuristicSpeedup(boolean heuristicSpeedup) {
-        this.heuristicSpeedup = heuristicSpeedup;
-    }
-
-    public boolean isVerbose() {
-        return verbose;
-    }
-
-    public void setVerbose(boolean verbose) {
-        this.verbose = verbose;
-    }
-
-    public boolean isNonZeroVarianceValidation() {
-        return nonZeroVarianceValidation;
-    }
-
-    public void setNonZeroVarianceValidation(boolean nonZeroVarianceValidation) {
-        this.nonZeroVarianceValidation = nonZeroVarianceValidation;
-    }
-
-    public boolean isUniqueVarNameValidation() {
-        return uniqueVarNameValidation;
-    }
-
-    public void setUniqueVarNameValidation(boolean uniqueVarNameValidation) {
-        this.uniqueVarNameValidation = uniqueVarNameValidation;
     }
 
     public JvmOptions getJvmOptions() {

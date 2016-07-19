@@ -18,35 +18,47 @@
  */
 package edu.pitt.dbmi.ccd.causal.rest.api.dto;
 
+import org.springframework.beans.factory.annotation.Value;
+
 /**
  *
  * @author Zhou Yuan (zhy19@pitt.edu)
  */
-public class FgsContinuousNewJob extends NewJob {
+public class FgsParameters {
 
-    // Algorithm parameters
-    private FgsContinuousParameters algorithmParameters;
+    protected int depth;
 
-    // Data validation flag
-    private FgsContinuousDataValidation dataValidation;
+    @Value("true")
+    protected boolean heuristicSpeedup;
 
-    public FgsContinuousNewJob() {
+    @Value("true")
+    protected boolean verbose;
+
+    public FgsParameters() {
     }
 
-    public FgsContinuousParameters getAlgorithmParameters() {
-        return algorithmParameters;
+    public int getDepth() {
+        return depth;
     }
 
-    public void setAlgorithmParameters(FgsContinuousParameters algorithmParameters) {
-        this.algorithmParameters = algorithmParameters;
+    public void setDepth(int depth) {
+        this.depth = depth;
     }
 
-    public FgsContinuousDataValidation getDataValidation() {
-        return dataValidation;
+    public boolean isHeuristicSpeedup() {
+        return heuristicSpeedup;
     }
 
-    public void setDataValidation(FgsContinuousDataValidation dataValidation) {
-        this.dataValidation = dataValidation;
+    public void setHeuristicSpeedup(boolean heuristicSpeedup) {
+        this.heuristicSpeedup = heuristicSpeedup;
+    }
+
+    public boolean isVerbose() {
+        return verbose;
+    }
+
+    public void setVerbose(boolean verbose) {
+        this.verbose = verbose;
     }
 
 }

@@ -426,9 +426,25 @@ Currently we support "FGS continuous" and "FGS discrete".
 ]
 ````
 
-Currently we support "FGS continuous" and "FGS discrete" and below are the parameters that you can use for each algorithm.
+Currently we support "FGS continuous" and "FGS discrete" and they share a common JSON structure as of their input, for example:
+
+| Input JSON Fields | Description |
+| --- | --- |
+| `dataFileId` | The data file ID, integer |
+| `dataValidation` | Algorithm specific input data validation flags, JSON object |
+| `algorithmParameters` | Algorithm specific parameters, JSON object |
+| `jvmOptions` | Advanced Options For Java Virtual Machine (JVM), JSON object. Currently only support `maxHeapSize` (Gigabyte, max value is 100) |
+
+Below are the data validation flags and parameters that you can use for each algorithm.
 
 **FGS continuous** 
+
+Data validation:
+
+| Parameters        | Description           | Default Value  |
+| ------------- | ------------- | ----- |
+| `nonZeroVariance`      | Non-zero Variance. Ensure that each variable has non-zero variance | true |
+| `uniqueVarName`      | Unique Variable Name. Ensure that there are no duplicated variable names      |  true |
 
 Algorithm parameters:
 
@@ -440,14 +456,16 @@ Algorithm parameters:
 | `heuristicSpeedup` | Heuristic speedup. All conditional independence relations that hold in the distribution are entailed by the Causal Markov Assumption      |    true |
 | `verbose` | Print additional information      |    true |
 
+**FGS discrete** 
+
 Data validation:
 
 | Parameters        | Description           | Default Value  |
 | ------------- | ------------- | ----- |
-| `nonZeroVarianceValidation`      | Non-zero Variance. Ensure that each variable has non-zero variance | true |
-| `uniqueVarNameValidation`      | Unique Variable Name. Ensure that there are no duplicated variable names      |  true |
+| `nonZeroVariance`      | Non-zero Variance. Ensure that each variable has non-zero variance | true |
+| `uniqueVarName`      | Unique Variable Name. Ensure that there are no duplicated variable names      |  true |
+| `limitNumOfCategory`      | Limit Number of Categories - ensure the number of categories of a variable does not exceed 10 | true |
 
-**FGS discrete** 
 
 Algorithm parameters:
 
@@ -458,14 +476,6 @@ Algorithm parameters:
 | `samplePrior` | Sample prior      |  |
 | `heuristicSpeedup` | Heuristic speedup. All conditional independence relations that hold in the distribution are entailed by the Causal Markov Assumption      |    true |
 | `verbose` | Print additional information      |    true |
-
-Data validation:
-
-| Parameters        | Description           | Default Value  |
-| ------------- | ------------- | ----- |
-| `nonZeroVarianceValidation`      | Non-zero Variance. Ensure that each variable has non-zero variance | true |
-| `uniqueVarNameValidation`      | Unique Variable Name. Ensure that there are no duplicated variable names      |  true |
-| `limitNumOfCategory`      | Limit Number of Categories - ensure the number of categories of a variable does not exceed 10 | true |
 
 #### Add a new job to run the desired algorithm on a given data file
 
@@ -479,8 +489,17 @@ Content-Type: application/json
 
 {
     "dataFileId": 8,
-    "depth": 3,
-    "penaltyDiscount": 4.0
+    "dataValidation": {
+      "nonZeroVariance": false,
+      "uniqueVarName": false
+    },
+    "algorithmParameters": {
+      "depth": 3,
+      "penaltyDiscount": 5.0
+    },
+    "jvmOptions": {
+      "maxHeapSize": 100
+    }
 }
 ````
 
@@ -496,9 +515,19 @@ Content-Type: application/json
 
 {
     "dataFileId": 9,
-    "depth": 3,
-    "structurePrior": 1.0,
-    "samplePrior": 1.0
+    "dataValidation": {
+      "nonZeroVariance": false,
+      "uniqueVarName": false,
+      "limitNumOfCategory": flase
+    },
+    "algorithmParameters": {
+      "depth": 3,
+      "structurePrior": 1.0,
+      "samplePrior": 1.0
+    },
+    "jvmOptions": {
+      "maxHeapSize": 100
+    }
 }
 ````
 

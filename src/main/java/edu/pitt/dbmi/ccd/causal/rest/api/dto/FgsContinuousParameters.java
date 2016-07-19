@@ -18,35 +18,37 @@
  */
 package edu.pitt.dbmi.ccd.causal.rest.api.dto;
 
+import org.springframework.beans.factory.annotation.Value;
+
 /**
  *
  * @author Zhou Yuan (zhy19@pitt.edu)
  */
-public class FgsContinuousNewJob extends NewJob {
+public class FgsContinuousParameters extends FgsParameters {
 
-    // Algorithm parameters
-    private FgsContinuousParameters algorithmParameters;
+    @Value("4.0")
+    private double penaltyDiscount;
 
-    // Data validation flag
-    private FgsContinuousDataValidation dataValidation;
+    @Value("true")
+    private boolean ignoreLinearDependence;
 
-    public FgsContinuousNewJob() {
+    public FgsContinuousParameters() {
     }
 
-    public FgsContinuousParameters getAlgorithmParameters() {
-        return algorithmParameters;
+    public double getPenaltyDiscount() {
+        return penaltyDiscount;
     }
 
-    public void setAlgorithmParameters(FgsContinuousParameters algorithmParameters) {
-        this.algorithmParameters = algorithmParameters;
+    public void setPenaltyDiscount(double penaltyDiscount) {
+        this.penaltyDiscount = penaltyDiscount;
     }
 
-    public FgsContinuousDataValidation getDataValidation() {
-        return dataValidation;
+    public boolean isIgnoreLinearDependence() {
+        return ignoreLinearDependence;
     }
 
-    public void setDataValidation(FgsContinuousDataValidation dataValidation) {
-        this.dataValidation = dataValidation;
+    public void setIgnoreLinearDependence(boolean ignoreLinearDependence) {
+        this.ignoreLinearDependence = ignoreLinearDependence;
     }
 
 }

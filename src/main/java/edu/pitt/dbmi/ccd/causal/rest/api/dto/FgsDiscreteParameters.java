@@ -22,31 +22,29 @@ package edu.pitt.dbmi.ccd.causal.rest.api.dto;
  *
  * @author Zhou Yuan (zhy19@pitt.edu)
  */
-public class FgsContinuousNewJob extends NewJob {
+public class FgsDiscreteParameters extends FgsParameters {
 
-    // Algorithm parameters
-    private FgsContinuousParameters algorithmParameters;
+    private double structurePrior;
 
-    // Data validation flag
-    private FgsContinuousDataValidation dataValidation;
+    private double samplePrior;
 
-    public FgsContinuousNewJob() {
+    public FgsDiscreteParameters() {
     }
 
-    public FgsContinuousParameters getAlgorithmParameters() {
-        return algorithmParameters;
+    public double getStructurePrior() {
+        return structurePrior;
     }
 
-    public void setAlgorithmParameters(FgsContinuousParameters algorithmParameters) {
-        this.algorithmParameters = algorithmParameters;
+    public void setStructurePrior(double structurePrior) {
+        this.structurePrior = structurePrior;
     }
 
-    public FgsContinuousDataValidation getDataValidation() {
-        return dataValidation;
+    public double getSamplePrior() {
+        return samplePrior;
     }
 
-    public void setDataValidation(FgsContinuousDataValidation dataValidation) {
-        this.dataValidation = dataValidation;
+    public void setSamplePrior(double samplePrior) {
+        this.samplePrior = samplePrior;
     }
 
 }
