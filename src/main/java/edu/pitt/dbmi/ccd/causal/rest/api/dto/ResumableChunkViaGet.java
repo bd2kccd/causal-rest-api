@@ -18,7 +18,9 @@
  */
 package edu.pitt.dbmi.ccd.causal.rest.api.dto;
 
+import javax.validation.constraints.NotNull;
 import javax.ws.rs.QueryParam;
+import org.hibernate.validator.constraints.NotBlank;
 
 /**
  * All query parameters found in GET request URL, no actual file data stream
@@ -27,30 +29,39 @@ import javax.ws.rs.QueryParam;
  */
 public class ResumableChunkViaGet {
 
+    @NotNull
     @QueryParam("resumableChunkSize")
     private long resumableChunkSize;
 
+    @NotNull
     @QueryParam("resumableTotalSize")
     private long resumableTotalSize;
 
+    @NotNull
     @QueryParam("resumableCurrentChunkSize")
     private long resumableCurrentChunkSize;
 
+    @NotNull
     @QueryParam("resumableChunkNumber")
     private int resumableChunkNumber;
 
+    @NotNull
     @QueryParam("resumableTotalChunks")
     private int resumableTotalChunks;
 
+    @NotBlank
     @QueryParam("resumableIdentifier")
     private String resumableIdentifier;
 
+    @NotBlank
     @QueryParam("resumableFilename")
     private String resumableFilename;
 
+    @NotBlank
     @QueryParam("resumableRelativePath")
     private String resumableRelativePath;
 
+    @NotBlank
     @QueryParam("resumableType")
     private String resumableType;
 

@@ -18,10 +18,9 @@
  */
 package edu.pitt.dbmi.ccd.causal.rest.api.dto;
 
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import org.hibernate.validator.constraints.NotBlank;
+import org.hibernate.validator.constraints.Range;
 
 /**
  * This bean is used to get form data when user wants to summarize a data file
@@ -31,8 +30,7 @@ import org.hibernate.validator.constraints.NotBlank;
 public class DataFileSummarization {
 
     @NotNull
-    @Min(1)
-    @Max(Long.MAX_VALUE)
+    @Range(min = 1, max = Long.MAX_VALUE)
     private Long id;
 
     /*

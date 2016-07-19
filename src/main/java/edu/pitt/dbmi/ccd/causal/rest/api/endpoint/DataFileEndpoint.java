@@ -163,7 +163,7 @@ public class DataFileEndpoint {
     @GET
     @Path("/chunkUpload")
     @RolesAllowed(Role.USER)
-    public Response checkChunkExistence(@PathParam("username") String username, @BeanParam ResumableChunkViaGet chunkViaGet) throws IOException {
+    public Response checkChunkExistence(@PathParam("username") String username, @Valid @BeanParam ResumableChunkViaGet chunkViaGet) throws IOException {
         if (dataFileEndpointService.chunkExists(chunkViaGet, username)) {
             // No need to re-upload the same chunk
             // This is used by the resumable clinet internally

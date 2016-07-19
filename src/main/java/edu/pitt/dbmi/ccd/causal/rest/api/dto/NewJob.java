@@ -19,9 +19,8 @@
 package edu.pitt.dbmi.ccd.causal.rest.api.dto;
 
 import javax.validation.Valid;
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
+import org.hibernate.validator.constraints.Range;
 
 /**
  *
@@ -30,8 +29,7 @@ import javax.validation.constraints.NotNull;
 public class NewJob {
 
     @NotNull
-    @Min(1)
-    @Max(Long.MAX_VALUE)
+    @Range(min = 1, max = Long.MAX_VALUE)
     protected Long dataFileId;
 
     // We must ues @Valid annoation here again to enable the bean validation in JvmOptions,

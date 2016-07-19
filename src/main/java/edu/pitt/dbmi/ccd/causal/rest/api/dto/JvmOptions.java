@@ -26,7 +26,7 @@ import org.hibernate.validator.constraints.Range;
  */
 public class JvmOptions {
 
-    // @Size(min = 0, max = 100) won't work
+    // @Size(min = 0, max = 100) won't work since it's used on CharSequence, Collection, Map and arrays
     @Range(min = 0, max = 100, message = "JVM maxmium heap size must be between 0 and 100 (Gigabyte)")
     private int maxHeapSize;
 
