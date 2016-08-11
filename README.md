@@ -66,9 +66,11 @@ This will start the API server, and you'll be able to access the API endpoints v
 
 ## API Usage and Examples
 
-This API requires user to be authenticated. Before using this API, the user will need to go to [Causal-Web App](https://dxcvm26.psc.edu/ccd/login) and create an account. After that, the username and password can be used to authenticate against the REST API via HTTP Basic Auth. The username will need to be specified in the requesting URI and password provided in the HTTP request `Authorization` header.
+In the following sections, we'll demonstrate the API usage with examples using the API server that is running on PSC bridges: https://ccd1.vm.bridges.psc.edu/ccd-api/
 
-Since this API is developed with Jersey, which supports [WADL](https://en.wikipedia.org/wiki/Web_Application_Description_Language). So you can view the generated WADL by going to `http://localhost:9000/causal/api/v1/application.wadl?detail=true` and see all resource available in the application. And below are some examples.
+This API requires user to be authenticated. Before using this API, the user will need to go to [Causal-Web App](https://ccd1.vm.bridges.psc.edu/ccd/) and create an account. After that, the username and password can be used to authenticate against the REST API via HTTP Basic Auth. The username will need to be specified in the requesting URI and password provided in the HTTP request `Authorization` header.
+
+Since this API is developed with Jersey, which supports [WADL](https://en.wikipedia.org/wiki/Web_Application_Description_Language). So you can view the generated WADL by going to `https://ccd1.vm.bridges.psc.edu/ccd-api/application.wadl?detail=true` and see all resource available in the application. And below are some examples.
 
 Basically, all the API usage examples are grouped into three categories: 
 
@@ -83,8 +85,8 @@ Basically, all the API usage examples are grouped into three categories:
 This is a multipart file upload via an HTML form, and the client is required to use `name="file"` to name their file upload field in their form.
 
 ````
-POST /causal/api/v1/zhy19/data/upload HTTP/1.1
-Host: localhost:9000
+POST /ccd-api/zhy19/data/upload HTTP/1.1
+Host: ccd1.vm.bridges.psc.edu
 Authorization: Basic emh5MTk6MTIzNDU2
 Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
 
@@ -129,8 +131,8 @@ and resumable uploads via the HTML5 File API.
 In this example, the data file is splited into 3 chunks. The upload of each chunk consists of a GET request and a POST request. 
 
 ````
-GET /causal/api/v1/zhy19/data/chunkUpload?resumableChunkNumber=2&resumableChunkSize=1048576&resumableCurrentChunkSize=1048576&resumableTotalSize=3309465&resumableType=text%2Fplain&resumableIdentifier=3309465-large-datatxt&resumableFilename=large-data.txt&resumableRelativePath=large-data.txt&resumableTotalChunks=3 HTTP/1.1
-Host: localhost:9000
+GET /ccd-api/zhy19/data/chunkUpload?resumableChunkNumber=2&resumableChunkSize=1048576&resumableCurrentChunkSize=1048576&resumableTotalSize=3309465&resumableType=text%2Fplain&resumableIdentifier=3309465-large-datatxt&resumableFilename=large-data.txt&resumableRelativePath=large-data.txt&resumableTotalChunks=3 HTTP/1.1
+Host: ccd1.vm.bridges.psc.edu
 Authorization: Basic emh5MTk6MTIzNDU2
 ````
 
@@ -138,7 +140,7 @@ This GET request checks if the data chunk is already on the server side. If noth
 
 ````
 POST /causal/api/v1/zhy19/data/chunkUpload HTTP/1.1
-Host: localhost:9000
+Host: ccd1.vm.bridges.psc.edu
 Authorization: Basic emh5MTk6MTIzNDU2
 Content-Type: multipart/form-data; boundary=----WebKitFormBoundaryMFjgApg56XGyeTnZ
 
@@ -198,8 +200,8 @@ b1db7511ee293d297e3055d9a7b46c5e
 #### List all data files of a user
 
 ````
-GET /causal/api/v1/zhy19/data HTTP/1.1
-Host: localhost:9000
+GET /ccd-api/zhy19/data HTTP/1.1
+Host: ccd1.vm.bridges.psc.edu
 Authorization: Basic emh5MTk6MTIzNDU2
 Accept: application/json
 ````
@@ -256,8 +258,8 @@ This `GET` request to the endpoint `http://localhost:9000/causal/api/v1/zhy19/da
 You can also specify the response format as XML in your request
 
 ````
-GET /causal/api/v1/zhy19/data HTTP/1.1
-Host: localhost:9000
+GET /ccd-api/zhy19/data HTTP/1.1
+Host: ccd1.vm.bridges.psc.edu
 Authorization: Basic emh5MTk6MTIzNDU2
 Accept: application/xml
 ````
@@ -319,8 +321,8 @@ Form the above output, we can also tell that data file with ID 10 doesn't have a
 You can also query the data file info for a given file id
 
 ````
-GET /causal/api/v1/zhy19/data/8 HTTP/1.1
-Host: localhost:9000
+GET /ccd-api/zhy19/data/8 HTTP/1.1
+Host: ccd1.vm.bridges.psc.edu
 Authorization: Basic emh5MTk6MTIzNDU2
 ````
 
@@ -346,8 +348,8 @@ And the resulting response looks like this:
 #### Delete physical data file and all records from database for a given file ID
 
 ````
-DELETE /causal/api/v1/zhy19/data/8 HTTP/1.1
-Host: localhost:9000
+DELETE /ccd-api/zhy19/data/8 HTTP/1.1
+Host: ccd1.vm.bridges.psc.edu
 Authorization: Basic emh5MTk6MTIzNDU2
 ````
 
@@ -367,8 +369,8 @@ Before we can go ahead to run the desired algorithm with the newly uploaded data
 | fileDelimiter | tab or comma |
 
 ````
-POST /causal/api/v1/zhy19/data/summarize HTTP/1.1
-Host: localhost:9000
+POST /ccd-api/zhy19/data/summarize HTTP/1.1
+Host: ccd1.vm.bridges.psc.edu
 Authorization: Basic emh5MTk6MTIzNDU2
 Content-Type: application/json
 
@@ -405,8 +407,8 @@ Once the data file is uploaded and summaried, you can start running a Causal Dis
 #### List all the available causal discovery algorithms
 
 ````
-GET /causal/api/v1/zhy19/algorithms HTTP/1.1
-Host: localhost:9000
+GET /ccd-api/zhy19/algorithms HTTP/1.1
+Host: ccd1.vm.bridges.psc.edu
 Authorization: Basic emh5MTk6MTIzNDU2
 ````
 Currently we support "FGS continuous" and "FGS discrete".
@@ -482,8 +484,8 @@ Algorithm parameters:
 This is a POST request and the algorithm and data file id will need to be specified in the POST body as a JSON when you make the request.
 
 ````
-POST /causal/api/v1/zhy19/jobs/fgs HTTP/1.1
-Host: localhost:9000
+POST /ccd-api/zhy19/jobs/fgs HTTP/1.1
+Host: ccd1.vm.bridges.psc.edu
 Authorization: Basic emh5MTk6MTIzNDU2
 Content-Type: application/json
 
@@ -508,8 +510,8 @@ In this example, we are running the "FGS continuous" algorithm on the file with 
 When you need to run "FGS discrete", just send the request to a different endpont URI:
 
 ````
-POST /causal/api/v1/zhy19/jobs/fgs-discrete HTTP/1.1
-Host: localhost:9000
+POST /ccd-api/zhy19/jobs/fgs-discrete HTTP/1.1
+Host: ccd1.vm.bridges.psc.edu
 Authorization: Basic emh5MTk6MTIzNDU2
 Content-Type: application/json
 
@@ -534,8 +536,8 @@ Content-Type: application/json
 #### List all running jobs
 
 ````
-GET /causal/api/v1/zhy19/jobs/ HTTP/1.1
-Host: localhost:9000
+GET /ccd-api/zhy19/jobs/ HTTP/1.1
+Host: ccd1.vm.bridges.psc.edu
 Authorization: Basic emh5MTk6MTIzNDU2
 Content-Type: application/json
 
@@ -563,8 +565,8 @@ Then you'll see the information of all jobs that are currently running:
 Once the new job is submitted, it takes time and resources to run the algorithm on the server. During the waiting, you can check the status of a given job ID:
 
 ````
-GET /causal/api/v1/zhy19/jobs/32 HTTP/1.1
-Host: localhost:9000
+GET /ccd-api/zhy19/jobs/32 HTTP/1.1
+Host: ccd1.vm.bridges.psc.edu
 Authorization: Basic emh5MTk6MTIzNDU2
 ````
 
@@ -575,8 +577,8 @@ This will either return "Pending" or "Completed".
 Sometimes you may want to cancel a submitted job.
 
 ````
-DELETE /causal/api/v1/zhy19/jobs/8 HTTP/1.1
-Host: localhost:9000
+DELETE /ccd-api/zhy19/jobs/8 HTTP/1.1
+Host: ccd1.vm.bridges.psc.edu
 Authorization: Basic emh5MTk6MTIzNDU2
 ````
 
@@ -587,8 +589,8 @@ This call will response either "Job 8 has been canceled" or "Unable to cancel jo
 #### List all result files generated by the algorithm
 
 ````
-GET /causal/api/v1/zhy19/results HTTP/1.1
-Host: localhost:9000
+GET /ccd-api/zhy19/results HTTP/1.1
+Host: ccd1.vm.bridges.psc.edu
 Authorization: Basic emh5MTk6MTIzNDU2
 ````
 
@@ -614,8 +616,8 @@ The response to this request will look like this:
 #### Download a speific result file generated by the algorithm based on file name
 
 ````
-GET /causal/api/v1/zhy19/results/fgs_data_small.txt_1466172140585.txt HTTP/1.1
-Host: localhost:9000
+GET /ccd-api/zhy19/results/fgs_data_small.txt_1466172140585.txt HTTP/1.1
+Host: ccd1.vm.bridges.psc.edu
 Authorization: Basic emh5MTk6MTIzNDU2
 ````
 On success, you will get the result file back as text file content. If there's a typo in file name of the that file doesn't exist, you'll get either a JSON or XML message based on the `accept` header in your request:
@@ -638,8 +640,8 @@ The response to this request will look like this:
 From Example 4 we can list all the algorithm result files, based on the results, we can also choose multiple files and run a comparison. 
 
 ````
-GET /causal/api/v1/zhy19/results/compare/fgs_sim_data_20vars_100cases.csv_1466171729046.txt!!fgs_data_small.txt_1467305104859.txt HTTP/1.1
-Host: localhost:9000
+GET /ccd-api/zhy19/results/compare/fgs_sim_data_20vars_100cases.csv_1466171729046.txt!!fgs_data_small.txt_1467305104859.txt HTTP/1.1
+Host: ccd1.vm.bridges.psc.edu
 Authorization: Basic emh5MTk6MTIzNDU2
 ````
 When you specify multiple file names, use the `!!` as a delimiter. This request will generate a result comparison file with the following content (shortened version):
@@ -666,8 +668,8 @@ From this comparison, you can see if the two algorithm graphs have common edges 
 #### List all the comparison files
 
 ````
-GET /causal/api/v1/zhy19/results/comparisons HTTP/1.1
-Host: localhost:9000
+GET /ccd-api/zhy19/results/comparisons HTTP/1.1
+Host: ccd1.vm.bridges.psc.edu
 Authorization: Basic emh5MTk6MTIzNDU2
 ````
 
@@ -699,8 +701,8 @@ The response will show a list of comparison files:
 #### Download a speific comparison file based on file name
 
 ````
-GET /causal/api/v1/zhy19/results/comparisons/result_comparison_1467388042261.txt HTTP/1.1
-Host: localhost:9000
+GET /ccd-api/zhy19/results/comparisons/result_comparison_1467388042261.txt HTTP/1.1
+Host: ccd1.vm.bridges.psc.edu
 Authorization: Basic emh5MTk6MTIzNDU2
 ````
 
