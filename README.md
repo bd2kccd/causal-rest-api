@@ -4,6 +4,8 @@ This RESTful API is designed for causal web. And it implements the [JAX-RS](http
 
 ## Installation
 
+The following installation instructions are supposed to be used by the server admin who deploys this API server. API users can skip this section and just start reading from the [API Usage and Examples](https://github.com/bd2kccd/causal-rest-api#api-usage-and-examples) section. 
+
 ### Dependencies
 
 If you want to run this API server and expose the API to your users, you'll first need to have the [Causal Web Application](https://github.com/bd2kccd/causal-web) installed and running. Your API users will use this web app to create their user accounts before they can consume the API.
@@ -66,7 +68,7 @@ This will start the API server, and you'll be able to access the API endpoints v
 
 ## API Usage and Examples
 
-In the following sections, we'll demonstrate the API usage with examples using the API server that is running on PSC bridges.
+In the following sections, we'll demonstrate the API usage with examples using the API server that is running on PSC (Pittsburgh Super Computing) bridges.
 
 This API requires user to be authenticated. Before using this API, the user will need to go to [Causal-Web App](https://ccd1.vm.bridges.psc.edu/ccd/) and create an account. After that, the username and password can be used to authenticate against the REST API via HTTP Basic Auth. The username will need to be specified in the requesting URI and password provided in the HTTP request `Authorization` header.
 
@@ -78,14 +80,22 @@ Basically, all the API usage examples are grouped into three categories:
 2. Causal Discovery
 3. Result Management
 
+And all the following examples will be issued by user `demouser` whose password is `123456`.
+
 ### 1. Data Management
 
 #### Upload small data file
 
+API Endpoint URI pattern:
+
+````
+POST https://ccd1.vm.bridges.psc.edu/ccd-api/{username}/data/upload
+````
+
 This is a multipart file upload via an HTML form, and the client is required to use `name="file"` to name their file upload field in their form.
 
 ````
-POST /ccd-api/zhy19/data/upload HTTP/1.1
+POST /ccd-api/demouser/data/upload HTTP/1.1
 Host: ccd1.vm.bridges.psc.edu
 Authorization: Basic emh5MTk6MTIzNDU2
 Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
@@ -106,7 +116,7 @@ If the Authorization header is not provided, the response will look like this:
   "status": 401,
   "error": "Unauthorized",
   "message": "User credentials are required.",
-  "path": "/zhy19/data/upload"
+  "path": "/demouser/data/upload"
 }
 ````
 
@@ -128,10 +138,18 @@ This POST request will upload the data file to the target server location and ad
 In addition to the regular file upload described in Example 6, we also provide the option of stable and resumable large file upload. It requires the client side to have a resumable upload implementation. We currently support client integrated with [Resumable.js](http://resumablejs.com/), whihc provides multiple simultaneous, stable 
 and resumable uploads via the HTML5 File API.
 
+API Endpoint URI pattern:
+
+````
+GET https://ccd1.vm.bridges.psc.edu/ccd-api/{username}/data/chunkUpload
+
+POST https://ccd1.vm.bridges.psc.edu/ccd-api/{username}/data/chunkUpload
+````
+
 In this example, the data file is splited into 3 chunks. The upload of each chunk consists of a GET request and a POST request. 
 
 ````
-GET /ccd-api/zhy19/data/chunkUpload?resumableChunkNumber=2&resumableChunkSize=1048576&resumableCurrentChunkSize=1048576&resumableTotalSize=3309465&resumableType=text%2Fplain&resumableIdentifier=3309465-large-datatxt&resumableFilename=large-data.txt&resumableRelativePath=large-data.txt&resumableTotalChunks=3 HTTP/1.1
+GET /ccd-api/demouser/data/chunkUpload?resumableChunkNumber=2&resumableChunkSize=1048576&resumableCurrentChunkSize=1048576&resumableTotalSize=3309465&resumableType=text%2Fplain&resumableIdentifier=3309465-large-datatxt&resumableFilename=large-data.txt&resumableRelativePath=large-data.txt&resumableTotalChunks=3 HTTP/1.1
 Host: ccd1.vm.bridges.psc.edu
 Authorization: Basic emh5MTk6MTIzNDU2
 ````
@@ -139,7 +157,7 @@ Authorization: Basic emh5MTk6MTIzNDU2
 This GET request checks if the data chunk is already on the server side. If nothing there, the client will issue another POST request to upload the actual data.
 
 ````
-POST /causal/api/v1/zhy19/data/chunkUpload HTTP/1.1
+POST /ccd-api/demouser/data/chunkUpload HTTP/1.1
 Host: ccd1.vm.bridges.psc.edu
 Authorization: Basic emh5MTk6MTIzNDU2
 Content-Type: multipart/form-data; boundary=----WebKitFormBoundaryMFjgApg56XGyeTnZ
@@ -199,14 +217,20 @@ b1db7511ee293d297e3055d9a7b46c5e
 
 #### List all data files of a user
 
+API Endpoint URI pattern:
+
 ````
-GET /ccd-api/zhy19/data HTTP/1.1
+POST https://ccd1.vm.bridges.psc.edu/ccd-api/{username}/data
+````
+
+````
+GET /ccd-api/demouser/data HTTP/1.1
 Host: ccd1.vm.bridges.psc.edu
 Authorization: Basic emh5MTk6MTIzNDU2
 Accept: application/json
 ````
 
-This `GET` request to the endpoint `http://localhost:9000/causal/api/v1/zhy19/data` with `Basic Auth` will return a `JSON` formatted list of all the input data files that are associated with user `zhy19`
+A `JSON` formatted list of all the input data files that are associated with user `demouser` will be returned.
 
 ````javascript
 [
@@ -258,7 +282,7 @@ This `GET` request to the endpoint `http://localhost:9000/causal/api/v1/zhy19/da
 You can also specify the response format as XML in your request
 
 ````
-GET /ccd-api/zhy19/data HTTP/1.1
+GET /ccd-api/demouser/data HTTP/1.1
 Host: ccd1.vm.bridges.psc.edu
 Authorization: Basic emh5MTk6MTIzNDU2
 Accept: application/xml
@@ -318,10 +342,16 @@ Form the above output, we can also tell that data file with ID 10 doesn't have a
 
 #### Get the deatil information of a data file based on ID
 
+API Endpoint URI pattern:
+
+````
+GET https://ccd1.vm.bridges.psc.edu/ccd-api/{username}/data/{id}
+````
+
 You can also query the data file info for a given file id
 
 ````
-GET /ccd-api/zhy19/data/8 HTTP/1.1
+GET /ccd-api/demouser/data/8 HTTP/1.1
 Host: ccd1.vm.bridges.psc.edu
 Authorization: Basic emh5MTk6MTIzNDU2
 ````
@@ -347,8 +377,15 @@ And the resulting response looks like this:
 
 #### Delete physical data file and all records from database for a given file ID
 
+API Endpoint URI pattern:
+
 ````
-DELETE /ccd-api/zhy19/data/8 HTTP/1.1
+DELETE https://ccd1.vm.bridges.psc.edu/ccd-api/{username}/data/{id}
+````
+For example:
+
+````
+DELETE /ccd-api/demouser/data/8 HTTP/1.1
 Host: ccd1.vm.bridges.psc.edu
 Authorization: Basic emh5MTk6MTIzNDU2
 ````
@@ -368,8 +405,14 @@ Before we can go ahead to run the desired algorithm with the newly uploaded data
 | variableType | discrete or continuous |
 | fileDelimiter | tab or comma |
 
+API Endpoint URI pattern:
+
 ````
-POST /ccd-api/zhy19/data/summarize HTTP/1.1
+POST https://ccd1.vm.bridges.psc.edu/ccd-api/{username}/data/summarize
+````
+
+````
+POST /ccd-api/demouser/data/summarize HTTP/1.1
 Host: ccd1.vm.bridges.psc.edu
 Authorization: Basic emh5MTk6MTIzNDU2
 Content-Type: application/json
@@ -406,8 +449,14 @@ Once the data file is uploaded and summaried, you can start running a Causal Dis
 
 #### List all the available causal discovery algorithms
 
+API Endpoint URI pattern:
+
 ````
-GET /ccd-api/zhy19/algorithms HTTP/1.1
+GET https://ccd1.vm.bridges.psc.edu/ccd-api/{username}/algorithms
+````
+
+````
+GET /ccd-api/demouser/algorithms HTTP/1.1
 Host: ccd1.vm.bridges.psc.edu
 Authorization: Basic emh5MTk6MTIzNDU2
 ````
@@ -481,10 +530,16 @@ Algorithm parameters:
 
 #### Add a new job to run the desired algorithm on a given data file
 
-This is a POST request and the algorithm and data file id will need to be specified in the POST body as a JSON when you make the request.
+This is a POST request and the algorithm details and data file id will need to be specified in the POST body as a JSON when you make the request.
+
+API Endpoint URI pattern:
 
 ````
-POST /ccd-api/zhy19/jobs/fgs HTTP/1.1
+POST https://ccd1.vm.bridges.psc.edu/ccd-api/{username}/jobs/fgs
+````
+
+````
+POST /ccd-api/demouser/jobs/fgs HTTP/1.1
 Host: ccd1.vm.bridges.psc.edu
 Authorization: Basic emh5MTk6MTIzNDU2
 Content-Type: application/json
@@ -509,8 +564,14 @@ In this example, we are running the "FGS continuous" algorithm on the file with 
 
 When you need to run "FGS discrete", just send the request to a different endpont URI:
 
+API Endpoint URI pattern:
+
 ````
-POST /ccd-api/zhy19/jobs/fgs-discrete HTTP/1.1
+POST https://ccd1.vm.bridges.psc.edu/ccd-api/{username}/jobs/fgs-discrete
+````
+
+````
+POST /ccd-api/demouser/jobs/fgs-discrete HTTP/1.1
 Host: ccd1.vm.bridges.psc.edu
 Authorization: Basic emh5MTk6MTIzNDU2
 Content-Type: application/json
@@ -535,8 +596,14 @@ Content-Type: application/json
 
 #### List all running jobs
 
+API Endpoint URI pattern:
+
 ````
-GET /ccd-api/zhy19/jobs/ HTTP/1.1
+GET https://ccd1.vm.bridges.psc.edu/ccd-api/{username}/jobs
+````
+
+````
+GET /ccd-api/demouser/jobs/ HTTP/1.1
 Host: ccd1.vm.bridges.psc.edu
 Authorization: Basic emh5MTk6MTIzNDU2
 Content-Type: application/json
@@ -564,8 +631,14 @@ Then you'll see the information of all jobs that are currently running:
 
 Once the new job is submitted, it takes time and resources to run the algorithm on the server. During the waiting, you can check the status of a given job ID:
 
+API Endpoint URI pattern:
+
 ````
-GET /ccd-api/zhy19/jobs/32 HTTP/1.1
+GET https://ccd1.vm.bridges.psc.edu/ccd-api/{username}/jobs/{id}
+````
+
+````
+GET /ccd-api/demouser/jobs/32 HTTP/1.1
 Host: ccd1.vm.bridges.psc.edu
 Authorization: Basic emh5MTk6MTIzNDU2
 ````
@@ -576,8 +649,14 @@ This will either return "Pending" or "Completed".
 
 Sometimes you may want to cancel a submitted job.
 
+API Endpoint URI pattern:
+
 ````
-DELETE /ccd-api/zhy19/jobs/8 HTTP/1.1
+DELETE https://ccd1.vm.bridges.psc.edu/ccd-api/{username}/jobs/{id}
+````
+
+````
+DELETE /ccd-api/demouser/jobs/8 HTTP/1.1
 Host: ccd1.vm.bridges.psc.edu
 Authorization: Basic emh5MTk6MTIzNDU2
 ````
@@ -588,8 +667,14 @@ This call will response either "Job 8 has been canceled" or "Unable to cancel jo
 
 #### List all result files generated by the algorithm
 
+API Endpoint URI pattern:
+
 ````
-GET /ccd-api/zhy19/results HTTP/1.1
+GET https://ccd1.vm.bridges.psc.edu/ccd-api/{username}/results
+````
+
+````
+GET /ccd-api/demouser/results HTTP/1.1
 Host: ccd1.vm.bridges.psc.edu
 Authorization: Basic emh5MTk6MTIzNDU2
 ````
@@ -615,8 +700,14 @@ The response to this request will look like this:
 
 #### Download a speific result file generated by the algorithm based on file name
 
+API Endpoint URI pattern:
+
 ````
-GET /ccd-api/zhy19/results/fgs_data_small.txt_1466172140585.txt HTTP/1.1
+GET https://ccd1.vm.bridges.psc.edu/ccd-api/{username}/results/{result_file_name}
+````
+
+````
+GET /ccd-api/demouser/results/fgs_data_small.txt_1466172140585.txt HTTP/1.1
 Host: ccd1.vm.bridges.psc.edu
 Authorization: Basic emh5MTk6MTIzNDU2
 ````
@@ -630,17 +721,24 @@ The response to this request will look like this:
   "status": 404,
   "error": "Not Found",
   "message": "Resource not found.",
-  "path": "/zhy19/results/fgs_data_small.txt_146172140585.txt"
+  "path": "/demouser/results/fgs_data_small.txt_146172140585.txt"
 }
 ````
 
 
 #### Compare algorithm result files
 
-From Example 4 we can list all the algorithm result files, based on the results, we can also choose multiple files and run a comparison. 
+Since we can list all the algorithm result files, based on the results, we can also choose multiple files and run a comparison. 
+
+API Endpoint URI pattern:
 
 ````
-GET /ccd-api/zhy19/results/compare/fgs_sim_data_20vars_100cases.csv_1466171729046.txt!!fgs_data_small.txt_1467305104859.txt HTTP/1.1
+GET https://ccd1.vm.bridges.psc.edu/ccd-api/{username}/results/compare/{result_file_name}!!{another_result_file_name}
+````
+
+
+````
+GET /ccd-api/demouser/results/compare/fgs_sim_data_20vars_100cases.csv_1466171729046.txt!!fgs_data_small.txt_1467305104859.txt HTTP/1.1
 Host: ccd1.vm.bridges.psc.edu
 Authorization: Basic emh5MTk6MTIzNDU2
 ````
@@ -667,8 +765,14 @@ From this comparison, you can see if the two algorithm graphs have common edges 
 
 #### List all the comparison files
 
+API Endpoint URI pattern:
+
 ````
-GET /ccd-api/zhy19/results/comparisons HTTP/1.1
+GET https://ccd1.vm.bridges.psc.edu/ccd-api/{username}/results/comparisons
+````
+
+````
+GET /ccd-api/demouser/results/comparisons HTTP/1.1
 Host: ccd1.vm.bridges.psc.edu
 Authorization: Basic emh5MTk6MTIzNDU2
 ````
@@ -700,8 +804,14 @@ The response will show a list of comparison files:
 
 #### Download a speific comparison file based on file name
 
+API Endpoint URI pattern:
+
 ````
-GET /ccd-api/zhy19/results/comparisons/result_comparison_1467388042261.txt HTTP/1.1
+GET https://ccd1.vm.bridges.psc.edu/ccd-api/{username}/results/comparisons/{comparison_file_name}
+````
+
+````
+GET /ccd-api/demouser/results/comparisons/result_comparison_1467388042261.txt HTTP/1.1
 Host: ccd1.vm.bridges.psc.edu
 Authorization: Basic emh5MTk6MTIzNDU2
 ````
