@@ -66,7 +66,7 @@ This will start the API server, and you'll be able to access the API endpoints v
 
 ## API Usage and Examples
 
-In the following sections, we'll demonstrate the API usage with examples using the API server that is running on PSC bridges: https://ccd1.vm.bridges.psc.edu/ccd-api/
+In the following sections, we'll demonstrate the API usage with examples using the API server that is running on PSC bridges.
 
 This API requires user to be authenticated. Before using this API, the user will need to go to [Causal-Web App](https://ccd1.vm.bridges.psc.edu/ccd/) and create an account. After that, the username and password can be used to authenticate against the REST API via HTTP Basic Auth. The username will need to be specified in the requesting URI and password provided in the HTTP request `Authorization` header.
 
