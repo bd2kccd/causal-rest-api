@@ -94,6 +94,8 @@ POST https://ccd1.vm.bridges.psc.edu/ccd-api/{username}/data/upload
 
 This is a multipart file upload via an HTML form, and the client is required to use `name="file"` to name their file upload field in their form.
 
+Generated HTTP request code example:
+
 ````
 POST /ccd-api/demouser/data/upload HTTP/1.1
 Host: ccd1.vm.bridges.psc.edu
@@ -148,6 +150,8 @@ POST https://ccd1.vm.bridges.psc.edu/ccd-api/{username}/data/chunkUpload
 
 In this example, the data file is splited into 3 chunks. The upload of each chunk consists of a GET request and a POST request. 
 
+Generated HTTP request code example:
+
 ````
 GET /ccd-api/demouser/data/chunkUpload?resumableChunkNumber=2&resumableChunkSize=1048576&resumableCurrentChunkSize=1048576&resumableTotalSize=3309465&resumableType=text%2Fplain&resumableIdentifier=3309465-large-datatxt&resumableFilename=large-data.txt&resumableRelativePath=large-data.txt&resumableTotalChunks=3 HTTP/1.1
 Host: ccd1.vm.bridges.psc.edu
@@ -155,6 +159,8 @@ Authorization: Basic emh5MTk6MTIzNDU2
 ````
 
 This GET request checks if the data chunk is already on the server side. If nothing there, the client will issue another POST request to upload the actual data.
+
+Generated HTTP request code example:
 
 ````
 POST /ccd-api/demouser/data/chunkUpload HTTP/1.1
@@ -223,6 +229,8 @@ API Endpoint URI pattern:
 POST https://ccd1.vm.bridges.psc.edu/ccd-api/{username}/data
 ````
 
+Generated HTTP request code example:
+
 ````
 GET /ccd-api/demouser/data HTTP/1.1
 Host: ccd1.vm.bridges.psc.edu
@@ -280,6 +288,8 @@ A `JSON` formatted list of all the input data files that are associated with use
 ````
 
 You can also specify the response format as XML in your request
+
+Generated HTTP request code example:
 
 ````
 GET /ccd-api/demouser/data HTTP/1.1
@@ -348,7 +358,7 @@ API Endpoint URI pattern:
 GET https://ccd1.vm.bridges.psc.edu/ccd-api/{username}/data/{id}
 ````
 
-You can also query the data file info for a given file id
+Generated HTTP request code example:
 
 ````
 GET /ccd-api/demouser/data/8 HTTP/1.1
@@ -382,7 +392,8 @@ API Endpoint URI pattern:
 ````
 DELETE https://ccd1.vm.bridges.psc.edu/ccd-api/{username}/data/{id}
 ````
-For example:
+
+Generated HTTP request code example:
 
 ````
 DELETE /ccd-api/demouser/data/8 HTTP/1.1
@@ -410,6 +421,8 @@ API Endpoint URI pattern:
 ````
 POST https://ccd1.vm.bridges.psc.edu/ccd-api/{username}/data/summarize
 ````
+
+Generated HTTP request code example:
 
 ````
 POST /ccd-api/demouser/data/summarize HTTP/1.1
@@ -454,6 +467,8 @@ API Endpoint URI pattern:
 ````
 GET https://ccd1.vm.bridges.psc.edu/ccd-api/{username}/algorithms
 ````
+
+Generated HTTP request code example:
 
 ````
 GET /ccd-api/demouser/algorithms HTTP/1.1
@@ -538,6 +553,8 @@ API Endpoint URI pattern:
 POST https://ccd1.vm.bridges.psc.edu/ccd-api/{username}/jobs/fgs
 ````
 
+Generated HTTP request code example:
+
 ````
 POST /ccd-api/demouser/jobs/fgs HTTP/1.1
 Host: ccd1.vm.bridges.psc.edu
@@ -570,6 +587,8 @@ API Endpoint URI pattern:
 POST https://ccd1.vm.bridges.psc.edu/ccd-api/{username}/jobs/fgs-discrete
 ````
 
+Generated HTTP request code example:
+
 ````
 POST /ccd-api/demouser/jobs/fgs-discrete HTTP/1.1
 Host: ccd1.vm.bridges.psc.edu
@@ -601,6 +620,8 @@ API Endpoint URI pattern:
 ````
 GET https://ccd1.vm.bridges.psc.edu/ccd-api/{username}/jobs
 ````
+
+Generated HTTP request code example:
 
 ````
 GET /ccd-api/demouser/jobs/ HTTP/1.1
@@ -637,6 +658,8 @@ API Endpoint URI pattern:
 GET https://ccd1.vm.bridges.psc.edu/ccd-api/{username}/jobs/{id}
 ````
 
+Generated HTTP request code example:
+
 ````
 GET /ccd-api/demouser/jobs/32 HTTP/1.1
 Host: ccd1.vm.bridges.psc.edu
@@ -655,6 +678,8 @@ API Endpoint URI pattern:
 DELETE https://ccd1.vm.bridges.psc.edu/ccd-api/{username}/jobs/{id}
 ````
 
+Generated HTTP request code example:
+
 ````
 DELETE /ccd-api/demouser/jobs/8 HTTP/1.1
 Host: ccd1.vm.bridges.psc.edu
@@ -672,6 +697,8 @@ API Endpoint URI pattern:
 ````
 GET https://ccd1.vm.bridges.psc.edu/ccd-api/{username}/results
 ````
+
+Generated HTTP request code example:
 
 ````
 GET /ccd-api/demouser/results HTTP/1.1
@@ -706,6 +733,8 @@ API Endpoint URI pattern:
 GET https://ccd1.vm.bridges.psc.edu/ccd-api/{username}/results/{result_file_name}
 ````
 
+Generated HTTP request code example:
+
 ````
 GET /ccd-api/demouser/results/fgs_data_small.txt_1466172140585.txt HTTP/1.1
 Host: ccd1.vm.bridges.psc.edu
@@ -736,6 +765,7 @@ API Endpoint URI pattern:
 GET https://ccd1.vm.bridges.psc.edu/ccd-api/{username}/results/compare/{result_file_name}!!{another_result_file_name}
 ````
 
+Generated HTTP request code example:
 
 ````
 GET /ccd-api/demouser/results/compare/fgs_sim_data_20vars_100cases.csv_1466171729046.txt!!fgs_data_small.txt_1467305104859.txt HTTP/1.1
@@ -770,6 +800,8 @@ API Endpoint URI pattern:
 ````
 GET https://ccd1.vm.bridges.psc.edu/ccd-api/{username}/results/comparisons
 ````
+
+Generated HTTP request code example:
 
 ````
 GET /ccd-api/demouser/results/comparisons HTTP/1.1
@@ -809,6 +841,8 @@ API Endpoint URI pattern:
 ````
 GET https://ccd1.vm.bridges.psc.edu/ccd-api/{username}/results/comparisons/{comparison_file_name}
 ````
+
+Generated HTTP request code example:
 
 ````
 GET /ccd-api/demouser/results/comparisons/result_comparison_1467388042261.txt HTTP/1.1
