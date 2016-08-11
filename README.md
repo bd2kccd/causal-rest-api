@@ -518,7 +518,7 @@ Content-Type: application/json
     "dataValidation": {
       "nonZeroVariance": false,
       "uniqueVarName": false,
-      "limitNumOfCategory": flase
+      "limitNumOfCategory": false
     },
     "algorithmParameters": {
       "depth": 3,
