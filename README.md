@@ -70,10 +70,10 @@ This will start the API server, and you'll be able to access the API endpoints v
 
 In the following sections, we'll demonstrate the API usage with examples using the API server that is running on PSC (Pittsburgh Super Computing) bridges.
 
-This API requires user to be authenticated. Before using this API, the user will need to go to [Causal-Web App](https://ccd1.vm.bridges.psc.edu/ccd/) and create an account. After that, the username and password can be used to authenticate against the REST API via **HTTP Basic Auth**. In basic auth, the user provides the username and password, which the HTTP client concatenates (username + ":" + password), and base64 encodes it. This encoded string is then sent using a `Authorization` header on each request. For instance:
+This API requires user to be authenticated. Before using this API, the user will need to go to [Causal-Web App](https://ccd1.vm.bridges.psc.edu/ccd/) and create an account. After that, the username and password can be used to authenticate against the REST API via **HTTP Basic Auth**. In basic auth, the user provides the username and password, which the HTTP client concatenates (username + ":" + password), and base64 encodes it. This encoded string is then sent using a `Authorization` header on each request. For instance user `demouser` whose password is `123`.
 
 ````
-Authorization: Basic emh5MTk6MTIzNDU2
+Authorization: Basic ZGVtb3VzZXI6MTIz
 ````
 
 Since this API is developed with Jersey, which supports [WADL](https://en.wikipedia.org/wiki/Web_Application_Description_Language). So you can view the generated WADL by going to `https://ccd1.vm.bridges.psc.edu/ccd-api/application.wadl?detail=true` and see all resource available in the application. And below are some examples.
@@ -84,7 +84,7 @@ Basically, all the API usage examples are grouped into three categories:
 2. Causal Discovery
 3. Result Management
 
-And all the following examples will be issued by user `demouser` whose password is `123456`.
+And all the following examples will be issued by user `demouser` whose password is `123`.
 
 ### 1. Data Management
 
@@ -103,7 +103,7 @@ Generated HTTP request code example:
 ````
 POST /ccd-api/demouser/data/upload HTTP/1.1
 Host: ccd1.vm.bridges.psc.edu
-Authorization: Basic emh5MTk6MTIzNDU2
+Authorization: Basic ZGVtb3VzZXI6MTIz
 Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
 
 ----WebKitFormBoundary7MA4YWxkTrZu0gW
@@ -159,7 +159,7 @@ Generated HTTP request code example:
 ````
 GET /ccd-api/demouser/data/chunkUpload?resumableChunkNumber=2&resumableChunkSize=1048576&resumableCurrentChunkSize=1048576&resumableTotalSize=3309465&resumableType=text%2Fplain&resumableIdentifier=3309465-large-datatxt&resumableFilename=large-data.txt&resumableRelativePath=large-data.txt&resumableTotalChunks=3 HTTP/1.1
 Host: ccd1.vm.bridges.psc.edu
-Authorization: Basic emh5MTk6MTIzNDU2
+Authorization: Basic ZGVtb3VzZXI6MTIz
 ````
 
 This GET request checks if the data chunk is already on the server side. If nothing there, the client will issue another POST request to upload the actual data.
@@ -169,7 +169,7 @@ Generated HTTP request code example:
 ````
 POST /ccd-api/demouser/data/chunkUpload HTTP/1.1
 Host: ccd1.vm.bridges.psc.edu
-Authorization: Basic emh5MTk6MTIzNDU2
+Authorization: Basic ZGVtb3VzZXI6MTIz
 Content-Type: multipart/form-data; boundary=----WebKitFormBoundaryMFjgApg56XGyeTnZ
 
 ------WebKitFormBoundaryMFjgApg56XGyeTnZ
@@ -238,7 +238,7 @@ Generated HTTP request code example:
 ````
 GET /ccd-api/demouser/data HTTP/1.1
 Host: ccd1.vm.bridges.psc.edu
-Authorization: Basic emh5MTk6MTIzNDU2
+Authorization: Basic ZGVtb3VzZXI6MTIz
 Accept: application/json
 ````
 
@@ -298,7 +298,7 @@ Generated HTTP request code example:
 ````
 GET /ccd-api/demouser/data HTTP/1.1
 Host: ccd1.vm.bridges.psc.edu
-Authorization: Basic emh5MTk6MTIzNDU2
+Authorization: Basic ZGVtb3VzZXI6MTIz
 Accept: application/xml
 ````
 
@@ -367,7 +367,7 @@ Generated HTTP request code example:
 ````
 GET /ccd-api/demouser/data/8 HTTP/1.1
 Host: ccd1.vm.bridges.psc.edu
-Authorization: Basic emh5MTk6MTIzNDU2
+Authorization: Basic ZGVtb3VzZXI6MTIz
 ````
 
 And the resulting response looks like this:
@@ -402,7 +402,7 @@ Generated HTTP request code example:
 ````
 DELETE /ccd-api/demouser/data/8 HTTP/1.1
 Host: ccd1.vm.bridges.psc.edu
-Authorization: Basic emh5MTk6MTIzNDU2
+Authorization: Basic ZGVtb3VzZXI6MTIz
 ````
 
 And this will result a HTTP 204 No Content status in response on success, which means the server successfully processed the deletion request but there's no content to response.
@@ -431,7 +431,7 @@ Generated HTTP request code example:
 ````
 POST /ccd-api/demouser/data/summarize HTTP/1.1
 Host: ccd1.vm.bridges.psc.edu
-Authorization: Basic emh5MTk6MTIzNDU2
+Authorization: Basic ZGVtb3VzZXI6MTIz
 Content-Type: application/json
 
 {
@@ -477,7 +477,7 @@ Generated HTTP request code example:
 ````
 GET /ccd-api/demouser/algorithms HTTP/1.1
 Host: ccd1.vm.bridges.psc.edu
-Authorization: Basic emh5MTk6MTIzNDU2
+Authorization: Basic ZGVtb3VzZXI6MTIz
 ````
 Currently we support "FGS continuous" and "FGS discrete".
 
@@ -562,7 +562,7 @@ Generated HTTP request code example:
 ````
 POST /ccd-api/demouser/jobs/fgs HTTP/1.1
 Host: ccd1.vm.bridges.psc.edu
-Authorization: Basic emh5MTk6MTIzNDU2
+Authorization: Basic ZGVtb3VzZXI6MTIz
 Content-Type: application/json
 
 {
@@ -596,7 +596,7 @@ Generated HTTP request code example:
 ````
 POST /ccd-api/demouser/jobs/fgs-discrete HTTP/1.1
 Host: ccd1.vm.bridges.psc.edu
-Authorization: Basic emh5MTk6MTIzNDU2
+Authorization: Basic ZGVtb3VzZXI6MTIz
 Content-Type: application/json
 
 {
@@ -630,7 +630,7 @@ Generated HTTP request code example:
 ````
 GET /ccd-api/demouser/jobs/ HTTP/1.1
 Host: ccd1.vm.bridges.psc.edu
-Authorization: Basic emh5MTk6MTIzNDU2
+Authorization: Basic ZGVtb3VzZXI6MTIz
 Content-Type: application/json
 
 ````
@@ -667,7 +667,7 @@ Generated HTTP request code example:
 ````
 GET /ccd-api/demouser/jobs/32 HTTP/1.1
 Host: ccd1.vm.bridges.psc.edu
-Authorization: Basic emh5MTk6MTIzNDU2
+Authorization: Basic ZGVtb3VzZXI6MTIz
 ````
 
 This will either return "Pending" or "Completed".
@@ -687,7 +687,7 @@ Generated HTTP request code example:
 ````
 DELETE /ccd-api/demouser/jobs/8 HTTP/1.1
 Host: ccd1.vm.bridges.psc.edu
-Authorization: Basic emh5MTk6MTIzNDU2
+Authorization: Basic ZGVtb3VzZXI6MTIz
 ````
 
 This call will response either "Job 8 has been canceled" or "Unable to cancel job 8". It's not guranteed that the system can always cencal a job successfully.
@@ -707,7 +707,7 @@ Generated HTTP request code example:
 ````
 GET /ccd-api/demouser/results HTTP/1.1
 Host: ccd1.vm.bridges.psc.edu
-Authorization: Basic emh5MTk6MTIzNDU2
+Authorization: Basic ZGVtb3VzZXI6MTIz
 ````
 
 The response to this request will look like this:
@@ -742,7 +742,7 @@ Generated HTTP request code example:
 ````
 GET /ccd-api/demouser/results/fgs_data_small.txt_1466172140585.txt HTTP/1.1
 Host: ccd1.vm.bridges.psc.edu
-Authorization: Basic emh5MTk6MTIzNDU2
+Authorization: Basic ZGVtb3VzZXI6MTIz
 ````
 On success, you will get the result file back as text file content. If there's a typo in file name of the that file doesn't exist, you'll get either a JSON or XML message based on the `accept` header in your request:
 
@@ -774,7 +774,7 @@ Generated HTTP request code example:
 ````
 GET /ccd-api/demouser/results/compare/fgs_sim_data_20vars_100cases.csv_1466171729046.txt!!fgs_data_small.txt_1467305104859.txt HTTP/1.1
 Host: ccd1.vm.bridges.psc.edu
-Authorization: Basic emh5MTk6MTIzNDU2
+Authorization: Basic ZGVtb3VzZXI6MTIz
 ````
 When you specify multiple file names, use the `!!` as a delimiter. This request will generate a result comparison file with the following content (shortened version):
 
@@ -810,7 +810,7 @@ Generated HTTP request code example:
 ````
 GET /ccd-api/demouser/results/comparisons HTTP/1.1
 Host: ccd1.vm.bridges.psc.edu
-Authorization: Basic emh5MTk6MTIzNDU2
+Authorization: Basic ZGVtb3VzZXI6MTIz
 ````
 
 The response will show a list of comparison files:
@@ -851,7 +851,7 @@ Generated HTTP request code example:
 ````
 GET /ccd-api/demouser/results/comparisons/result_comparison_1467388042261.txt HTTP/1.1
 Host: ccd1.vm.bridges.psc.edu
-Authorization: Basic emh5MTk6MTIzNDU2
+Authorization: Basic ZGVtb3VzZXI6MTIz
 ````
 
 Then it returns the content of that comparison file (shorted version):
