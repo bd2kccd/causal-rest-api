@@ -142,7 +142,7 @@ This POST request will upload the data file to the target server location and ad
 #### Resumable data file upload
 
 In addition to the regular file upload described in Example 6, we also provide the option of stable and resumable large file upload. It requires the client side to have a resumable upload implementation. We currently support client integrated with [Resumable.js](http://resumablejs.com/), whihc provides multiple simultaneous, stable 
-and resumable uploads via the HTML5 File API.
+and resumable uploads via the HTML5 File API. You can also create your own client as long as al the following parameters are set correctly.
 
 API Endpoint URI pattern:
 
@@ -152,7 +152,17 @@ GET https://ccd1.vm.bridges.psc.edu/ccd-api/{username}/data/chunkUpload
 POST https://ccd1.vm.bridges.psc.edu/ccd-api/{username}/data/chunkUpload
 ````
 
-In this example, the data file is splited into 3 chunks. The upload of each chunk consists of a GET request and a POST request. 
+In this example, the data file is splited into 3 chunks. The upload of each chunk consists of a GET request and a POST request. To handle the state of upload chunks, a number of extra parameters are sent along with all requests:
+
+* `resumableChunkNumber`: The index of the chunk in the current upload. First chunk is `1` (no base-0 counting here).
+* `resumableChunkSize`: The general chunk size. Using this value and `resumableTotalSize` you can calculate the total number of chunks. Please note that the size of the data received in the HTTP might be lower than `resumableChunkSize` of this for the last chunk for a file.
+* `resumableCurrentChunkSize`: The size of the current resumable chuck.
+* `resumableTotalSize`: The total file size.
+* `resumableType`: The file type of the resumable chuck, e.e., "text/plain".
+* `resumableIdentifier`: A unique identifier for the file contained in the request.
+* `resumableFilename`: The original file name (since a bug in Firefox results in the file name not being transmitted in chunk multipart posts).
+* `resumableRelativePath`: The file's relative path when selecting a directory (defaults to file name in all browsers except Chrome).
+* `resumableTotalChunks`: The total number of chunks.  
 
 Generated HTTP request code example:
 
@@ -162,7 +172,7 @@ Host: ccd1.vm.bridges.psc.edu
 Authorization: Basic ZGVtb3VzZXI6MTIz
 ````
 
-This GET request checks if the data chunk is already on the server side. If nothing there, the client will issue another POST request to upload the actual data.
+This GET request checks if the data chunk is already on the server side. If the target file chunk is not found on the server, the client will issue a POST request to upload the actual data.
 
 Generated HTTP request code example:
 
