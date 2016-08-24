@@ -26,23 +26,11 @@ import org.springframework.beans.factory.annotation.Value;
  */
 public abstract class FgsDataValidation {
 
-    // Non-zero Variance - ensure that each variable has non-zero variance
-    @Value("true")
-    protected boolean nonZeroVariance;
-
     // Unique Variable Name - ensure that there are no duplicated variable names
     @Value("true")
     protected boolean uniqueVarName;
 
     public FgsDataValidation() {
-    }
-
-    public boolean isNonZeroVariance() {
-        return nonZeroVariance;
-    }
-
-    public void setNonZeroVariance(boolean nonZeroVariance) {
-        this.nonZeroVariance = nonZeroVariance;
     }
 
     public boolean isUniqueVarName() {

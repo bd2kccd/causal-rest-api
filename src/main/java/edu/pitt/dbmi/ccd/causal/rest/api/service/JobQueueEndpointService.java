@@ -161,10 +161,6 @@ public class JobQueueEndpointService {
             commands.add("--skip-category-limit");
         }
 
-        if (!dataValidation.isNonZeroVariance()) {
-            commands.add("--skip-non-zero-variance");
-        }
-
         if (!dataValidation.isUniqueVarName()) {
             commands.add("--skip-unique-var-name");
         }

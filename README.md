@@ -542,7 +542,6 @@ Data validation:
 
 | Parameters        | Description           | Default Value  |
 | ------------- | ------------- | ----- |
-| `nonZeroVariance`      | Non-zero Variance. Ensure that each variable has non-zero variance | true |
 | `uniqueVarName`      | Unique Variable Name. Ensure that there are no duplicated variable names      |  true |
 | `limitNumOfCategory`      | Limit Number of Categories - ensure the number of categories of a variable does not exceed 10 | true |
 
@@ -612,7 +611,6 @@ Content-Type: application/json
 {
     "dataFileId": 9,
     "dataValidation": {
-      "nonZeroVariance": false,
       "uniqueVarName": false,
       "limitNumOfCategory": false
     },
