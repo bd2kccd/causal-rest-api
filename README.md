@@ -130,13 +130,19 @@ This POST request will upload the data file to the target server location and ad
 
 ````javascript
 {
-  "id": 6,
-  "name": "Lung-tetrad_hv.txt",
-  "creationTime": 1466622267000,
-  "lastModifiedTime": 1466622267000,
-  "fileSize": 3309465,
-  "md5checkSum": "b1db7511ee293d297e3055d9a7b46c5e"
-}
+    "id": 6,
+    "name": "Lung-tetrad_hv.txt",
+    "creationTime": 1466622267000,
+    "lastModifiedTime": 1466622267000,
+    "fileSize": 3309465,
+    "fileSummary": {
+      "md5checkSum": "b1db7511ee293d297e3055d9a7b46c5e",
+      "variableType": null,
+      "fileDelimiter": null,
+      "numOfRows": null,
+      "numOfColumns": null
+    }
+  }
 ````
 
 #### Resumable data file upload
