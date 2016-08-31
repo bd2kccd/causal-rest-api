@@ -25,6 +25,7 @@ import edu.pitt.dbmi.ccd.causal.rest.api.dto.FgsDiscreteDataValidation;
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.FgsDiscreteNewJob;
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.FgsDiscreteParameters;
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.JobInfoDTO;
+import edu.pitt.dbmi.ccd.causal.rest.api.dto.JobRequestInfoDTO;
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.JvmOptions;
 import edu.pitt.dbmi.ccd.causal.rest.api.exception.NotFoundByIdException;
 import edu.pitt.dbmi.ccd.causal.rest.api.exception.UserNotFoundException;
@@ -37,6 +38,7 @@ import edu.pitt.dbmi.ccd.db.entity.UserAccount;
 import edu.pitt.dbmi.ccd.db.service.DataFileService;
 import edu.pitt.dbmi.ccd.db.service.JobQueueInfoService;
 import edu.pitt.dbmi.ccd.db.service.UserAccountService;
+
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collections;
@@ -45,6 +47,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -86,7 +89,7 @@ public class JobQueueEndpointService {
      * @param newJob
      * @return Job ID
      */
-    public Long addFgsDiscreteNewJob(String username, FgsDiscreteNewJob newJob) {
+    public JobRequestInfoDTO addFgsDiscreteNewJob(String username, FgsDiscreteNewJob newJob) {
         // Right now, we only support "fgs" and "fgs-discrete"
         // Not implimenting prior knowledge in API
         String algorithm = "fgs-discrete";
@@ -204,7 +207,17 @@ public class JobQueueEndpointService {
 
         LOGGER.info(String.format("New FGS Discrete job submitted. Job ID: %d", newJobId));
 
-        return newJobId;
+        fileName = fileName + ".txt";
+        String errorFileName = String.format("error_%s", fileName);
+        
+        JobRequestInfoDTO jobRequestInfo = new JobRequestInfoDTO();
+        jobRequestInfo.setAddedTime(jobQueueInfo.getAddedTime());
+        jobRequestInfo.setAlgorithmName(algorithm);
+        jobRequestInfo.setResultFileName(fileName);
+        jobRequestInfo.setErrorResultFileName(errorFileName);
+        jobRequestInfo.setId(jobQueueInfo.getId());
+        
+        return jobRequestInfo;
     }
 
     /**
@@ -214,7 +227,7 @@ public class JobQueueEndpointService {
      * @param newJob
      * @return
      */
-    public Long addFgsContinuousNewJob(String username, FgsContinuousNewJob newJob) {
+    public JobRequestInfoDTO addFgsContinuousNewJob(String username, FgsContinuousNewJob newJob) {
         // Right now, we only support "fgs" and "fgs-discrete"
         // Not implimenting prior knowledge in API
         String algorithm = "fgs";
@@ -329,7 +342,17 @@ public class JobQueueEndpointService {
 
         LOGGER.info(String.format("New FGS Continuous job submitted. Job ID: %d", newJobId));
 
-        return newJobId;
+        fileName = fileName + ".txt";
+        String errorFileName = String.format("error_%s", fileName);
+        
+        JobRequestInfoDTO jobRequestInfo = new JobRequestInfoDTO();
+        jobRequestInfo.setAddedTime(jobQueueInfo.getAddedTime());
+        jobRequestInfo.setAlgorithmName(algorithm);
+        jobRequestInfo.setResultFileName(fileName);
+        jobRequestInfo.setErrorResultFileName(errorFileName);
+        jobRequestInfo.setId(jobQueueInfo.getId());
+        
+        return jobRequestInfo;
     }
 
     /**
