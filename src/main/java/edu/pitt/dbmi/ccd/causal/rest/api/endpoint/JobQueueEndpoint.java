@@ -22,9 +22,12 @@ import edu.pitt.dbmi.ccd.causal.rest.api.Role;
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.FgsContinuousNewJob;
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.FgsDiscreteNewJob;
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.JobInfoDTO;
+import edu.pitt.dbmi.ccd.causal.rest.api.dto.JobRequestInfoDTO;
 import edu.pitt.dbmi.ccd.causal.rest.api.service.JobQueueEndpointService;
+
 import java.io.IOException;
 import java.util.List;
+
 import javax.annotation.security.RolesAllowed;
 import javax.validation.Valid;
 import javax.ws.rs.Consumes;
@@ -35,10 +38,13 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.GenericEntity;
+
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static javax.ws.rs.core.MediaType.APPLICATION_XML;
+
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
+
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -69,10 +75,10 @@ public class JobQueueEndpoint {
     @Produces({APPLICATION_JSON, APPLICATION_XML})
     @RolesAllowed(Role.USER)
     public Response addFgsContinuousNewJob(@PathParam("username") String username, @Valid FgsContinuousNewJob newJob) throws IOException {
-        Long id = jobQueueEndpointService.addFgsContinuousNewJob(username, newJob);
-
+	JobRequestInfoDTO jobRequestInfo = jobQueueEndpointService.addFgsContinuousNewJob(username, newJob);
+	GenericEntity<JobRequestInfoDTO> jobRequestEntity = new GenericEntity<JobRequestInfoDTO>(jobRequestInfo){};
         // Return 201 Created status code and the job id in body
-        return Response.status(Status.CREATED).entity(id).build();
+        return Response.status(Status.CREATED).entity(jobRequestEntity).build();
     }
 
     /**
@@ -89,10 +95,10 @@ public class JobQueueEndpoint {
     @Produces({APPLICATION_JSON, APPLICATION_XML})
     @RolesAllowed(Role.USER)
     public Response addFgsDiscreteNewJob(@PathParam("username") String username, @Valid FgsDiscreteNewJob newJob) throws IOException {
-        Long id = jobQueueEndpointService.addFgsDiscreteNewJob(username, newJob);
-
+	JobRequestInfoDTO jobRequestInfo = jobQueueEndpointService.addFgsDiscreteNewJob(username, newJob);
+	GenericEntity<JobRequestInfoDTO> jobRequestEntity = new GenericEntity<JobRequestInfoDTO>(jobRequestInfo){};
         // Return 201 Created status code and the job id in body
-        return Response.status(Status.CREATED).entity(id).build();
+        return Response.status(Status.CREATED).entity(jobRequestEntity).build();
     }
 
     /**
