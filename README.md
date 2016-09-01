@@ -596,7 +596,19 @@ Content-Type: application/json
 }
 ````
 
-In this example, we are running the "FGS continuous" algorithm on the file with ID 8. And this call will return the job ID number with a 201 Created response status code.
+In this example, we are running the "FGS continuous" algorithm on the file with ID 8. And this call will return the job info with a 201 Created response status code.
+
+````
+{
+  "id": 5,
+  "algorithmName": "fgs",
+  "addedTime": 1472742564355,
+  "resultFileName": "fgs_data_small.txt_1472742564353.txt",
+  "errorResultFileName": "error_fgs_data_small.txt_1472742564353.txt"
+}
+````
+
+From this response we can tell that the job ID is 5, and the result file name will be `fgs_data_small.txt_1472742564353.txt` if everything goes well. If something is wrong an error result file with name `error_fgs_data_small.txt_1472742564353.txt` will be created.
 
 When you need to run "FGS discrete", just send the request to a different endpont URI:
 
