@@ -31,6 +31,9 @@ public class JobRequestInfoDTO {
     private String resultFileName;
 
     @XmlElement
+    private String resultJsonFileName;
+
+    @XmlElement
     private String errorResultFileName;
 
     public Long getId() {
@@ -63,6 +66,14 @@ public class JobRequestInfoDTO {
 
     public void setResultFileName(String resultFileName) {
 	this.resultFileName = resultFileName;
+    }
+
+    public String getResultJsonFileName() {
+	return resultJsonFileName;
+    }
+
+    public void setResultJsonFileName(String resultJsonFileName) {
+	this.resultJsonFileName = resultJsonFileName;
     }
 
     public String getErrorResultFileName() {

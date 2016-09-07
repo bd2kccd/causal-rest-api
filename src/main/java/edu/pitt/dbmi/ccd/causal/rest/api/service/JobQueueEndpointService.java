@@ -172,6 +172,8 @@ public class JobQueueEndpointService {
             commands.add("--skip-unique-var-name");
         }
 
+        commands.add("--tetrad-graph-json");
+
         // Don't create any validation files
         commands.add("--no-validation-output");
 
@@ -207,6 +209,7 @@ public class JobQueueEndpointService {
 
         LOGGER.info(String.format("New FGS Discrete job submitted. Job ID: %d", newJobId));
 
+        String resultJsonFileName = fileName + ".json";
         fileName = fileName + ".txt";
         String errorFileName = String.format("error_%s", fileName);
         
@@ -214,6 +217,7 @@ public class JobQueueEndpointService {
         jobRequestInfo.setAddedTime(jobQueueInfo.getAddedTime());
         jobRequestInfo.setAlgorithmName(algorithm);
         jobRequestInfo.setResultFileName(fileName);
+        jobRequestInfo.setResultJsonFileName(resultJsonFileName);
         jobRequestInfo.setErrorResultFileName(errorFileName);
         jobRequestInfo.setId(jobQueueInfo.getId());
         
@@ -307,6 +311,8 @@ public class JobQueueEndpointService {
             commands.add("--skip-unique-var-name");
         }
 
+        commands.add("--tetrad-graph-json");
+
         // Don't create any validation files
         commands.add("--no-validation-output");
 
@@ -342,6 +348,7 @@ public class JobQueueEndpointService {
 
         LOGGER.info(String.format("New FGS Continuous job submitted. Job ID: %d", newJobId));
 
+        String resultJsonFileName = fileName + ".json";
         fileName = fileName + ".txt";
         String errorFileName = String.format("error_%s", fileName);
         
@@ -349,6 +356,7 @@ public class JobQueueEndpointService {
         jobRequestInfo.setAddedTime(jobQueueInfo.getAddedTime());
         jobRequestInfo.setAlgorithmName(algorithm);
         jobRequestInfo.setResultFileName(fileName);
+        jobRequestInfo.setResultJsonFileName(resultJsonFileName);
         jobRequestInfo.setErrorResultFileName(errorFileName);
         jobRequestInfo.setId(jobQueueInfo.getId());
         
