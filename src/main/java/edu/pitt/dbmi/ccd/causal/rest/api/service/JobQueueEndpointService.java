@@ -51,6 +51,8 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
 /**
@@ -70,6 +72,17 @@ public class JobQueueEndpointService {
 
     private final JobQueueInfoService jobQueueInfoService;
 
+    @Autowired
+    private Environment env;
+    
+    @Autowired
+    @Value("${ccd.remote.server.dataspace:}") 
+    private String remotedataspace;
+    
+    @Autowired
+    @Value("${ccd.remote.server.workspace:}") 
+    private String remoteworkspace;
+    
     @Autowired
     public JobQueueEndpointService(
             CausalRestProperties causalRestProperties,
@@ -384,6 +397,12 @@ public class JobQueueEndpointService {
         Path dataDir = Paths.get(workspaceDir, username, dataFolder);
         Path tmpDir = Paths.get(workspaceDir, username, tmpFolder);
         Path resultDir = Paths.get(workspaceDir, username, resultsFolder, algorithmFolder);
+        
+        if(env.acceptsProfiles("slurm")){
+        	tmpDir = Paths.get(remoteworkspace, username, tmpFolder);
+        	algorithmJarPath = Paths.get(remoteworkspace, libFolder, algorithmJar);
+        	dataDir = Paths.get(remotedataspace, username, dataFolder);
+        }
 
         // The following keys will be shared when running each algorithm
         map.put("algorithmJarPath", algorithmJarPath.toString());
