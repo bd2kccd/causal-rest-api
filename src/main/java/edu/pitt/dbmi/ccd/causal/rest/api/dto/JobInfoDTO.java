@@ -19,6 +19,7 @@
 package edu.pitt.dbmi.ccd.causal.rest.api.dto;
 
 import java.util.Date;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -39,7 +40,20 @@ public class JobInfoDTO {
     private String algorithmName;
 
     @XmlElement
+    private int status;
+    
+    @XmlElement
     private Date addedTime;
+
+    @XmlElement
+    private String resultFileName;
+    
+    @XmlElement
+    private String resultJsonFileName;
+
+    @XmlElement
+    private String errorResultFileName;
+    
 
     public JobInfoDTO() {
     }
@@ -60,12 +74,44 @@ public class JobInfoDTO {
         this.algorithmName = algorithmName;
     }
 
+    public int getStatus() {
+        return status;
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
+    }
+
     public Date getAddedTime() {
         return addedTime;
     }
 
     public void setAddedTime(Date addedTime) {
         this.addedTime = addedTime;
+    }
+
+    public String getResultFileName() {
+        return resultFileName;
+    }
+
+    public void setResultFileName(String resultFileName) {
+        this.resultFileName = resultFileName;
+    }
+
+    public String getResultJsonFileName() {
+        return resultJsonFileName;
+    }
+
+    public void setResultJsonFileName(String resultJsonFileName) {
+        this.resultJsonFileName = resultJsonFileName;
+    }
+
+    public String getErrorResultFileName() {
+        return errorResultFileName;
+    }
+
+    public void setErrorResultFileName(String errorResultFileName) {
+        this.errorResultFileName = errorResultFileName;
     }
 
 }

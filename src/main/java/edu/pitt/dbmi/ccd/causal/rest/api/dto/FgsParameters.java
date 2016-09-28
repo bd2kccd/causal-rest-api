@@ -26,10 +26,10 @@ import org.springframework.beans.factory.annotation.Value;
  */
 public abstract class FgsParameters {
 
-    protected int depth;
+    protected int maxDegree;
 
     @Value("true")
-    protected boolean heuristicSpeedup;
+    protected boolean faithfulnessAssumed;
 
     @Value("true")
     protected boolean verbose;
@@ -37,20 +37,20 @@ public abstract class FgsParameters {
     public FgsParameters() {
     }
 
-    public int getDepth() {
-        return depth;
+    public int getMaxDegree() {
+        return maxDegree;
     }
 
-    public void setDepth(int depth) {
-        this.depth = depth;
+    public void setDepth(int maxDegree) {
+        this.maxDegree = maxDegree;
     }
 
-    public boolean isHeuristicSpeedup() {
-        return heuristicSpeedup;
+    public boolean isFaithfulnessAssumed() {
+        return faithfulnessAssumed;
     }
 
-    public void setHeuristicSpeedup(boolean heuristicSpeedup) {
-        this.heuristicSpeedup = heuristicSpeedup;
+    public void setFaithfulnessAssumed(boolean faithfulnessAssumed) {
+        this.faithfulnessAssumed = faithfulnessAssumed;
     }
 
     public boolean isVerbose() {

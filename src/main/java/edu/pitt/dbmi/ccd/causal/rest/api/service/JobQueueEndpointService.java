@@ -25,7 +25,6 @@ import edu.pitt.dbmi.ccd.causal.rest.api.dto.FgsDiscreteDataValidation;
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.FgsDiscreteNewJob;
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.FgsDiscreteParameters;
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.JobInfoDTO;
-import edu.pitt.dbmi.ccd.causal.rest.api.dto.JobRequestInfoDTO;
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.JvmOptions;
 import edu.pitt.dbmi.ccd.causal.rest.api.exception.NotFoundByIdException;
 import edu.pitt.dbmi.ccd.causal.rest.api.exception.UserNotFoundException;
@@ -51,6 +50,8 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
 /**
@@ -71,6 +72,17 @@ public class JobQueueEndpointService {
     private final JobQueueInfoService jobQueueInfoService;
 
     @Autowired
+    private Environment env;
+    
+    @Autowired
+    @Value("${ccd.remote.server.dataspace:}") 
+    private String remotedataspace;
+    
+    @Autowired
+    @Value("${ccd.remote.server.workspace:}") 
+    private String remoteworkspace;
+    
+    @Autowired
     public JobQueueEndpointService(
             CausalRestProperties causalRestProperties,
             UserAccountService userAccountService,
@@ -89,10 +101,10 @@ public class JobQueueEndpointService {
      * @param newJob
      * @return Job ID
      */
-    public JobRequestInfoDTO addFgsDiscreteNewJob(String username, FgsDiscreteNewJob newJob) {
+    public JobInfoDTO addFgsDiscreteNewJob(String username, FgsDiscreteNewJob newJob) {
         // Right now, we only support "fgs" and "fgs-discrete"
         // Not implimenting prior knowledge in API
-        String algorithm = "fgs-discrete";
+        String algorithm = causalRestProperties.getFgsDiscrete();
 
         UserAccount userAccount = userAccountService.findByUsername(username);
         if (userAccount == null) {
@@ -146,15 +158,15 @@ public class JobQueueEndpointService {
         commands.add("--sample-prior");
         commands.add(Double.toString(algorithmParameters.getSamplePrior()));
 
-        commands.add("--depth");
-        commands.add(Integer.toString(algorithmParameters.getDepth()));
+        commands.add("--max-indegree");
+        commands.add(Integer.toString(algorithmParameters.getMaxDegree()));
 
         if (algorithmParameters.isVerbose()) {
             commands.add("--verbose");
         }
 
-        if (!algorithmParameters.isHeuristicSpeedup()) {
-            commands.add("--disable-heuristic-speedup");
+        if (algorithmParameters.isFaithfulnessAssumed()) {
+            commands.add("--faithfulness-assumed");
         }
 
         // Data validation
@@ -213,15 +225,16 @@ public class JobQueueEndpointService {
         fileName = fileName + ".txt";
         String errorFileName = String.format("error_%s", fileName);
         
-        JobRequestInfoDTO jobRequestInfo = new JobRequestInfoDTO();
-        jobRequestInfo.setAddedTime(jobQueueInfo.getAddedTime());
-        jobRequestInfo.setAlgorithmName(algorithm);
-        jobRequestInfo.setResultFileName(fileName);
-        jobRequestInfo.setResultJsonFileName(resultJsonFileName);
-        jobRequestInfo.setErrorResultFileName(errorFileName);
-        jobRequestInfo.setId(jobQueueInfo.getId());
+        JobInfoDTO jobInfo = new JobInfoDTO();
+        jobInfo.setStatus(0);
+        jobInfo.setAddedTime(jobQueueInfo.getAddedTime());
+        jobInfo.setAlgorithmName(algorithm);
+        jobInfo.setResultFileName(fileName);
+        jobInfo.setResultJsonFileName(resultJsonFileName);
+        jobInfo.setErrorResultFileName(errorFileName);
+        jobInfo.setId(jobQueueInfo.getId());
         
-        return jobRequestInfo;
+        return jobInfo;
     }
 
     /**
@@ -229,12 +242,12 @@ public class JobQueueEndpointService {
      *
      * @param username
      * @param newJob
-     * @return
+     * @return JobInfoDTO
      */
-    public JobRequestInfoDTO addFgsContinuousNewJob(String username, FgsContinuousNewJob newJob) {
+    public JobInfoDTO addFgsContinuousNewJob(String username, FgsContinuousNewJob newJob) {
         // Right now, we only support "fgs" and "fgs-discrete"
         // Not implimenting prior knowledge in API
-        String algorithm = "fgs";
+        String algorithm = causalRestProperties.getFgs();
 
         UserAccount userAccount = userAccountService.findByUsername(username);
         if (userAccount == null) {
@@ -285,15 +298,15 @@ public class JobQueueEndpointService {
         commands.add("--penalty-discount");
         commands.add(Double.toString(algorithmParameters.getPenaltyDiscount()));
 
-        commands.add("--depth");
-        commands.add(Integer.toString(algorithmParameters.getDepth()));
+        commands.add("--max-indegree");
+        commands.add(Integer.toString(algorithmParameters.getMaxDegree()));
 
         if (algorithmParameters.isVerbose()) {
             commands.add("--verbose");
         }
 
-        if (!algorithmParameters.isHeuristicSpeedup()) {
-            commands.add("--disable-heuristic-speedup");
+        if (algorithmParameters.isFaithfulnessAssumed()) {
+            commands.add("--faithfulness-assumed");
         }
 
         if (algorithmParameters.isIgnoreLinearDependence()) {
@@ -352,15 +365,16 @@ public class JobQueueEndpointService {
         fileName = fileName + ".txt";
         String errorFileName = String.format("error_%s", fileName);
         
-        JobRequestInfoDTO jobRequestInfo = new JobRequestInfoDTO();
-        jobRequestInfo.setAddedTime(jobQueueInfo.getAddedTime());
-        jobRequestInfo.setAlgorithmName(algorithm);
-        jobRequestInfo.setResultFileName(fileName);
-        jobRequestInfo.setResultJsonFileName(resultJsonFileName);
-        jobRequestInfo.setErrorResultFileName(errorFileName);
-        jobRequestInfo.setId(jobQueueInfo.getId());
+        JobInfoDTO jobInfo = new JobInfoDTO();
+        jobInfo.setStatus(0);
+        jobInfo.setAddedTime(jobQueueInfo.getAddedTime());
+        jobInfo.setAlgorithmName(algorithm);
+        jobInfo.setResultFileName(fileName);
+        jobInfo.setResultJsonFileName(resultJsonFileName);
+        jobInfo.setErrorResultFileName(errorFileName);
+        jobInfo.setId(jobQueueInfo.getId());
         
-        return jobRequestInfo;
+        return jobInfo;
     }
 
     /**
@@ -384,6 +398,12 @@ public class JobQueueEndpointService {
         Path dataDir = Paths.get(workspaceDir, username, dataFolder);
         Path tmpDir = Paths.get(workspaceDir, username, tmpFolder);
         Path resultDir = Paths.get(workspaceDir, username, resultsFolder, algorithmFolder);
+
+        if(env.acceptsProfiles("slurm")){
+    		tmpDir = Paths.get(remoteworkspace, username, tmpFolder);
+    		algorithmJarPath = Paths.get(remoteworkspace, libFolder, algorithmJar);
+    		dataDir = Paths.get(remotedataspace, username, dataFolder);
+        }
 
         // The following keys will be shared when running each algorithm
         map.put("algorithmJarPath", algorithmJarPath.toString());
@@ -415,8 +435,18 @@ public class JobQueueEndpointService {
             // Not listing data file name nor ID in response at this moment
             jobInfoDTO.setId(job.getId()); // Job ID
             jobInfoDTO.setAlgorithmName(job.getAlgorName());
+            jobInfoDTO.setStatus(job.getStatus());
             jobInfoDTO.setAddedTime(job.getAddedTime());
 
+            String fileName = job.getFileName();
+            String resultJsonFileName = fileName + ".json";
+            fileName = fileName + ".txt";
+            String errorFileName = String.format("error_%s", fileName);
+
+            jobInfoDTO.setResultFileName(fileName);
+            jobInfoDTO.setResultJsonFileName(resultJsonFileName);
+            jobInfoDTO.setErrorResultFileName(errorFileName);
+            
             jobInfoDTOs.add(jobInfoDTO);
         });
 
@@ -431,16 +461,33 @@ public class JobQueueEndpointService {
      *
      * @param username
      * @param id
-     * @return true on completed or false on running
+     * @return jobInfoDTO
      */
-    public boolean checkJobStatus(String username, Long id) {
-        JobQueueInfo jobQueueInfo = jobQueueInfoService.findOne(id);
-        // As long as there's database record, the job is pending
-        return (jobQueueInfo == null);
+    public JobInfoDTO checkJobStatus(String username, Long id) {
+        JobQueueInfo job = jobQueueInfoService.findOne(id);
+        
+        JobInfoDTO jobInfoDTO = null;
+        
+        if(job != null){
+            jobInfoDTO = new JobInfoDTO();
 
-        // We should also check to see if the result file exists
-        // Since users may recheck the status of a canceld job,
-        // and it will say "Completed" just by checking the database record
+            // Not listing data file name nor ID in response at this moment
+            jobInfoDTO.setId(job.getId()); // Job ID
+            jobInfoDTO.setAlgorithmName(job.getAlgorName());
+            jobInfoDTO.setStatus(job.getStatus());
+            jobInfoDTO.setAddedTime(job.getAddedTime());
+
+            String fileName = job.getFileName();
+            String resultJsonFileName = fileName + ".json";
+            fileName = fileName + ".txt";
+            String errorFileName = String.format("error_%s", fileName);
+
+            jobInfoDTO.setResultFileName(fileName);
+            jobInfoDTO.setResultJsonFileName(resultJsonFileName);
+            jobInfoDTO.setErrorResultFileName(errorFileName);
+        }
+        
+        return jobInfoDTO;
     }
 
     /**
