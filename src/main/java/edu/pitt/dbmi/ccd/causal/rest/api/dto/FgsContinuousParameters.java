@@ -29,9 +29,6 @@ public class FgsContinuousParameters extends FgsParameters {
     @Value("4.0")
     private double penaltyDiscount;
 
-    @Value("true")
-    private boolean ignoreLinearDependence;
-
     public FgsContinuousParameters() {
     }
 
@@ -41,14 +38,6 @@ public class FgsContinuousParameters extends FgsParameters {
 
     public void setPenaltyDiscount(double penaltyDiscount) {
         this.penaltyDiscount = penaltyDiscount;
-    }
-
-    public boolean isIgnoreLinearDependence() {
-        return ignoreLinearDependence;
-    }
-
-    public void setIgnoreLinearDependence(boolean ignoreLinearDependence) {
-        this.ignoreLinearDependence = ignoreLinearDependence;
     }
 
 }

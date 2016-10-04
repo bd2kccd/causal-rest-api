@@ -24,7 +24,7 @@ import org.springframework.beans.factory.annotation.Value;
  *
  * @author Zhou Yuan (zhy19@pitt.edu)
  */
-public abstract class FgsDataValidation {
+public abstract class BasicDataValidation {
 
     // Non-zero Variance - ensure that each variable has non-zero variance
     @Value("true")
@@ -34,7 +34,7 @@ public abstract class FgsDataValidation {
     @Value("true")
     protected boolean uniqueVarName;
 
-    public FgsDataValidation() {
+    public BasicDataValidation() {
     }
 
     public boolean isNonZeroVariance() {

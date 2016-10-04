@@ -28,6 +28,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 /**
  *
  * @author Zhou Yuan (zhy19@pitt.edu)
+ * @author Chirayu (Kong) Wongchokprasitti, PhD (chw20@pitt.edu)
  */
 @XmlRootElement(name = "jobInfo")
 @XmlAccessorType(XmlAccessType.FIELD)

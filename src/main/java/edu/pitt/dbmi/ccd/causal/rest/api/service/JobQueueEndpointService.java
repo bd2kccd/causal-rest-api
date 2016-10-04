@@ -18,12 +18,15 @@
  */
 package edu.pitt.dbmi.ccd.causal.rest.api.service;
 
+import edu.pitt.dbmi.ccd.causal.rest.api.dto.BasicDataValidation;
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.FgsContinuousDataValidation;
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.FgsContinuousNewJob;
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.FgsContinuousParameters;
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.FgsDiscreteDataValidation;
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.FgsDiscreteNewJob;
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.FgsDiscreteParameters;
+import edu.pitt.dbmi.ccd.causal.rest.api.dto.GfciContinuousNewJob;
+import edu.pitt.dbmi.ccd.causal.rest.api.dto.GfciContinuousParameters;
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.JobInfoDTO;
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.JvmOptions;
 import edu.pitt.dbmi.ccd.causal.rest.api.exception.NotFoundByIdException;
@@ -57,6 +60,7 @@ import org.springframework.stereotype.Service;
 /**
  *
  * @author Zhou Yuan (zhy19@pitt.edu)
+ * @author Chirayu (Kong) Wongchokprasitti, PhD (chw20@pitt.edu)
  */
 @Service
 public class JobQueueEndpointService {
@@ -93,6 +97,140 @@ public class JobQueueEndpointService {
         this.dataFileService = dataFileService;
         this.jobQueueInfoService = jobQueueInfoService;
     }
+    
+    /**
+     * Add a new job to the job queue and run the GFCI Continuous algorithm
+     *
+     * @param username
+     * @param newJob
+     * @return JobInfoDTO
+     */
+    public JobInfoDTO addGfciContinuousNewJob(String username, GfciContinuousNewJob newJob) {
+        String algorithm = causalRestProperties.getGfci();
+
+        UserAccount userAccount = userAccountService.findByUsername(username);
+        if (userAccount == null) {
+            throw new UserNotFoundException(username);
+        }
+
+        // algorithmJarPath, dataDir, tmpDir, resultDir
+        // will be used in all algorithms
+        Map<String, String> map = createSharedMapping(username);
+
+        // Building the command line
+        List<String> commands = new LinkedList<>();
+
+        // The first command
+        commands.add("java");
+
+        // Add JVM options
+        if (newJob.getJvmOptions() != null) {
+            JvmOptions jvmOptions = newJob.getJvmOptions();
+            commands.add(String.format("-Xmx%dG", jvmOptions.getMaxHeapSize()));
+        }
+
+        // Add causal-cmd jar path
+        commands.add("-jar");
+        commands.add(map.get("algorithmJarPath"));
+
+        // Add algorithm
+        commands.add("--algorithm");
+        commands.add(algorithm);
+
+        // Get data file name by file id
+        Long dataFileId = newJob.getDataFileId();
+        DataFile dataFile = dataFileService.findByIdAndUserAccount(dataFileId, userAccount);
+        if (dataFile == null) {
+            throw new NotFoundByIdException(dataFileId);
+        }
+        Path dataPath = Paths.get(map.get("dataDir"), dataFile.getName());
+
+        commands.add("--data");
+        commands.add(dataPath.toAbsolutePath().toString());
+
+        // Algorithm parameters
+        GfciContinuousParameters algorithmParameters = newJob.getAlgorithmParameters();
+
+        commands.add("--delimiter");
+        commands.add(getFileDelimiter(newJob.getDataFileId()));
+
+        commands.add("--penalty-discount");
+        commands.add(Double.toString(algorithmParameters.getPenaltyDiscount()));
+
+        commands.add("--max-indegree");
+        commands.add(Integer.toString(algorithmParameters.getMaxInDegree()));
+
+        if (algorithmParameters.isVerbose()) {
+            commands.add("--verbose");
+        }
+
+        if (algorithmParameters.isFaithfulnessAssumed()) {
+            commands.add("--faithfulness-assumed");
+        }
+
+        // Data validation
+        BasicDataValidation dataValidation = newJob.getDataValidation();
+
+        if (!dataValidation.isNonZeroVariance()) {
+            commands.add("--skip-non-zero-variance");
+        }
+
+        if (!dataValidation.isUniqueVarName()) {
+            commands.add("--skip-unique-var-name");
+        }
+
+        commands.add("--tetrad-graph-json");
+
+        // Don't create any validation files
+        commands.add("--no-validation-output");
+
+        long currentTime = System.currentTimeMillis();
+        // Algorithm result file name
+        String fileName;
+
+        DataFile df = dataFileService.findByIdAndUserAccount(dataFileId, userAccount);
+        fileName = String.format("%s_%s_%d", algorithm, df.getName(), currentTime);
+
+        commands.add("--output-prefix");
+        commands.add(fileName);
+
+        // Then separate those commands with ; and store the whole string into database
+        // ccd-job-queue will assemble the command line again at
+        // https://github.com/bd2kccd/ccd-job-queue/blob/master/src/main/java/edu/pitt/dbmi/ccd/queue/service/AlgorithmQueueService.java#L79
+        String cmd = listToSeparatedValues(commands, ";");
+
+        // Insert to database table `job_queue_info`
+        JobQueueInfo jobQueueInfo = new JobQueueInfo();
+        jobQueueInfo.setAddedTime(new Date(System.currentTimeMillis()));
+        jobQueueInfo.setAlgorName(algorithm);
+        jobQueueInfo.setCommands(cmd);
+        jobQueueInfo.setFileName(fileName);
+        jobQueueInfo.setOutputDirectory(map.get("resultDir"));
+        jobQueueInfo.setStatus(0);
+        jobQueueInfo.setTmpDirectory(map.get("tmpDir"));
+        jobQueueInfo.setUserAccounts(Collections.singleton(userAccount));
+
+        jobQueueInfo = jobQueueInfoService.saveJobIntoQueue(jobQueueInfo);
+
+        Long newJobId = jobQueueInfo.getId();
+
+        LOGGER.info(String.format("New GFCI Continuous job submitted. Job ID: %d", newJobId));
+
+        String resultJsonFileName = fileName + ".json";
+        fileName = fileName + ".txt";
+        String errorFileName = String.format("error_%s", fileName);
+        
+        JobInfoDTO jobInfo = new JobInfoDTO();
+        jobInfo.setStatus(0);
+        jobInfo.setAddedTime(jobQueueInfo.getAddedTime());
+        jobInfo.setAlgorithmName(algorithm);
+        jobInfo.setResultFileName(fileName);
+        jobInfo.setResultJsonFileName(resultJsonFileName);
+        jobInfo.setErrorResultFileName(errorFileName);
+        jobInfo.setId(jobQueueInfo.getId());
+        
+        return jobInfo;
+    }
 
     /**
      * Add a new job to the job queue and run the FGS Discrete algorithm
@@ -102,8 +240,6 @@ public class JobQueueEndpointService {
      * @return Job ID
      */
     public JobInfoDTO addFgsDiscreteNewJob(String username, FgsDiscreteNewJob newJob) {
-        // Right now, we only support "fgs" and "fgs-discrete"
-        // Not implimenting prior knowledge in API
         String algorithm = causalRestProperties.getFgsDiscrete();
 
         UserAccount userAccount = userAccountService.findByUsername(username);
@@ -158,7 +294,7 @@ public class JobQueueEndpointService {
         commands.add("--sample-prior");
         commands.add(Double.toString(algorithmParameters.getSamplePrior()));
 
-        commands.add("--max-indegree");
+        commands.add("--max-degree");
         commands.add(Integer.toString(algorithmParameters.getMaxDegree()));
 
         if (algorithmParameters.isVerbose()) {
@@ -245,8 +381,6 @@ public class JobQueueEndpointService {
      * @return JobInfoDTO
      */
     public JobInfoDTO addFgsContinuousNewJob(String username, FgsContinuousNewJob newJob) {
-        // Right now, we only support "fgs" and "fgs-discrete"
-        // Not implimenting prior knowledge in API
         String algorithm = causalRestProperties.getFgs();
 
         UserAccount userAccount = userAccountService.findByUsername(username);
@@ -298,7 +432,7 @@ public class JobQueueEndpointService {
         commands.add("--penalty-discount");
         commands.add(Double.toString(algorithmParameters.getPenaltyDiscount()));
 
-        commands.add("--max-indegree");
+        commands.add("--max-degree");
         commands.add(Integer.toString(algorithmParameters.getMaxDegree()));
 
         if (algorithmParameters.isVerbose()) {
@@ -307,10 +441,6 @@ public class JobQueueEndpointService {
 
         if (algorithmParameters.isFaithfulnessAssumed()) {
             commands.add("--faithfulness-assumed");
-        }
-
-        if (algorithmParameters.isIgnoreLinearDependence()) {
-            commands.add("--ignore-linear-dependence");
         }
 
         // Data validation

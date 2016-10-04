@@ -22,6 +22,6 @@ package edu.pitt.dbmi.ccd.causal.rest.api.dto;
  *
  * @author Zhou Yuan (zhy19@pitt.edu)
  */
-public class FgsContinuousDataValidation extends FgsDataValidation {
+public class FgsContinuousDataValidation extends BasicDataValidation {
 
 }
