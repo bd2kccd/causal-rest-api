@@ -34,8 +34,9 @@ public class AlgorithmEndpointService {
     private static final List<AlgorithmDTO> ALGORITHMS = new LinkedList<>();
 
     static {
-        ALGORITHMS.add(new AlgorithmDTO(1, "fgs", "FGS continuous"));
-        ALGORITHMS.add(new AlgorithmDTO(2, "fgs-discrete", "FGS discrete"));
+        ALGORITHMS.add(new AlgorithmDTO(1, "fgsc", "FGS continuous"));
+        ALGORITHMS.add(new AlgorithmDTO(2, "fgsd", "FGS discrete"));
+        ALGORITHMS.add(new AlgorithmDTO(3, "gfcic", "GFCI continuous"));
     }
 
     /**
