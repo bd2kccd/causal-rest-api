@@ -154,6 +154,9 @@ public class JobQueueEndpointService {
         commands.add("--delimiter");
         commands.add(getFileDelimiter(newJob.getDataFileId()));
 
+        commands.add("--alpha");
+        commands.add(Double.toString(algorithmParameters.getAlpha()));
+
         commands.add("--penalty-discount");
         commands.add(Double.toString(algorithmParameters.getPenaltyDiscount()));
 
