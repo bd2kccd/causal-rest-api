@@ -13,7 +13,7 @@ public class GfciContinuousNewJob extends NewJob {
     private GfciContinuousParameters algorithmParameters;
 
     // Data validation flag
-    private BasicDataValidation dataValidation;
+    private GfciContinuousDataValidation dataValidation;
 
     public GfciContinuousParameters getAlgorithmParameters() {
         return algorithmParameters;
@@ -23,11 +23,11 @@ public class GfciContinuousNewJob extends NewJob {
         this.algorithmParameters = algorithmParameters;
     }
 
-    public BasicDataValidation getDataValidation() {
+    public GfciContinuousDataValidation getDataValidation() {
         return dataValidation;
     }
 
-    public void setDataValidation(BasicDataValidation dataValidation) {
+    public void setDataValidation(GfciContinuousDataValidation dataValidation) {
         this.dataValidation = dataValidation;
     }
 

@@ -18,6 +18,7 @@
  */
 package edu.pitt.dbmi.ccd.causal.rest.api.service;
 
+import edu.pitt.dbmi.ccd.causal.rest.api.dto.GfciContinuousDataValidation;
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.BasicDataValidation;
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.FgsContinuousDataValidation;
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.FgsContinuousNewJob;
@@ -172,7 +173,7 @@ public class JobQueueEndpointService {
         }
 
         // Data validation
-        BasicDataValidation dataValidation = newJob.getDataValidation();
+        GfciContinuousDataValidation dataValidation = newJob.getDataValidation();
 
         if (!dataValidation.isNonZeroVariance()) {
             commands.add("--skip-non-zero-variance");
