@@ -24,13 +24,13 @@ import org.springframework.beans.factory.annotation.Value;
  *
  * @author Zhou Yuan (zhy19@pitt.edu)
  */
-public abstract class FgsDataValidation {
+public abstract class BasicDataValidation {
 
     // Unique Variable Name - ensure that there are no duplicated variable names
     @Value("true")
     protected boolean uniqueVarName;
 
-    public FgsDataValidation() {
+    public BasicDataValidation() {
     }
 
     public boolean isUniqueVarName() {

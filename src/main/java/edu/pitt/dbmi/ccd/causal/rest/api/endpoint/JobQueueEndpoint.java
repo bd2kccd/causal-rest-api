@@ -21,8 +21,8 @@ package edu.pitt.dbmi.ccd.causal.rest.api.endpoint;
 import edu.pitt.dbmi.ccd.causal.rest.api.Role;
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.FgsContinuousNewJob;
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.FgsDiscreteNewJob;
+import edu.pitt.dbmi.ccd.causal.rest.api.dto.GfciContinuousNewJob;
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.JobInfoDTO;
-import edu.pitt.dbmi.ccd.causal.rest.api.dto.JobRequestInfoDTO;
 import edu.pitt.dbmi.ccd.causal.rest.api.service.JobQueueEndpointService;
 
 import java.io.IOException;
@@ -62,6 +62,26 @@ public class JobQueueEndpoint {
     }
 
     /**
+     * Adding a new job and run GFCI continuous
+     *
+     * @param username
+     * @param newJob
+     * @return 201 Created status code with new job ID
+     * @throws IOException
+     */
+    @POST
+    @Path("/gfcic")
+    @Consumes(APPLICATION_JSON)
+    @Produces({APPLICATION_JSON, APPLICATION_XML})
+    @RolesAllowed(Role.USER)
+    public Response addGfciContinuousNewJob(@PathParam("username") String username, @Valid GfciContinuousNewJob newJob) throws IOException {
+	JobInfoDTO jobInfo = jobQueueEndpointService.addGfciContinuousNewJob(username, newJob);
+	GenericEntity<JobInfoDTO> jobRequestEntity = new GenericEntity<JobInfoDTO>(jobInfo){};
+        // Return 201 Created status code and the job id in body
+        return Response.status(Status.CREATED).entity(jobRequestEntity).build();
+    }
+
+    /**
      * Adding a new job and run FGS continuous
      *
      * @param username
@@ -70,13 +90,13 @@ public class JobQueueEndpoint {
      * @throws IOException
      */
     @POST
-    @Path("/fgs")
+    @Path("/fgsc")
     @Consumes(APPLICATION_JSON)
     @Produces({APPLICATION_JSON, APPLICATION_XML})
     @RolesAllowed(Role.USER)
     public Response addFgsContinuousNewJob(@PathParam("username") String username, @Valid FgsContinuousNewJob newJob) throws IOException {
-	JobRequestInfoDTO jobRequestInfo = jobQueueEndpointService.addFgsContinuousNewJob(username, newJob);
-	GenericEntity<JobRequestInfoDTO> jobRequestEntity = new GenericEntity<JobRequestInfoDTO>(jobRequestInfo){};
+	JobInfoDTO jobInfo = jobQueueEndpointService.addFgsContinuousNewJob(username, newJob);
+	GenericEntity<JobInfoDTO> jobRequestEntity = new GenericEntity<JobInfoDTO>(jobInfo){};
         // Return 201 Created status code and the job id in body
         return Response.status(Status.CREATED).entity(jobRequestEntity).build();
     }
@@ -90,13 +110,13 @@ public class JobQueueEndpoint {
      * @throws IOException
      */
     @POST
-    @Path("/fgs-discrete")
+    @Path("/fgsd")
     @Consumes(APPLICATION_JSON)
     @Produces({APPLICATION_JSON, APPLICATION_XML})
     @RolesAllowed(Role.USER)
     public Response addFgsDiscreteNewJob(@PathParam("username") String username, @Valid FgsDiscreteNewJob newJob) throws IOException {
-	JobRequestInfoDTO jobRequestInfo = jobQueueEndpointService.addFgsDiscreteNewJob(username, newJob);
-	GenericEntity<JobRequestInfoDTO> jobRequestEntity = new GenericEntity<JobRequestInfoDTO>(jobRequestInfo){};
+	JobInfoDTO jobInfo = jobQueueEndpointService.addFgsDiscreteNewJob(username, newJob);
+	GenericEntity<JobInfoDTO> jobRequestEntity = new GenericEntity<JobInfoDTO>(jobInfo){};
         // Return 201 Created status code and the job id in body
         return Response.status(Status.CREATED).entity(jobRequestEntity).build();
     }
@@ -127,20 +147,19 @@ public class JobQueueEndpoint {
      *
      * @param username
      * @param id
-     * @return 200 OK status code with job status ("Pending" or "Completed")
+     * @return 200 OK status code with JobInfoDTO object or 404 NOT_FOUND
      * @throws IOException
      */
     @GET
     @Path("/{id}")
     @RolesAllowed(Role.USER)
     public Response jobStatus(@PathParam("username") String username, @PathParam("id") Long id) throws IOException {
-        boolean completed = jobQueueEndpointService.checkJobStatus(username, id);
-
-        if (completed) {
-            return Response.ok("Job " + id + " has been completed.").build();
-        } else {
-            return Response.ok("Job " + id + " is still running.").build();
+        JobInfoDTO jobInfoDTO = jobQueueEndpointService.checkJobStatus(username, id);
+        if(jobInfoDTO == null){
+            return Response.status(Status.NOT_FOUND).build();
         }
+        GenericEntity<JobInfoDTO> entity = new GenericEntity<JobInfoDTO>(jobInfoDTO){}; 
+        return Response.ok(entity).build();
     }
 
     /**

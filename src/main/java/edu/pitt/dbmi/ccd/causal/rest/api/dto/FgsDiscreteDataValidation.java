@@ -24,7 +24,7 @@ import org.springframework.beans.factory.annotation.Value;
  *
  * @author Zhou Yuan (zhy19@pitt.edu)
  */
-public class FgsDiscreteDataValidation extends FgsDataValidation {
+public class FgsDiscreteDataValidation extends BasicDataValidation {
 
     // Limit Number of Categories - ensure the number of categories of a variable does not exceed 10.
     @Value("true")

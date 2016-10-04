@@ -56,6 +56,15 @@ public class CausalRestProperties {
     @Value("${ccd.folder.results.comparison}")
     private String comparisonFolder;
 
+    @Value("${ccd.algorithm.fgs}")
+    private String fgs;
+
+    @Value("${ccd.algorithm.fgs.discrete}")
+    private String fgsDiscrete;
+
+    @Value("${ccd.algorithm.gfci}")
+    private String gfci;
+
     public CausalRestProperties() {
     }
 
@@ -121,5 +130,29 @@ public class CausalRestProperties {
 
     public void setComparisonFolder(String comparisonFolder) {
         this.comparisonFolder = comparisonFolder;
+    }
+
+    public String getFgs() {
+        return fgs;
+    }
+
+    public void setFgs(String fgs) {
+        this.fgs = fgs;
+    }
+
+    public String getFgsDiscrete() {
+        return fgsDiscrete;
+    }
+
+    public void setFgsDiscrete(String fgsDiscrete) {
+        this.fgsDiscrete = fgsDiscrete;
+    }
+
+    public String getGfci() {
+        return gfci;
+    }
+
+    public void setGfci(String gfci) {
+        this.gfci = gfci;
     }
 }
