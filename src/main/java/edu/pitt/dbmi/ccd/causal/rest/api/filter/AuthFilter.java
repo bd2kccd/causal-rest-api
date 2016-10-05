@@ -18,13 +18,18 @@
  */
 package edu.pitt.dbmi.ccd.causal.rest.api.filter;
 
+import com.auth0.jwt.JWTVerifyException;
 import edu.pitt.dbmi.ccd.causal.rest.api.service.AuthFilterService;
 import java.io.IOException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.SignatureException;
 import javax.annotation.Priority;
 import javax.ws.rs.Priorities;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.ext.Provider;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -36,6 +41,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 @Provider
 @Priority(Priorities.AUTHENTICATION)
 public class AuthFilter implements ContainerRequestFilter {
+
+    private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(AuthFilter.class);
 
     private final AuthFilterService authFilterService;
 
@@ -54,7 +61,11 @@ public class AuthFilter implements ContainerRequestFilter {
             return;
         }
 
-        authFilterService.doBasicAuth(requestContext);
+        try {
+            authFilterService.auth(requestContext);
+        } catch (NoSuchAlgorithmException | InvalidKeyException | IllegalStateException | SignatureException | JWTVerifyException ex) {
+            LOGGER.error("JWT verification failed.", ex);
+        }
     }
 
 }

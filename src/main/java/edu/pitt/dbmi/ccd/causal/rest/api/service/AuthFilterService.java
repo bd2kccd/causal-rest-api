@@ -18,24 +18,29 @@
  */
 package edu.pitt.dbmi.ccd.causal.rest.api.service;
 
+import com.auth0.jwt.JWTVerifier;
+import com.auth0.jwt.JWTVerifyException;
 import edu.pitt.dbmi.ccd.causal.rest.api.Role;
 import edu.pitt.dbmi.ccd.causal.rest.api.exception.AccessDeniedException;
 import edu.pitt.dbmi.ccd.causal.rest.api.exception.AccessForbiddenException;
 import edu.pitt.dbmi.ccd.db.entity.UserAccount;
 import edu.pitt.dbmi.ccd.db.entity.UserRole;
 import edu.pitt.dbmi.ccd.db.service.UserAccountService;
+import java.io.IOException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.security.Principal;
-import java.util.Base64;
+import java.security.SignatureException;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
-import java.util.StringTokenizer;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.SecurityContext;
-import org.apache.shiro.authc.credential.DefaultPasswordService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 /**
@@ -47,49 +52,61 @@ import org.springframework.stereotype.Service;
 @Service
 public class AuthFilterService {
 
+    @Value("${ccd.jwt.issuer}")
+    private String jwtIssuer;
+
+    @Value("${ccd.jwt.secret}")
+    private String jwtSecret;
+
     private static final Logger LOGGER = LoggerFactory.getLogger(AuthFilterService.class);
 
+    // The JWT is sent via the Authorization header using the Bearer authentication scheme
     private static final String AUTH_HEADER = "Authorization";
-    public static final String AUTH_SCHEME_BASIC = "Basic";
+    public static final String AUTH_SCHEME_BEARER = "Bearer";
 
-    private static final AccessDeniedException USER_CREDENTIALS_REQUIRED = new AccessDeniedException("User credentials are required.");
-    private static final AccessDeniedException INVALID_USER_CREDENTIALS = new AccessDeniedException("Invalid username and/or password.");
+    private static final AccessDeniedException JWT_REQUIRED = new AccessDeniedException("API JWT(JSON Web Token) is required.");
+    private static final AccessDeniedException INVALID_JWT = new AccessDeniedException("Invalid JWT(JSON Web Token).");
     private static final AccessForbiddenException FORBIDDEN_ACCESS = new AccessForbiddenException("You cannot access this resource.");
 
     private final UserAccountService userAccountService;
-    private final DefaultPasswordService defaultPasswordService;
 
     @Autowired
-    public AuthFilterService(UserAccountService userAccountService, DefaultPasswordService defaultPasswordService) {
+    public AuthFilterService(UserAccountService userAccountService) {
         this.userAccountService = userAccountService;
-        this.defaultPasswordService = defaultPasswordService;
     }
 
-    public void doBasicAuth(ContainerRequestContext requestContext) {
+    public void auth(ContainerRequestContext requestContext) throws NoSuchAlgorithmException, InvalidKeyException, IllegalStateException, IOException, SignatureException, JWTVerifyException {
         String authCredentials = requestContext.getHeaderString(AUTH_HEADER);
-        if (authCredentials == null || !authCredentials.contains(AUTH_SCHEME_BASIC)) {
-            throw USER_CREDENTIALS_REQUIRED;
+        if (authCredentials == null || !authCredentials.contains(AUTH_SCHEME_BEARER)) {
+            throw JWT_REQUIRED;
         }
 
-        String authCredentialBase64 = authCredentials.replaceFirst(AUTH_SCHEME_BASIC, "").trim();
-        String credentials = new String(Base64.getDecoder().decode(authCredentialBase64));
-        UserAccount userAccount = retrieveUserAccount(credentials);
-        if (userAccount == null) {
-            throw INVALID_USER_CREDENTIALS;
+        String jwt = authCredentials.replaceFirst(AUTH_SCHEME_BEARER, "").trim();
+        // Verify both secret and issuer
+        final JWTVerifier jwtVerifier = new JWTVerifier(jwtSecret, null, jwtIssuer);
+        final Map<String, Object> claims = jwtVerifier.verify(jwt);
+
+        String username = claims.get("username").toString();
+        boolean valid = (Boolean) claims.get("valid");
+
+        if (valid != true) {
+            throw INVALID_JWT;
         }
+
+        UserAccount userAccount = userAccountService.findByUsername(username);
 
         SecurityContext securityContext = createSecurityContext(userAccount, requestContext, SecurityContext.BASIC_AUTH);
-        if (!(securityContext.isUserInRole("admin") || isAccountMatchesRequest(userAccount, requestContext))) {
+        if (!(securityContext.isUserInRole("admin") || isAccountMatchesRequest(username, requestContext))) {
             throw FORBIDDEN_ACCESS;
         }
         requestContext.setSecurityContext(securityContext);
     }
 
-    private boolean isAccountMatchesRequest(UserAccount userAccount, ContainerRequestContext requestContext) {
+    private boolean isAccountMatchesRequest(String jwtUsername, ContainerRequestContext requestContext) {
         MultivaluedMap<String, String> pathParams = requestContext.getUriInfo().getPathParameters();
         String username = pathParams.getFirst("username");
 
-        return userAccount.getUsername().equals(username);
+        return jwtUsername.equals(username);
     }
 
     private SecurityContext createSecurityContext(UserAccount userAccount, ContainerRequestContext requestContext, String authScheme) {
@@ -109,22 +126,6 @@ public class AuthFilterService {
         boolean secure = "https".equals(requestContext.getUriInfo().getRequestUri().getScheme());
 
         return new CustomSecurityContext(username, roles, authScheme, secure);
-    }
-
-    private UserAccount retrieveUserAccount(String credentials) {
-        StringTokenizer tokenizer = new StringTokenizer(credentials, ":");
-        String username = tokenizer.nextToken();
-        String password = tokenizer.nextToken();
-
-        UserAccount userAccount = userAccountService.findByUsername(username);
-        if (userAccount != null) {
-            String hashedPassword = userAccount.getPassword();
-            if (!defaultPasswordService.passwordsMatch(password, hashedPassword)) {
-                userAccount = null;
-            }
-        }
-
-        return userAccount;
     }
 
     class CustomSecurityContext implements SecurityContext {
