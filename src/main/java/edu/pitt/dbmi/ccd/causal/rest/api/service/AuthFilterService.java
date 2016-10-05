@@ -19,24 +19,22 @@
 package edu.pitt.dbmi.ccd.causal.rest.api.service;
 
 import com.auth0.jwt.JWTVerifier;
-import com.auth0.jwt.JWTVerifyException;
 import edu.pitt.dbmi.ccd.causal.rest.api.Role;
 import edu.pitt.dbmi.ccd.causal.rest.api.exception.AccessDeniedException;
 import edu.pitt.dbmi.ccd.causal.rest.api.exception.AccessForbiddenException;
 import edu.pitt.dbmi.ccd.db.entity.UserAccount;
 import edu.pitt.dbmi.ccd.db.entity.UserRole;
 import edu.pitt.dbmi.ccd.db.service.UserAccountService;
-import java.io.IOException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
 import java.security.Principal;
-import java.security.SignatureException;
+import java.util.Base64;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.StringTokenizer;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.SecurityContext;
+import org.apache.shiro.authc.credential.DefaultPasswordService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,53 +58,67 @@ public class AuthFilterService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AuthFilterService.class);
 
-    // The JWT is sent via the Authorization header using the Bearer authentication scheme
     private static final String AUTH_HEADER = "Authorization";
+    public static final String AUTH_SCHEME_BASIC = "Basic";
     public static final String AUTH_SCHEME_BEARER = "Bearer";
 
-    private static final AccessDeniedException JWT_REQUIRED = new AccessDeniedException("API JWT(JSON Web Token) is required.");
-    private static final AccessDeniedException INVALID_JWT = new AccessDeniedException("Invalid JWT(JSON Web Token).");
+    private static final AccessDeniedException USER_CREDENTIALS_REQUIRED = new AccessDeniedException("User credentials are required.");
+    private static final AccessDeniedException INVALID_USER_CREDENTIALS = new AccessDeniedException("Invalid username and/or password.");
     private static final AccessForbiddenException FORBIDDEN_ACCESS = new AccessForbiddenException("You cannot access this resource.");
 
     private final UserAccountService userAccountService;
+    private final DefaultPasswordService defaultPasswordService;
 
     @Autowired
-    public AuthFilterService(UserAccountService userAccountService) {
+    public AuthFilterService(UserAccountService userAccountService, DefaultPasswordService defaultPasswordService) {
         this.userAccountService = userAccountService;
+        this.defaultPasswordService = defaultPasswordService;
     }
 
-    public void auth(ContainerRequestContext requestContext) throws NoSuchAlgorithmException, InvalidKeyException, IllegalStateException, IOException, SignatureException, JWTVerifyException {
+    public void auth(ContainerRequestContext requestContext) {
         String authCredentials = requestContext.getHeaderString(AUTH_HEADER);
-        if (authCredentials == null || !authCredentials.contains(AUTH_SCHEME_BEARER)) {
-            throw JWT_REQUIRED;
+        if (authCredentials == null) {
+            throw USER_CREDENTIALS_REQUIRED;
         }
 
-        String jwt = authCredentials.replaceFirst(AUTH_SCHEME_BEARER, "").trim();
-        // Verify both secret and issuer
-        final JWTVerifier jwtVerifier = new JWTVerifier(jwtSecret, null, jwtIssuer);
-        final Map<String, Object> claims = jwtVerifier.verify(jwt);
+        UserAccount userAccount = null;
 
-        String username = claims.get("username").toString();
-        boolean valid = (Boolean) claims.get("valid");
+        // Use jwt as the authtication method
+        if (authCredentials.contains(AUTH_SCHEME_BEARER)) {
+            String jwt = authCredentials.replaceFirst(AUTH_SCHEME_BEARER, "").trim();
+            // Verify both secret and issuer
+            final JWTVerifier jwtVerifier = new JWTVerifier(jwtSecret, null, jwtIssuer);
+            final Map<String, Object> claims = jwtVerifier.verify(jwt);
 
-        if (valid != true) {
-            throw INVALID_JWT;
+            String username = claims.get("username").toString();
+
+            userAccount = userAccountService.findByUsername(username);
         }
 
-        UserAccount userAccount = userAccountService.findByUsername(username);
+        // Use basic auth as the authtication method
+        if (authCredentials.contains(AUTH_SCHEME_BASIC)) {
+            String authCredentialBase64 = authCredentials.replaceFirst(AUTH_SCHEME_BASIC, "").trim();
+            String credentials = new String(Base64.getDecoder().decode(authCredentialBase64));
+            userAccount = retrieveUserAccount(credentials);
+
+        }
+
+        if (userAccount == null) {
+            throw INVALID_USER_CREDENTIALS;
+        }
 
         SecurityContext securityContext = createSecurityContext(userAccount, requestContext, SecurityContext.BASIC_AUTH);
-        if (!(securityContext.isUserInRole("admin") || isAccountMatchesRequest(username, requestContext))) {
+        if (!(securityContext.isUserInRole("admin") || isAccountMatchesRequest(userAccount, requestContext))) {
             throw FORBIDDEN_ACCESS;
         }
         requestContext.setSecurityContext(securityContext);
     }
 
-    private boolean isAccountMatchesRequest(String jwtUsername, ContainerRequestContext requestContext) {
+    private boolean isAccountMatchesRequest(UserAccount userAccount, ContainerRequestContext requestContext) {
         MultivaluedMap<String, String> pathParams = requestContext.getUriInfo().getPathParameters();
         String username = pathParams.getFirst("username");
 
-        return jwtUsername.equals(username);
+        return userAccount.getUsername().equals(username);
     }
 
     private SecurityContext createSecurityContext(UserAccount userAccount, ContainerRequestContext requestContext, String authScheme) {
@@ -126,6 +138,22 @@ public class AuthFilterService {
         boolean secure = "https".equals(requestContext.getUriInfo().getRequestUri().getScheme());
 
         return new CustomSecurityContext(username, roles, authScheme, secure);
+    }
+
+    private UserAccount retrieveUserAccount(String credentials) {
+        StringTokenizer tokenizer = new StringTokenizer(credentials, ":");
+        String username = tokenizer.nextToken();
+        String password = tokenizer.nextToken();
+
+        UserAccount userAccount = userAccountService.findByUsername(username);
+        if (userAccount != null) {
+            String hashedPassword = userAccount.getPassword();
+            if (!defaultPasswordService.passwordsMatch(password, hashedPassword)) {
+                userAccount = null;
+            }
+        }
+
+        return userAccount;
     }
 
     class CustomSecurityContext implements SecurityContext {

@@ -18,12 +18,8 @@
  */
 package edu.pitt.dbmi.ccd.causal.rest.api.filter;
 
-import com.auth0.jwt.JWTVerifyException;
 import edu.pitt.dbmi.ccd.causal.rest.api.service.AuthFilterService;
 import java.io.IOException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.security.SignatureException;
 import javax.annotation.Priority;
 import javax.ws.rs.Priorities;
 import javax.ws.rs.container.ContainerRequestContext;
@@ -61,11 +57,7 @@ public class AuthFilter implements ContainerRequestFilter {
             return;
         }
 
-        try {
-            authFilterService.auth(requestContext);
-        } catch (NoSuchAlgorithmException | InvalidKeyException | IllegalStateException | SignatureException | JWTVerifyException ex) {
-            LOGGER.error("JWT verification failed.", ex);
-        }
+        authFilterService.auth(requestContext);
     }
 
 }
