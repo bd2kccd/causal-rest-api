@@ -46,7 +46,7 @@ There are 4 configuration files to configure located at `causal-rest-api/src/mai
 - **application.properties**: Spring Boot application settings
 - **causal.properties**: Data file directory path and folder settings
 
-Befor editing the `causal.properties` file, you need to create a workspace for the application to work in. Create a directory called workspace, for an example `/home/zhy19/ccd/workspace`. Inside the workspace directory, create another folder called `lib`. Then build the jar file of Tetred using the [tetrad-5.3.0-20160624](https://github.com/cmu-phil/tetrad/releases/tag/v5.3.0-20160624) pre-release version. After that, copy the jar file to the `lib` folder created earlier.
+Befor editing the `causal.properties` file, you need to create a workspace for the application to work in. Create a directory called workspace, for an example `/home/zhy19/ccd/workspace`. Inside the workspace directory, create another folder called `lib`. Then build the jar file of Tetred using the [6.0-alpha-20160930](https://github.com/cmu-phil/tetrad/releases/tag/6.0-alpha-20160930) pre-release version. After that, copy the jar file to the `lib` folder created earlier.
 
 ### Start the API Server
 
@@ -492,18 +492,23 @@ Currently we support "FGS continuous" and "FGS discrete".
 [
   {
     "id": 1,
-    "name": "fgs",
+    "name": "fgsc",
     "description": "FGS continuous"
   },
   {
     "id": 2,
-    "name": "fgs-discrete",
+    "name": "fgsd",
     "description": "FGS discrete"
+  },
+  {
+    "id": 3,
+    "name": "gfcic",
+    "description": "GFCI continuous"
   }
 ]
 ````
 
-Currently we support "FGS continuous" and "FGS discrete" and they share a common JSON structure as of their input, for example:
+Currently we support "FGS continuous", "FGS discrete" and "GFCI continuous". They also share a common JSON structure as of their input, for example:
 
 | Input JSON Fields | Description |
 | --- | --- |
@@ -553,6 +558,22 @@ Algorithm parameters:
 | `heuristicSpeedup` | Heuristic speedup. All conditional independence relations that hold in the distribution are entailed by the Causal Markov Assumption      |    true |
 | `verbose` | Print additional information      |    true |
 
+**GFCI continuous** 
+
+Data validation:
+
+| Parameters        | Description           | Default Value  |
+| ------------- | ------------- | ----- |
+| `uniqueVarName`      | Unique Variable Name. Ensure that there are no duplicated variable names      |  true |
+
+Algorithm parameters:
+
+| Parameters        | Description           | Default Value  |
+| ------------- | ------------- | ----- |
+| `alpha`      | Search depth. Integer value |  1.0 | 
+| `penaltyDiscount`      | Penalty discount      |   4.0 |
+| `verbose` | Print additional information      |    true |
+
 #### Add a new job to run the desired algorithm on a given data file
 
 This is a POST request and the algorithm details and data file id will need to be specified in the POST body as a JSON when you make the request.
@@ -560,13 +581,13 @@ This is a POST request and the algorithm details and data file id will need to b
 API Endpoint URI pattern:
 
 ````
-POST https://ccd1.vm.bridges.psc.edu/ccd-api/{username}/jobs/fgs
+POST https://ccd1.vm.bridges.psc.edu/ccd-api/{username}/jobs/fgsc
 ````
 
 Generated HTTP request code example:
 
 ````
-POST /ccd-api/demouser/jobs/fgs HTTP/1.1
+POST /ccd-api/demouser/jobs/fgsc HTTP/1.1
 Host: ccd1.vm.bridges.psc.edu
 Authorization: Basic ZGVtb3VzZXI6MTIz
 Content-Type: application/json
@@ -592,7 +613,7 @@ In this example, we are running the "FGS continuous" algorithm on the file with 
 ````
 {
   "id": 5,
-  "algorithmName": "fgs",
+  "algorithmName": "fgsc",
   "addedTime": 1472742564355,
   "resultFileName": "fgs_data_small.txt_1472742564353.txt",
   "errorResultFileName": "error_fgs_data_small.txt_1472742564353.txt"
@@ -606,13 +627,13 @@ When you need to run "FGS discrete", just send the request to a different endpon
 API Endpoint URI pattern:
 
 ````
-POST https://ccd1.vm.bridges.psc.edu/ccd-api/{username}/jobs/fgs-discrete
+POST https://ccd1.vm.bridges.psc.edu/ccd-api/{username}/jobs/fgsd
 ````
 
 Generated HTTP request code example:
 
 ````
-POST /ccd-api/demouser/jobs/fgs-discrete HTTP/1.1
+POST /ccd-api/demouser/jobs/fgsd HTTP/1.1
 Host: ccd1.vm.bridges.psc.edu
 Authorization: Basic ZGVtb3VzZXI6MTIz
 Content-Type: application/json
@@ -658,12 +679,12 @@ Then you'll see the information of all jobs that are currently running:
 [
   {
     "id": 32,
-    "algorithmName": "fgs",
+    "algorithmName": "fgsc",
     "addedTime": 1468436085000
   },
   {
     "id": 33,
-    "algorithmName": "fgs",
+    "algorithmName": "fgsd",
     "addedTime": 1468436087000
   }
 ]
