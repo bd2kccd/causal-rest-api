@@ -5,11 +5,15 @@
  */
 package edu.pitt.dbmi.ccd.causal.rest.api.endpoint;
 
+import edu.pitt.dbmi.ccd.causal.rest.api.dto.JwtDTO;
 import edu.pitt.dbmi.ccd.causal.rest.api.service.JwtEndpointService;
 import javax.annotation.security.PermitAll;
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
+import static javax.ws.rs.core.MediaType.APPLICATION_XML;
 import javax.ws.rs.core.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -31,8 +35,9 @@ public class JwtEndpoint {
     }
 
     @GET
+    @Produces({APPLICATION_JSON, APPLICATION_XML})
     public Response getJwt(@HeaderParam("Authorization") String authString) {
-        String jwt = jwtEndpointService.generateJwt(authString);
-        return Response.ok(jwt).build();
+        JwtDTO jwtDTO = jwtEndpointService.generateJwt(authString);
+        return Response.ok(jwtDTO).build();
     }
 }

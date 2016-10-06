@@ -6,6 +6,7 @@
 package edu.pitt.dbmi.ccd.causal.rest.api.service;
 
 import com.auth0.jwt.JWTSigner;
+import edu.pitt.dbmi.ccd.causal.rest.api.dto.JwtDTO;
 import edu.pitt.dbmi.ccd.causal.rest.api.prop.CausalRestProperties;
 import java.util.Base64;
 import java.util.HashMap;
@@ -33,7 +34,7 @@ public class JwtEndpointService {
         this.causalRestProperties = causalRestProperties;
     }
 
-    public String generateJwt(String authString) {
+    public JwtDTO generateJwt(String authString) {
         // Parse the username from the authString
         String authCredentialBase64 = authString.replaceFirst(AUTH_SCHEME_BASIC, "").trim();
         String credentials = new String(Base64.getDecoder().decode(authCredentialBase64));
@@ -61,7 +62,12 @@ public class JwtEndpointService {
         // Generate the token string
         String jwt = signer.sign(claims);
 
-        return jwt;
+        JwtDTO jwtDTO = new JwtDTO();
+        jwtDTO.setJwt(jwt);
+        jwtDTO.setIat(iat);
+        jwtDTO.setExp(exp);
+
+        return jwtDTO;
     }
 
 }
