@@ -19,13 +19,18 @@
 package edu.pitt.dbmi.ccd.causal.rest.api.service;
 
 import com.auth0.jwt.JWTVerifier;
+import com.auth0.jwt.JWTVerifyException;
 import edu.pitt.dbmi.ccd.causal.rest.api.Role;
 import edu.pitt.dbmi.ccd.causal.rest.api.exception.AccessDeniedException;
 import edu.pitt.dbmi.ccd.causal.rest.api.exception.AccessForbiddenException;
 import edu.pitt.dbmi.ccd.db.entity.UserAccount;
 import edu.pitt.dbmi.ccd.db.entity.UserRole;
 import edu.pitt.dbmi.ccd.db.service.UserAccountService;
+import java.io.IOException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.security.Principal;
+import java.security.SignatureException;
 import java.util.Base64;
 import java.util.HashSet;
 import java.util.Map;
@@ -75,6 +80,7 @@ public class AuthFilterService {
         this.defaultPasswordService = defaultPasswordService;
     }
 
+    // Direct the actual authentication to either baisc auth or jwt based bearer schema
     public void auth(ContainerRequestContext requestContext) {
         String authCredentials = requestContext.getHeaderString(AUTH_HEADER);
         if (authCredentials == null) {
@@ -85,22 +91,26 @@ public class AuthFilterService {
 
         // Use jwt as the authtication method
         if (authCredentials.contains(AUTH_SCHEME_BEARER)) {
-            String jwt = authCredentials.replaceFirst(AUTH_SCHEME_BEARER, "").trim();
-            // Verify both secret and issuer
-            final JWTVerifier jwtVerifier = new JWTVerifier(jwtSecret, null, jwtIssuer);
-            final Map<String, Object> claims = jwtVerifier.verify(jwt);
-
-            String username = claims.get("username").toString();
-
-            userAccount = userAccountService.findByUsername(username);
+            try {
+                String jwt = authCredentials.replaceFirst(AUTH_SCHEME_BEARER, "").trim();
+                // Verify both secret and issuer
+                final JWTVerifier jwtVerifier = new JWTVerifier(jwtSecret, null, jwtIssuer);
+                final Map<String, Object> claims = jwtVerifier.verify(jwt);
+                // In the jwt bearer schhema, we can simply get the user account based on the username
+                String username = claims.get("name").toString();
+                userAccount = userAccountService.findByUsername(username);
+            } catch (NoSuchAlgorithmException | InvalidKeyException | IllegalStateException | IOException | SignatureException | JWTVerifyException ex) {
+                LOGGER.error("Failed to verify JWT", ex);
+            }
         }
 
         // Use basic auth as the authtication method
         if (authCredentials.contains(AUTH_SCHEME_BASIC)) {
             String authCredentialBase64 = authCredentials.replaceFirst(AUTH_SCHEME_BASIC, "").trim();
+            // In the basic auth schema, both username and password are encoded in the request header
+            // So we'll need to get the user account info with username and password
             String credentials = new String(Base64.getDecoder().decode(authCredentialBase64));
             userAccount = retrieveUserAccount(credentials);
-
         }
 
         if (userAccount == null) {

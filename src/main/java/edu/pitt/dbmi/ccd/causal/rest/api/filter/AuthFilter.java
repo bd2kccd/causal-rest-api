@@ -57,6 +57,7 @@ public class AuthFilter implements ContainerRequestFilter {
             return;
         }
 
+        // This auth service handles both basic auth and jwt bearer auth
         authFilterService.auth(requestContext);
     }
 
