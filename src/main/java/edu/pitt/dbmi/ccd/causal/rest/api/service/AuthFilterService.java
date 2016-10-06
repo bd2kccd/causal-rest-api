@@ -67,10 +67,14 @@ public class AuthFilterService {
     public static final String AUTH_SCHEME_BASIC = "Basic";
     public static final String AUTH_SCHEME_BEARER = "Bearer";
 
-    private static final AccessDeniedException USER_CREDENTIALS_REQUIRED = new AccessDeniedException("User credentials are required.");
-    private static final AccessDeniedException BASIC_AUTH_REQUIRED = new AccessDeniedException("Basic Auth is required to get the JSON Web Token(JWT).");
-    private static final AccessDeniedException BEARER_AUTH_REQUIRED = new AccessDeniedException("Bearer Auth is required to acees this resource.");
-    private static final AccessDeniedException INVALID_USER_CREDENTIALS = new AccessDeniedException("Invalid user credentials.");
+    private static final AccessDeniedException BASIC_AUTH_USER_CREDENTIALS_REQUIRED = new AccessDeniedException("User credentials are required.");
+    private static final AccessDeniedException BASIC_AUTH_REQUIRED = new AccessDeniedException("Basic Authentication scheme is required to get the JSON Web Token(JWT).");
+    private static final AccessDeniedException BASIC_AUTH_INVALID_USER_CREDENTIALS = new AccessDeniedException("Invalid user credentials.");
+
+    private static final AccessDeniedException BEARER_AUTH_REQUIRED = new AccessDeniedException("Bearer Authentication scheme is required to acees this resource.");
+    private static final AccessDeniedException BEARER_AUTH_JWT_REQUIRED = new AccessDeniedException("JSON Web Token(JWT) is required.");
+    private static final AccessDeniedException BEARER_AUTH_INVALID_JWT = new AccessDeniedException("Invalid JSON Web Token(JWT).");
+
     private static final AccessForbiddenException FORBIDDEN_ACCESS = new AccessForbiddenException("You don't have permission to access this resource.");
 
     private final UserAccountService userAccountService;
@@ -86,7 +90,7 @@ public class AuthFilterService {
     public void verifyBasicAuth(ContainerRequestContext requestContext) {
         String authCredentials = requestContext.getHeaderString(AUTH_HEADER);
         if (authCredentials == null) {
-            throw USER_CREDENTIALS_REQUIRED;
+            throw BASIC_AUTH_USER_CREDENTIALS_REQUIRED;
         }
 
         if (!authCredentials.contains(AUTH_SCHEME_BASIC)) {
@@ -100,7 +104,7 @@ public class AuthFilterService {
         UserAccount userAccount = retrieveUserAccount(credentials);
 
         if (userAccount == null) {
-            throw INVALID_USER_CREDENTIALS;
+            throw BASIC_AUTH_INVALID_USER_CREDENTIALS;
         }
 
         // No need to check isUserInRole("admin") since everyone can sign in
@@ -114,7 +118,7 @@ public class AuthFilterService {
     public void verifyJwt(ContainerRequestContext requestContext) {
         String authCredentials = requestContext.getHeaderString(AUTH_HEADER);
         if (authCredentials == null) {
-            throw USER_CREDENTIALS_REQUIRED;
+            throw BEARER_AUTH_JWT_REQUIRED;
         }
 
         // All other endpoints use bearer JWT to verify the API consumer
@@ -133,7 +137,7 @@ public class AuthFilterService {
             UserAccount userAccount = userAccountService.findByUsername(username);
 
             if (userAccount == null) {
-                throw INVALID_USER_CREDENTIALS;
+                throw BEARER_AUTH_INVALID_JWT;
             }
 
             // Also make sure the username found in jwt matches the one in URI
