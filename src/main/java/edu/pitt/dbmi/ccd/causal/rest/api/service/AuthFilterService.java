@@ -68,8 +68,8 @@ public class AuthFilterService {
     public static final String AUTH_SCHEME_BEARER = "Bearer";
 
     private static final AccessDeniedException USER_CREDENTIALS_REQUIRED = new AccessDeniedException("User credentials are required.");
-    private static final AccessDeniedException INVALID_USER_CREDENTIALS = new AccessDeniedException("Invalid username and/or password.");
-    private static final AccessForbiddenException FORBIDDEN_ACCESS = new AccessForbiddenException("You cannot access this resource.");
+    private static final AccessDeniedException INVALID_USER_CREDENTIALS = new AccessDeniedException("Invalid user credentials.");
+    private static final AccessForbiddenException FORBIDDEN_ACCESS = new AccessForbiddenException("You don't have permission to access this resource.");
 
     private final UserAccountService userAccountService;
     private final DefaultPasswordService defaultPasswordService;
