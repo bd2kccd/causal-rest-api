@@ -7,7 +7,9 @@ package edu.pitt.dbmi.ccd.causal.rest.api.service;
 
 import com.auth0.jwt.JWTSigner;
 import edu.pitt.dbmi.ccd.causal.rest.api.prop.CausalRestProperties;
+import java.util.Base64;
 import java.util.HashMap;
+import java.util.StringTokenizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +24,8 @@ public class JwtEndpointService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JwtEndpointService.class);
 
+    public static final String AUTH_SCHEME_BASIC = "Basic";
+
     private final CausalRestProperties causalRestProperties;
 
     @Autowired
@@ -29,7 +33,13 @@ public class JwtEndpointService {
         this.causalRestProperties = causalRestProperties;
     }
 
-    public String generateJwt(String username) {
+    public String generateJwt(String authString) {
+        // Parse the username from the authString
+        String authCredentialBase64 = authString.replaceFirst(AUTH_SCHEME_BASIC, "").trim();
+        String credentials = new String(Base64.getDecoder().decode(authCredentialBase64));
+        StringTokenizer tokenizer = new StringTokenizer(credentials, ":");
+        String username = tokenizer.nextToken();
+
         // Generate JWT (JSON Web Token, for API authentication)
         // Each jwt is issued at claim (per page refresh)
         final long iat = System.currentTimeMillis() / 1000l;

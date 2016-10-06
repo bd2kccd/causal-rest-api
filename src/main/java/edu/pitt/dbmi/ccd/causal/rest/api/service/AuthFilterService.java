@@ -103,10 +103,10 @@ public class AuthFilterService {
             throw INVALID_USER_CREDENTIALS;
         }
 
+        // No need to check isUserInRole("admin") since everyone can sign in
+        // No need to check isAccountMatchesRequest(userAccount, requestContext) since the jwt URI doesn't contain username
         SecurityContext securityContext = createSecurityContext(userAccount, requestContext, AUTH_SCHEME_BASIC);
-        if (!(securityContext.isUserInRole("admin") || isAccountMatchesRequest(userAccount, requestContext))) {
-            throw FORBIDDEN_ACCESS;
-        }
+
         requestContext.setSecurityContext(securityContext);
     }
 
@@ -136,6 +136,7 @@ public class AuthFilterService {
                 throw INVALID_USER_CREDENTIALS;
             }
 
+            // Also make sure the username found in jwt matches the one in URI
             SecurityContext securityContext = createSecurityContext(userAccount, requestContext, AUTH_SCHEME_BEARER);
             if (!(securityContext.isUserInRole("admin") || isAccountMatchesRequest(userAccount, requestContext))) {
                 throw FORBIDDEN_ACCESS;
