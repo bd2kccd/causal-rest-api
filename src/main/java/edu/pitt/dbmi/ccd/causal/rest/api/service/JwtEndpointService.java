@@ -6,24 +6,28 @@
 package edu.pitt.dbmi.ccd.causal.rest.api.service;
 
 import com.auth0.jwt.JWTSigner;
+import edu.pitt.dbmi.ccd.causal.rest.api.prop.CausalRestProperties;
 import java.util.HashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 /**
  *
  * @author Zhou Yuan (zhy19@pitt.edu)
  */
+@Service
 public class JwtEndpointService {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(DataFileEndpointService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(JwtEndpointService.class);
 
-    @Value("${ccd.jwt.issuer}")
-    private String jwtIssuer;
+    private final CausalRestProperties causalRestProperties;
 
-    @Value("${ccd.jwt.secret}")
-    private String jwtSecret;
+    @Autowired
+    public JwtEndpointService(CausalRestProperties causalRestProperties) {
+        this.causalRestProperties = causalRestProperties;
+    }
 
     public String generateJwt(String username) {
         // Generate JWT (JSON Web Token, for API authentication)
@@ -33,12 +37,12 @@ public class JwtEndpointService {
         final long exp = iat + 3600L;
 
         // Sign the token with secret
-        final JWTSigner signer = new JWTSigner(jwtSecret);
+        final JWTSigner signer = new JWTSigner(causalRestProperties.getJwtSecret());
 
         // JWT claims
         final HashMap<String, Object> claims = new HashMap<>();
         // Add reserved claims
-        claims.put("iss", jwtIssuer);
+        claims.put("iss", causalRestProperties.getJwtIssuer());
         claims.put("iat", iat);
         claims.put("exp", exp);
         // Private/custom claim

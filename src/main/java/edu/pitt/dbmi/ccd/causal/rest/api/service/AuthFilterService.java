@@ -69,7 +69,7 @@ public class AuthFilterService {
 
     private static final AccessDeniedException USER_CREDENTIALS_REQUIRED = new AccessDeniedException("User credentials are required.");
     private static final AccessDeniedException BASIC_AUTH_REQUIRED = new AccessDeniedException("Basic Auth is required to get the JSON Web Token(JWT).");
-    private static final AccessDeniedException BEARER_AUTH_REQUIRED = new AccessDeniedException("BEARER Auth is required to acees this resource.");
+    private static final AccessDeniedException BEARER_AUTH_REQUIRED = new AccessDeniedException("Bearer Auth is required to acees this resource.");
     private static final AccessDeniedException INVALID_USER_CREDENTIALS = new AccessDeniedException("Invalid user credentials.");
     private static final AccessForbiddenException FORBIDDEN_ACCESS = new AccessForbiddenException("You don't have permission to access this resource.");
 

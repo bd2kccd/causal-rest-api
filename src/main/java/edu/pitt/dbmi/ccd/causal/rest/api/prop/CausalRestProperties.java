@@ -65,6 +65,12 @@ public class CausalRestProperties {
     @Value("${ccd.algorithm.gfci}")
     private String gfci;
 
+    @Value("${ccd.jwt.issuer}")
+    private String jwtIssuer;
+
+    @Value("${ccd.jwt.secret}")
+    private String jwtSecret;
+
     public CausalRestProperties() {
     }
 
@@ -155,4 +161,21 @@ public class CausalRestProperties {
     public void setGfci(String gfci) {
         this.gfci = gfci;
     }
+
+    public String getJwtIssuer() {
+        return jwtIssuer;
+    }
+
+    public void setJwtIssuer(String jwtIssuer) {
+        this.jwtIssuer = jwtIssuer;
+    }
+
+    public String getJwtSecret() {
+        return jwtSecret;
+    }
+
+    public void setJwtSecret(String jwtSecret) {
+        this.jwtSecret = jwtSecret;
+    }
+
 }
