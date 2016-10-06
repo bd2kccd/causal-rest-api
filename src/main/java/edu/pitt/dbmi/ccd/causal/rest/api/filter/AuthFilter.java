@@ -57,8 +57,13 @@ public class AuthFilter implements ContainerRequestFilter {
             return;
         }
 
-        // This auth service handles both basic auth and jwt bearer auth
-        authFilterService.auth(requestContext);
+        // We'll only use basic auth for API sign in to get the JWT
+        // and all other following requests will be handled by JWT verification
+        if (method.equals("GET") && path.equals("jwt")) {
+            authFilterService.verifyBasicAuth(requestContext);
+        } else {
+            authFilterService.verifyJwt(requestContext);
+        }
     }
 
 }

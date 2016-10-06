@@ -68,6 +68,8 @@ public class AuthFilterService {
     public static final String AUTH_SCHEME_BEARER = "Bearer";
 
     private static final AccessDeniedException USER_CREDENTIALS_REQUIRED = new AccessDeniedException("User credentials are required.");
+    private static final AccessDeniedException BASIC_AUTH_REQUIRED = new AccessDeniedException("Basic Auth is required to get the JSON Web Token(JWT).");
+    private static final AccessDeniedException BEARER_AUTH_REQUIRED = new AccessDeniedException("BEARER Auth is required to acees this resource.");
     private static final AccessDeniedException INVALID_USER_CREDENTIALS = new AccessDeniedException("Invalid user credentials.");
     private static final AccessForbiddenException FORBIDDEN_ACCESS = new AccessForbiddenException("You don't have permission to access this resource.");
 
@@ -80,48 +82,68 @@ public class AuthFilterService {
         this.defaultPasswordService = defaultPasswordService;
     }
 
-    // Direct the actual authentication to either baisc auth or jwt based bearer schema
-    public void auth(ContainerRequestContext requestContext) {
+    // Direct the actual authentication to baisc auth
+    public void verifyBasicAuth(ContainerRequestContext requestContext) {
         String authCredentials = requestContext.getHeaderString(AUTH_HEADER);
         if (authCredentials == null) {
             throw USER_CREDENTIALS_REQUIRED;
         }
 
-        UserAccount userAccount = null;
-
-        // Use jwt as the authtication method
-        if (authCredentials.contains(AUTH_SCHEME_BEARER)) {
-            try {
-                String jwt = authCredentials.replaceFirst(AUTH_SCHEME_BEARER, "").trim();
-                // Verify both secret and issuer
-                final JWTVerifier jwtVerifier = new JWTVerifier(jwtSecret, null, jwtIssuer);
-                final Map<String, Object> claims = jwtVerifier.verify(jwt);
-                // In the jwt bearer schhema, we can simply get the user account based on the username
-                String username = claims.get("name").toString();
-                userAccount = userAccountService.findByUsername(username);
-            } catch (NoSuchAlgorithmException | InvalidKeyException | IllegalStateException | IOException | SignatureException | JWTVerifyException ex) {
-                LOGGER.error("Failed to verify JWT", ex);
-            }
+        if (!authCredentials.contains(AUTH_SCHEME_BASIC)) {
+            throw BASIC_AUTH_REQUIRED;
         }
 
-        // Use basic auth as the authtication method
-        if (authCredentials.contains(AUTH_SCHEME_BASIC)) {
-            String authCredentialBase64 = authCredentials.replaceFirst(AUTH_SCHEME_BASIC, "").trim();
-            // In the basic auth schema, both username and password are encoded in the request header
-            // So we'll need to get the user account info with username and password
-            String credentials = new String(Base64.getDecoder().decode(authCredentialBase64));
-            userAccount = retrieveUserAccount(credentials);
-        }
+        String authCredentialBase64 = authCredentials.replaceFirst(AUTH_SCHEME_BASIC, "").trim();
+        // In the basic auth schema, both username and password are encoded in the request header
+        // So we'll need to get the user account info with username and password
+        String credentials = new String(Base64.getDecoder().decode(authCredentialBase64));
+        UserAccount userAccount = retrieveUserAccount(credentials);
 
         if (userAccount == null) {
             throw INVALID_USER_CREDENTIALS;
         }
 
-        SecurityContext securityContext = createSecurityContext(userAccount, requestContext, SecurityContext.BASIC_AUTH);
+        SecurityContext securityContext = createSecurityContext(userAccount, requestContext, AUTH_SCHEME_BASIC);
         if (!(securityContext.isUserInRole("admin") || isAccountMatchesRequest(userAccount, requestContext))) {
             throw FORBIDDEN_ACCESS;
         }
         requestContext.setSecurityContext(securityContext);
+    }
+
+    // Direct the actual authentication to jwt based bearer schema
+    public void verifyJwt(ContainerRequestContext requestContext) {
+        String authCredentials = requestContext.getHeaderString(AUTH_HEADER);
+        if (authCredentials == null) {
+            throw USER_CREDENTIALS_REQUIRED;
+        }
+
+        // All other endpoints use bearer JWT to verify the API consumer
+        if (!authCredentials.contains(AUTH_SCHEME_BEARER)) {
+            throw BEARER_AUTH_REQUIRED;
+        }
+
+        // Verify JWT
+        try {
+            String jwt = authCredentials.replaceFirst(AUTH_SCHEME_BEARER, "").trim();
+            // Verify both secret and issuer
+            final JWTVerifier jwtVerifier = new JWTVerifier(jwtSecret, null, jwtIssuer);
+            final Map<String, Object> claims = jwtVerifier.verify(jwt);
+            // In the jwt bearer schhema, we can simply get the user account based on the username
+            String username = claims.get("name").toString();
+            UserAccount userAccount = userAccountService.findByUsername(username);
+
+            if (userAccount == null) {
+                throw INVALID_USER_CREDENTIALS;
+            }
+
+            SecurityContext securityContext = createSecurityContext(userAccount, requestContext, AUTH_SCHEME_BEARER);
+            if (!(securityContext.isUserInRole("admin") || isAccountMatchesRequest(userAccount, requestContext))) {
+                throw FORBIDDEN_ACCESS;
+            }
+            requestContext.setSecurityContext(securityContext);
+        } catch (NoSuchAlgorithmException | InvalidKeyException | IllegalStateException | IOException | SignatureException | JWTVerifyException ex) {
+            LOGGER.error("Failed to verify JWT", ex);
+        }
     }
 
     private boolean isAccountMatchesRequest(UserAccount userAccount, ContainerRequestContext requestContext) {
