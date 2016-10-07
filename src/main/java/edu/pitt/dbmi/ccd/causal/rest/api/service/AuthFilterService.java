@@ -68,11 +68,11 @@ public class AuthFilterService {
     public static final String AUTH_SCHEME_BEARER = "Bearer";
 
     private static final AccessDeniedException BASIC_AUTH_USER_CREDENTIALS_REQUIRED = new AccessDeniedException("User credentials are required.");
-    private static final AccessDeniedException BASIC_AUTH_REQUIRED = new AccessDeniedException("Basic Authentication scheme is required to get the JSON Web Token(JWT).");
+    private static final AccessDeniedException BASIC_AUTH_SCHEME_REQUIRED = new AccessDeniedException("Basic Authentication scheme is required to get the JSON Web Token(JWT).");
     private static final AccessDeniedException BASIC_AUTH_INVALID_USER_CREDENTIALS = new AccessDeniedException("Invalid user credentials.");
 
-    private static final AccessDeniedException BEARER_AUTH_REQUIRED = new AccessDeniedException("Bearer Authentication scheme is required to acees this resource.");
     private static final AccessDeniedException BEARER_AUTH_JWT_REQUIRED = new AccessDeniedException("JSON Web Token(JWT) is required.");
+    private static final AccessDeniedException BEARER_AUTH_SCHEME_REQUIRED = new AccessDeniedException("Bearer Authentication scheme is required to acees this resource.");
     private static final AccessDeniedException BEARER_AUTH_INVALID_JWT = new AccessDeniedException("Invalid JSON Web Token(JWT).");
 
     private static final AccessForbiddenException FORBIDDEN_ACCESS = new AccessForbiddenException("You don't have permission to access this resource.");
@@ -94,7 +94,7 @@ public class AuthFilterService {
         }
 
         if (!authCredentials.contains(AUTH_SCHEME_BASIC)) {
-            throw BASIC_AUTH_REQUIRED;
+            throw BASIC_AUTH_SCHEME_REQUIRED;
         }
 
         String authCredentialBase64 = authCredentials.replaceFirst(AUTH_SCHEME_BASIC, "").trim();
@@ -123,16 +123,17 @@ public class AuthFilterService {
 
         // All other endpoints use bearer JWT to verify the API consumer
         if (!authCredentials.contains(AUTH_SCHEME_BEARER)) {
-            throw BEARER_AUTH_REQUIRED;
+            throw BEARER_AUTH_SCHEME_REQUIRED;
         }
 
         // Verify JWT
         try {
             String jwt = authCredentials.replaceFirst(AUTH_SCHEME_BEARER, "").trim();
+
             // Verify both secret and issuer
             final JWTVerifier jwtVerifier = new JWTVerifier(jwtSecret, null, jwtIssuer);
             final Map<String, Object> claims = jwtVerifier.verify(jwt);
-            // In the jwt bearer schhema, we can simply get the user account based on the username
+            // In the jwt bearer schema, we can simply get the user account based on the username
             String username = claims.get("name").toString();
             UserAccount userAccount = userAccountService.findByUsername(username);
 
@@ -145,6 +146,14 @@ public class AuthFilterService {
             if (!(securityContext.isUserInRole("admin") || isAccountMatchesRequest(userAccount, requestContext))) {
                 throw FORBIDDEN_ACCESS;
             }
+
+            // Then compare the jwt with the one stored in `public_key` field in user account table
+            // It's very possible that the jwt sent here has already been overwritten
+            String currentJwt = userAccount.getPublicKey();
+            if (!currentJwt.equals(jwt)) {
+                throw BEARER_AUTH_INVALID_JWT;
+            }
+
             requestContext.setSecurityContext(securityContext);
         } catch (NoSuchAlgorithmException | InvalidKeyException | IllegalStateException | IOException | SignatureException | JWTVerifyException ex) {
             LOGGER.error("Failed to verify JWT", ex);

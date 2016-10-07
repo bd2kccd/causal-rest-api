@@ -8,6 +8,8 @@ package edu.pitt.dbmi.ccd.causal.rest.api.service;
 import com.auth0.jwt.JWTSigner;
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.JwtDTO;
 import edu.pitt.dbmi.ccd.causal.rest.api.prop.CausalRestProperties;
+import edu.pitt.dbmi.ccd.db.entity.UserAccount;
+import edu.pitt.dbmi.ccd.db.service.UserAccountService;
 import java.time.Instant;
 import java.util.Base64;
 import java.util.Date;
@@ -31,9 +33,12 @@ public class JwtEndpointService {
 
     private final CausalRestProperties causalRestProperties;
 
+    private final UserAccountService userAccountService;
+
     @Autowired
-    public JwtEndpointService(CausalRestProperties causalRestProperties) {
+    public JwtEndpointService(CausalRestProperties causalRestProperties, UserAccountService userAccountService) {
         this.causalRestProperties = causalRestProperties;
+        this.userAccountService = userAccountService;
     }
 
     public JwtDTO generateJwt(String authString) {
@@ -44,7 +49,8 @@ public class JwtEndpointService {
         String username = tokenizer.nextToken();
 
         // Generate JWT (JSON Web Token, for API authentication)
-        // Each jwt is issued at claim (per page refresh)
+        // Each jwt is issued at claim (per API request)
+        // When refresh the request, the new jwt will overwrite the old one
         // Using Java 8 time API
         Instant iatInstant = Instant.now();
         // The token expires in 3600 seconds (1 hour)
@@ -68,6 +74,13 @@ public class JwtEndpointService {
         // Generate the token string
         String jwt = signer.sign(claims);
 
+        // No need to check if the user exists, since the AuthFiter also done that check.
+        UserAccount userAccount = userAccountService.findByUsername(username);
+        // We store this JWT into `public_key` field of the user account table
+        userAccount.setPublicKey(jwt);
+        userAccountService.saveUserAccount(userAccount);
+
+        // Return the jwt to API consumer
         JwtDTO jwtDTO = new JwtDTO();
         jwtDTO.setJwt(jwt);
         jwtDTO.setIssuedTime(iatDate);
