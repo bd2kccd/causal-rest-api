@@ -6,7 +6,9 @@ This RESTful API is designed for causal web. And it implements the [JAX-RS](http
 
 The following installation instructions are supposed to be used by the server admin who deploys this API server. API users can skip this section and just start reading from the [API Usage and Examples](https://github.com/bd2kccd/causal-rest-api#api-usage-and-examples) section. 
 
-### Prerequisites - You must have the following installed to build/install Causal REST API:
+### Prerequisites 
+
+You must have the following installed to build/install Causal REST API:
 
 - [Oracle Java SE Development Kit 8](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html)
 - [Maven 3.x](https://maven.apache.org/download.cgi)
