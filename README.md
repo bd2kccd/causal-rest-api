@@ -70,17 +70,17 @@ In the following sections, we'll demonstrate the API usage with examples using t
 
 This API requires user to be authenticated. Before using this API, the user will need to go to [Causal-Web App](https://ccd1.vm.bridges.psc.edu/ccd/) and create an account. 
 
-### API Sign In
+### Getting JSON Web Token(JWT)
 
-After registration, the username and password can be used to authenticate against the REST API Sign In to get the JSON Web Token(JWT) via **HTTP Basic Auth**. 
+After registration in Causal Web App, the username and password can be used to authenticate against the Causal REST API to get the access token (we use JWT) via **HTTP Basic Auth**. 
 
-API Sing In Endpoint URI pattern:
+API Endpoint URI pattern:
 
 ````
 GET https://ccd1.vm.bridges.psc.edu/ccd-api/jwt
 ````
 
-In basic auth, the user provides the username and password, which the HTTP client concatenates (username + ":" + password), and base64 encodes it. This encoded string is then sent using a `Authorization` header on each request. For instance user `demouser` whose password is `123`.
+In basic auth, the user provides the username and password, which the HTTP client concatenates (username + ":" + password), and base64 encodes it. This encoded string is then sent using a `Authorization` header with the "Basic" schema. For instance user `demouser` whose password is `123`.
 
 ````
 POST /ccd-api/jwt HTTP/1.1
@@ -88,7 +88,7 @@ Host: ccd1.vm.bridges.psc.edu
 Authorization: Basic ZGVtb3VzZXI6MTIz
 ````
 
-The successful request will return a JWT that can be used for further API query.
+Once the request is processed successfully, a JWT will be returned in the response for further API queries.
 
 ````
 {
@@ -99,7 +99,9 @@ The successful request will return a JWT that can be used for further API query.
 }
 ````
 
-This JWT expires in 3600 seconds, so the API consumer will need to request for another JWT otherwise the API query to other API endpoints will be denied. And this JWT will need to be sent via the HTTP `Authorization` header as well, but using the `Bearer` schema.
+This JWT expires in 3600 seconds(1 hour), so the API consumer will need to request for another JWT otherwise the API query to other API endpoints will be denied. And this JWT will need to be sent via the HTTP `Authorization` header as well, but using the `Bearer` schema.
+
+Note: querying the JWT endpoint again before the current JWT expires will generate a new JWT, which obsletes the old JWT and reset the lifetime of this token.
 
 Since this API is developed with Jersey, which supports [WADL](https://en.wikipedia.org/wiki/Web_Application_Description_Language). So you can view the generated WADL by going to `https://ccd1.vm.bridges.psc.edu/ccd-api/application.wadl?detail=true` and see all resource available in the application. Accessing to this endpoint doesn't require authentication.
 
