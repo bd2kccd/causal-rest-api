@@ -101,7 +101,7 @@ Once the request is processed successfully, a JWT will be returned in the respon
 
 This JWT expires in 3600 seconds(1 hour), so the API consumer will need to request for another JWT otherwise the API query to other API endpoints will be denied. And this JWT will need to be sent via the HTTP `Authorization` header as well, but using the `Bearer` schema.
 
-Note: querying the JWT endpoint again before the current JWT expires will generate a new JWT, which obsletes the old JWT and reset the lifetime of this token.
+Note: querying the JWT endpoint again before the current JWT expires will generate a new JWT, which makes the old JWT expired automatically. And this newly generated JWT will be valid in another hour unless there's another new JWT being queried.
 
 Since this API is developed with Jersey, which supports [WADL](https://en.wikipedia.org/wiki/Web_Application_Description_Language). So you can view the generated WADL by going to `https://ccd1.vm.bridges.psc.edu/ccd-api/application.wadl?detail=true` and see all resource available in the application. Accessing to this endpoint doesn't require authentication.
 
