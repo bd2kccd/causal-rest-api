@@ -5,10 +5,12 @@
  */
 package edu.pitt.dbmi.ccd.causal.rest.api.dto;
 
+import java.util.Date;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import org.springframework.beans.factory.annotation.Value;
 
 /**
  *
@@ -22,10 +24,14 @@ public class JwtDTO {
     private String jwt;
 
     @XmlElement
-    private long iat;
+    private Date issuedTime;
 
     @XmlElement
-    private long exp;
+    @Value("${ccd.jwt.lifetime}")
+    private long lifetime;
+
+    @XmlElement
+    private Date expireTime;
 
     public JwtDTO() {
     }
@@ -38,20 +44,28 @@ public class JwtDTO {
         this.jwt = jwt;
     }
 
-    public long getIat() {
-        return iat;
+    public Date getIssuedTime() {
+        return issuedTime;
     }
 
-    public void setIat(long iat) {
-        this.iat = iat;
+    public void setIssuedTime(Date issuedTime) {
+        this.issuedTime = issuedTime;
     }
 
-    public long getExp() {
-        return exp;
+    public long getLifetime() {
+        return lifetime;
     }
 
-    public void setExp(long exp) {
-        this.exp = exp;
+    public void setLifetime(long lifetime) {
+        this.lifetime = lifetime;
+    }
+
+    public Date getExpireTime() {
+        return expireTime;
+    }
+
+    public void setExpireTime(Date expireTime) {
+        this.expireTime = expireTime;
     }
 
 }

@@ -71,6 +71,9 @@ public class CausalRestProperties {
     @Value("${ccd.jwt.secret}")
     private String jwtSecret;
 
+    @Value("${ccd.jwt.lifetime}")
+    private long jwtLifetime;
+
     public CausalRestProperties() {
     }
 
@@ -176,6 +179,14 @@ public class CausalRestProperties {
 
     public void setJwtSecret(String jwtSecret) {
         this.jwtSecret = jwtSecret;
+    }
+
+    public long getJwtLifetime() {
+        return jwtLifetime;
+    }
+
+    public void setJwtLifetime(long jwtLifetime) {
+        this.jwtLifetime = jwtLifetime;
     }
 
 }

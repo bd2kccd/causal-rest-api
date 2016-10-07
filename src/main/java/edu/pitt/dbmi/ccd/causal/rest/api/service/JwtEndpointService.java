@@ -8,7 +8,9 @@ package edu.pitt.dbmi.ccd.causal.rest.api.service;
 import com.auth0.jwt.JWTSigner;
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.JwtDTO;
 import edu.pitt.dbmi.ccd.causal.rest.api.prop.CausalRestProperties;
+import java.time.Instant;
 import java.util.Base64;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.StringTokenizer;
 import org.slf4j.Logger;
@@ -43,19 +45,23 @@ public class JwtEndpointService {
 
         // Generate JWT (JSON Web Token, for API authentication)
         // Each jwt is issued at claim (per page refresh)
-        final long iat = System.currentTimeMillis() / 1000l;
-        // Expires claim. In this case the token expires in 3600 seconds (1 hour)
-        final long exp = iat + 3600L;
+        // Using Java 8 time API
+        Instant iatInstant = Instant.now();
+        // The token expires in 3600 seconds (1 hour)
+        Instant expInstant = iatInstant.plusSeconds(causalRestProperties.getJwtLifetime());
+        Date iatDate = Date.from(iatInstant);
+        Date expDate = Date.from(expInstant);
 
         // Sign the token with secret
-        final JWTSigner signer = new JWTSigner(causalRestProperties.getJwtSecret());
+        JWTSigner signer = new JWTSigner(causalRestProperties.getJwtSecret());
 
         // JWT claims
-        final HashMap<String, Object> claims = new HashMap<>();
+        HashMap<String, Object> claims = new HashMap<>();
         // Add reserved claims
         claims.put("iss", causalRestProperties.getJwtIssuer());
-        claims.put("iat", iat);
-        claims.put("exp", exp);
+        // Convert iatDate and expDate into long
+        claims.put("iat", iatDate.getTime());
+        claims.put("exp", expDate.getTime());
         // Private/custom claim
         claims.put("name", username);
 
@@ -64,8 +70,9 @@ public class JwtEndpointService {
 
         JwtDTO jwtDTO = new JwtDTO();
         jwtDTO.setJwt(jwt);
-        jwtDTO.setIat(iat);
-        jwtDTO.setExp(exp);
+        jwtDTO.setIssuedTime(iatDate);
+        jwtDTO.setLifetime(causalRestProperties.getJwtLifetime());
+        jwtDTO.setExpireTime(expDate);
 
         return jwtDTO;
     }
