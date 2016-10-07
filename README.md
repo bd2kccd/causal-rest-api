@@ -61,13 +61,40 @@ This will start the API server, and you'll be able to access the API endpoints v
 
 In the following sections, we'll demonstrate the API usage with examples using the API server that is running on PSC (Pittsburgh Super Computing) bridges.
 
-This API requires user to be authenticated. Before using this API, the user will need to go to [Causal-Web App](https://ccd1.vm.bridges.psc.edu/ccd/) and create an account. After that, the username and password can be used to authenticate against the REST API via **HTTP Basic Auth**. In basic auth, the user provides the username and password, which the HTTP client concatenates (username + ":" + password), and base64 encodes it. This encoded string is then sent using a `Authorization` header on each request. For instance user `demouser` whose password is `123`.
+This API requires user to be authenticated. Before using this API, the user will need to go to [Causal-Web App](https://ccd1.vm.bridges.psc.edu/ccd/) and create an account. 
+
+### API Sign In
+
+After registration, the username and password can be used to authenticate against the REST API Sign In to get the JSON Web Token(JWT) via **HTTP Basic Auth**. 
+
+API Sing In Endpoint URI pattern:
 
 ````
+GET https://ccd1.vm.bridges.psc.edu/ccd-api/jwt
+````
+
+In basic auth, the user provides the username and password, which the HTTP client concatenates (username + ":" + password), and base64 encodes it. This encoded string is then sent using a `Authorization` header on each request. For instance user `demouser` whose password is `123`.
+
+````
+POST /ccd-api/jwt HTTP/1.1
+Host: ccd1.vm.bridges.psc.edu
 Authorization: Basic ZGVtb3VzZXI6MTIz
 ````
 
-Since this API is developed with Jersey, which supports [WADL](https://en.wikipedia.org/wiki/Web_Application_Description_Language). So you can view the generated WADL by going to `https://ccd1.vm.bridges.psc.edu/ccd-api/application.wadl?detail=true` and see all resource available in the application. And below are some examples.
+The successful request will return a JWT that can be used for further API query.
+
+````
+{
+  "jwt": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL2Nsb3VkLmNjZC5waXR0LmVkdS8iLCJuYW1lIjoiemh5MTkiLCJleHAiOjE0NzU4NTA0Mjg1OTcsImlhdCI6MTQ3NTg0NjgyODU5N30.FcE7aEpg0u2c-gUVugIjJkzjhlDu5qav_XHtgLu3c6E",
+  "issuedTime": 1475846828597,
+  "lifetime": 3600,
+  "expireTime": 1475850428597
+}
+````
+
+This JWT expires in 3600 seconds, so the API consumer will need to request for another JWT otherwise the API query to other API endpoints will be denied. And this JWT will need to be sent via the HTTP `Authorization` header as well, but using the `Bearer` schema.
+
+Since this API is developed with Jersey, which supports [WADL](https://en.wikipedia.org/wiki/Web_Application_Description_Language). So you can view the generated WADL by going to `https://ccd1.vm.bridges.psc.edu/ccd-api/application.wadl?detail=true` and see all resource available in the application. Accessing to this endpoint doesn't require authentication.
 
 Basically, all the API usage examples are grouped into three categories: 
 
@@ -94,7 +121,7 @@ Generated HTTP request code example:
 ````
 POST /ccd-api/demouser/data/upload HTTP/1.1
 Host: ccd1.vm.bridges.psc.edu
-Authorization: Basic ZGVtb3VzZXI6MTIz
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL2Nsb3VkLmNjZC5waXR0LmVkdS8iLCJuYW1lIjoiemh5MTkiLCJleHAiOjE0NzU4NTA2NzY4MDQsImlhdCI6MTQ3NTg0NzA3NjgwNH0.8azVEoNPfETczXb-vn7dfyDd98eRt7iiLBXehGpPGzY
 Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
 
 ----WebKitFormBoundary7MA4YWxkTrZu0gW
@@ -176,7 +203,7 @@ Generated HTTP request code example:
 ````
 POST /ccd-api/demouser/data/chunkUpload HTTP/1.1
 Host: ccd1.vm.bridges.psc.edu
-Authorization: Basic ZGVtb3VzZXI6MTIz
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL2Nsb3VkLmNjZC5waXR0LmVkdS8iLCJuYW1lIjoiemh5MTkiLCJleHAiOjE0NzU4NTA2NzY4MDQsImlhdCI6MTQ3NTg0NzA3NjgwNH0.8azVEoNPfETczXb-vn7dfyDd98eRt7iiLBXehGpPGzY
 Content-Type: multipart/form-data; boundary=----WebKitFormBoundaryMFjgApg56XGyeTnZ
 
 ------WebKitFormBoundaryMFjgApg56XGyeTnZ
@@ -245,7 +272,7 @@ Generated HTTP request code example:
 ````
 GET /ccd-api/demouser/data HTTP/1.1
 Host: ccd1.vm.bridges.psc.edu
-Authorization: Basic ZGVtb3VzZXI6MTIz
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL2Nsb3VkLmNjZC5waXR0LmVkdS8iLCJuYW1lIjoiemh5MTkiLCJleHAiOjE0NzU4NTA2NzY4MDQsImlhdCI6MTQ3NTg0NzA3NjgwNH0.8azVEoNPfETczXb-vn7dfyDd98eRt7iiLBXehGpPGzY
 Accept: application/json
 ````
 
@@ -305,7 +332,7 @@ Generated HTTP request code example:
 ````
 GET /ccd-api/demouser/data HTTP/1.1
 Host: ccd1.vm.bridges.psc.edu
-Authorization: Basic ZGVtb3VzZXI6MTIz
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL2Nsb3VkLmNjZC5waXR0LmVkdS8iLCJuYW1lIjoiemh5MTkiLCJleHAiOjE0NzU4NTA2NzY4MDQsImlhdCI6MTQ3NTg0NzA3NjgwNH0.8azVEoNPfETczXb-vn7dfyDd98eRt7iiLBXehGpPGzY
 Accept: application/xml
 ````
 
@@ -374,7 +401,7 @@ Generated HTTP request code example:
 ````
 GET /ccd-api/demouser/data/8 HTTP/1.1
 Host: ccd1.vm.bridges.psc.edu
-Authorization: Basic ZGVtb3VzZXI6MTIz
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL2Nsb3VkLmNjZC5waXR0LmVkdS8iLCJuYW1lIjoiemh5MTkiLCJleHAiOjE0NzU4NTA2NzY4MDQsImlhdCI6MTQ3NTg0NzA3NjgwNH0.8azVEoNPfETczXb-vn7dfyDd98eRt7iiLBXehGpPGzY
 ````
 
 And the resulting response looks like this:
@@ -409,7 +436,7 @@ Generated HTTP request code example:
 ````
 DELETE /ccd-api/demouser/data/8 HTTP/1.1
 Host: ccd1.vm.bridges.psc.edu
-Authorization: Basic ZGVtb3VzZXI6MTIz
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL2Nsb3VkLmNjZC5waXR0LmVkdS8iLCJuYW1lIjoiemh5MTkiLCJleHAiOjE0NzU4NTA2NzY4MDQsImlhdCI6MTQ3NTg0NzA3NjgwNH0.8azVEoNPfETczXb-vn7dfyDd98eRt7iiLBXehGpPGzY
 ````
 
 And this will result a HTTP 204 No Content status in response on success, which means the server successfully processed the deletion request but there's no content to response.
@@ -438,7 +465,7 @@ Generated HTTP request code example:
 ````
 POST /ccd-api/demouser/data/summarize HTTP/1.1
 Host: ccd1.vm.bridges.psc.edu
-Authorization: Basic ZGVtb3VzZXI6MTIz
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL2Nsb3VkLmNjZC5waXR0LmVkdS8iLCJuYW1lIjoiemh5MTkiLCJleHAiOjE0NzU4NTA2NzY4MDQsImlhdCI6MTQ3NTg0NzA3NjgwNH0.8azVEoNPfETczXb-vn7dfyDd98eRt7iiLBXehGpPGzY
 Content-Type: application/json
 
 {
@@ -484,7 +511,7 @@ Generated HTTP request code example:
 ````
 GET /ccd-api/demouser/algorithms HTTP/1.1
 Host: ccd1.vm.bridges.psc.edu
-Authorization: Basic ZGVtb3VzZXI6MTIz
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL2Nsb3VkLmNjZC5waXR0LmVkdS8iLCJuYW1lIjoiemh5MTkiLCJleHAiOjE0NzU4NTA2NzY4MDQsImlhdCI6MTQ3NTg0NzA3NjgwNH0.8azVEoNPfETczXb-vn7dfyDd98eRt7iiLBXehGpPGzY
 ````
 Currently we support "FGS continuous" and "FGS discrete".
 
@@ -589,7 +616,7 @@ Generated HTTP request code example:
 ````
 POST /ccd-api/demouser/jobs/fgsc HTTP/1.1
 Host: ccd1.vm.bridges.psc.edu
-Authorization: Basic ZGVtb3VzZXI6MTIz
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL2Nsb3VkLmNjZC5waXR0LmVkdS8iLCJuYW1lIjoiemh5MTkiLCJleHAiOjE0NzU4NTA2NzY4MDQsImlhdCI6MTQ3NTg0NzA3NjgwNH0.8azVEoNPfETczXb-vn7dfyDd98eRt7iiLBXehGpPGzY
 Content-Type: application/json
 
 {
@@ -635,7 +662,7 @@ Generated HTTP request code example:
 ````
 POST /ccd-api/demouser/jobs/fgsd HTTP/1.1
 Host: ccd1.vm.bridges.psc.edu
-Authorization: Basic ZGVtb3VzZXI6MTIz
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL2Nsb3VkLmNjZC5waXR0LmVkdS8iLCJuYW1lIjoiemh5MTkiLCJleHAiOjE0NzU4NTA2NzY4MDQsImlhdCI6MTQ3NTg0NzA3NjgwNH0.8azVEoNPfETczXb-vn7dfyDd98eRt7iiLBXehGpPGzY
 Content-Type: application/json
 
 {
@@ -668,7 +695,7 @@ Generated HTTP request code example:
 ````
 GET /ccd-api/demouser/jobs/ HTTP/1.1
 Host: ccd1.vm.bridges.psc.edu
-Authorization: Basic ZGVtb3VzZXI6MTIz
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL2Nsb3VkLmNjZC5waXR0LmVkdS8iLCJuYW1lIjoiemh5MTkiLCJleHAiOjE0NzU4NTA2NzY4MDQsImlhdCI6MTQ3NTg0NzA3NjgwNH0.8azVEoNPfETczXb-vn7dfyDd98eRt7iiLBXehGpPGzY
 Content-Type: application/json
 
 ````
@@ -705,7 +732,7 @@ Generated HTTP request code example:
 ````
 GET /ccd-api/demouser/jobs/32 HTTP/1.1
 Host: ccd1.vm.bridges.psc.edu
-Authorization: Basic ZGVtb3VzZXI6MTIz
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL2Nsb3VkLmNjZC5waXR0LmVkdS8iLCJuYW1lIjoiemh5MTkiLCJleHAiOjE0NzU4NTA2NzY4MDQsImlhdCI6MTQ3NTg0NzA3NjgwNH0.8azVEoNPfETczXb-vn7dfyDd98eRt7iiLBXehGpPGzY
 ````
 
 This will either return "Pending" or "Completed".
@@ -725,7 +752,7 @@ Generated HTTP request code example:
 ````
 DELETE /ccd-api/demouser/jobs/8 HTTP/1.1
 Host: ccd1.vm.bridges.psc.edu
-Authorization: Basic ZGVtb3VzZXI6MTIz
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL2Nsb3VkLmNjZC5waXR0LmVkdS8iLCJuYW1lIjoiemh5MTkiLCJleHAiOjE0NzU4NTA2NzY4MDQsImlhdCI6MTQ3NTg0NzA3NjgwNH0.8azVEoNPfETczXb-vn7dfyDd98eRt7iiLBXehGpPGzY
 ````
 
 This call will response either "Job 8 has been canceled" or "Unable to cancel job 8". It's not guranteed that the system can always cencal a job successfully.
@@ -745,7 +772,7 @@ Generated HTTP request code example:
 ````
 GET /ccd-api/demouser/results HTTP/1.1
 Host: ccd1.vm.bridges.psc.edu
-Authorization: Basic ZGVtb3VzZXI6MTIz
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL2Nsb3VkLmNjZC5waXR0LmVkdS8iLCJuYW1lIjoiemh5MTkiLCJleHAiOjE0NzU4NTA2NzY4MDQsImlhdCI6MTQ3NTg0NzA3NjgwNH0.8azVEoNPfETczXb-vn7dfyDd98eRt7iiLBXehGpPGzY
 ````
 
 The response to this request will look like this:
@@ -780,7 +807,7 @@ Generated HTTP request code example:
 ````
 GET /ccd-api/demouser/results/fgs_data_small.txt_1466172140585.txt HTTP/1.1
 Host: ccd1.vm.bridges.psc.edu
-Authorization: Basic ZGVtb3VzZXI6MTIz
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL2Nsb3VkLmNjZC5waXR0LmVkdS8iLCJuYW1lIjoiemh5MTkiLCJleHAiOjE0NzU4NTA2NzY4MDQsImlhdCI6MTQ3NTg0NzA3NjgwNH0.8azVEoNPfETczXb-vn7dfyDd98eRt7iiLBXehGpPGzY
 ````
 On success, you will get the result file back as text file content. If there's a typo in file name of the that file doesn't exist, you'll get either a JSON or XML message based on the `accept` header in your request:
 
@@ -812,7 +839,7 @@ Generated HTTP request code example:
 ````
 GET /ccd-api/demouser/results/compare/fgs_sim_data_20vars_100cases.csv_1466171729046.txt!!fgs_data_small.txt_1467305104859.txt HTTP/1.1
 Host: ccd1.vm.bridges.psc.edu
-Authorization: Basic ZGVtb3VzZXI6MTIz
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL2Nsb3VkLmNjZC5waXR0LmVkdS8iLCJuYW1lIjoiemh5MTkiLCJleHAiOjE0NzU4NTA2NzY4MDQsImlhdCI6MTQ3NTg0NzA3NjgwNH0.8azVEoNPfETczXb-vn7dfyDd98eRt7iiLBXehGpPGzY
 ````
 When you specify multiple file names, use the `!!` as a delimiter. This request will generate a result comparison file with the following content (shortened version):
 
@@ -848,7 +875,7 @@ Generated HTTP request code example:
 ````
 GET /ccd-api/demouser/results/comparisons HTTP/1.1
 Host: ccd1.vm.bridges.psc.edu
-Authorization: Basic ZGVtb3VzZXI6MTIz
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL2Nsb3VkLmNjZC5waXR0LmVkdS8iLCJuYW1lIjoiemh5MTkiLCJleHAiOjE0NzU4NTA2NzY4MDQsImlhdCI6MTQ3NTg0NzA3NjgwNH0.8azVEoNPfETczXb-vn7dfyDd98eRt7iiLBXehGpPGzY
 ````
 
 The response will show a list of comparison files:
@@ -889,7 +916,7 @@ Generated HTTP request code example:
 ````
 GET /ccd-api/demouser/results/comparisons/result_comparison_1467388042261.txt HTTP/1.1
 Host: ccd1.vm.bridges.psc.edu
-Authorization: Basic ZGVtb3VzZXI6MTIz
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL2Nsb3VkLmNjZC5waXR0LmVkdS8iLCJuYW1lIjoiemh5MTkiLCJleHAiOjE0NzU4NTA2NzY4MDQsImlhdCI6MTQ3NTg0NzA3NjgwNH0.8azVEoNPfETczXb-vn7dfyDd98eRt7iiLBXehGpPGzY
 ````
 
 Then it returns the content of that comparison file (shorted version):
