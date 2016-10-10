@@ -568,6 +568,8 @@ Algorithm parameters:
 | Parameters        | Description           | Default Value  |
 | ------------- | ------------- | ----- |
 | `depth`      | Search depth. Integer value |  |
+| `faithfulnessAssumed`      | Yes if (one edge) faithfulness should be assumed      |   false |
+| `maxDegree`      | The maximum degree of the output graph      |   5 |
 | `penaltyDiscount`      | Penalty discount      |   4.0 |
 | `ignoreLinearDependence` | Ignore linear dependence      |    true |
 | `heuristicSpeedup` | Heuristic speedup. All conditional independence relations that hold in the distribution are entailed by the Causal Markov Assumption      |    true |
@@ -588,6 +590,8 @@ Algorithm parameters:
 | Parameters        | Description           | Default Value  |
 | ------------- | ------------- | ----- |
 | `depth`      | Search depth. Integer value |  |
+| `faithfulnessAssumed`      | Yes if (one edge) faithfulness should be assumed      |   false |
+| `maxDegree`      | The maximum degree of the output graph      |   5 |
 | `structurePrior`      | Penalty discount      |  |
 | `samplePrior` | Sample prior      |  |
 | `heuristicSpeedup` | Heuristic speedup. All conditional independence relations that hold in the distribution are entailed by the Causal Markov Assumption      |    true |
@@ -606,6 +610,8 @@ Algorithm parameters:
 | Parameters        | Description           | Default Value  |
 | ------------- | ------------- | ----- |
 | `alpha`      | Search depth. Integer value |  1.0 | 
+| `faithfulnessAssumed`      | Yes if (one edge) faithfulness should be assumed      |   false |
+| `maxInDegree`      | Maximum indegree of graph      |   100 |
 | `penaltyDiscount`      | Penalty discount      |   4.0 |
 | `verbose` | Print additional information      |    true |
 
