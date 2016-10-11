@@ -87,10 +87,11 @@ Host: cloud.ccd.pitt.edu
 Authorization: Basic ZGVtb3VzZXI6MTIz
 ````
 
-Once the request is processed successfully, a JWT will be returned in the response for further API queries.
+Once the request is processed successfully, the user ID together with a JWT will be returned in the response for further API queries.
 
 ````
 {
+  "userId": 22,
   "jwt": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL2Nsb3VkLmNjZC5waXR0LmVkdS8iLCJuYW1lIjoiemh5MTkiLCJleHAiOjE0NzU4NTA0Mjg1OTcsImlhdCI6MTQ3NTg0NjgyODU5N30.FcE7aEpg0u2c-gUVugIjJkzjhlDu5qav_XHtgLu3c6E",
   "issuedTime": 1475846828597,
   "lifetime": 3600,
@@ -98,7 +99,7 @@ Once the request is processed successfully, a JWT will be returned in the respon
 }
 ````
 
-This JWT expires in 3600 seconds(1 hour), so the API consumer will need to request for another JWT otherwise the API query to other API endpoints will be denied. And this JWT will need to be sent via the HTTP `Authorization` header as well, but using the `Bearer` schema.
+We'll need to use this `userId` in the URI path of all subsequent requests. And this `jwt` expires in 3600 seconds(1 hour), so the API consumer will need to request for another JWT otherwise the API query to other API endpoints will be denied. And this JWT will need to be sent via the HTTP `Authorization` header as well, but using the `Bearer` schema.
 
 Note: querying the JWT endpoint again before the current JWT expires will generate a new JWT, which makes the old JWT expired automatically. And this newly generated JWT will be valid in another hour unless there's another new JWT being queried.
 
@@ -110,7 +111,7 @@ Basically, all the API usage examples are grouped into three categories:
 2. Causal Discovery
 3. Result Management
 
-And all the following examples will be issued by user `demouser` whose password is `123`.
+And all the following examples will be issued by user `22` whose password is `123`.
 
 ### 1. Data Management
 
@@ -119,7 +120,7 @@ And all the following examples will be issued by user `demouser` whose password 
 API Endpoint URI pattern:
 
 ````
-POST https://cloud.ccd.pitt.edu/ccd-api/{username}/data/upload
+POST https://cloud.ccd.pitt.edu/ccd-api/{userId}/data/upload
 ````
 
 This is a multipart file upload via an HTML form, and the client is required to use `name="file"` to name their file upload field in their form.
@@ -127,7 +128,7 @@ This is a multipart file upload via an HTML form, and the client is required to 
 Generated HTTP request code example:
 
 ````
-POST /ccd-api/demouser/data/upload HTTP/1.1
+POST /ccd-api/22/data/upload HTTP/1.1
 Host: cloud.ccd.pitt.edu
 Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL2Nsb3VkLmNjZC5waXR0LmVkdS8iLCJuYW1lIjoiemh5MTkiLCJleHAiOjE0NzU4NTA2NzY4MDQsImlhdCI6MTQ3NTg0NzA3NjgwNH0.8azVEoNPfETczXb-vn7dfyDd98eRt7iiLBXehGpPGzY
 Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
@@ -148,7 +149,7 @@ If the Authorization header is not provided, the response will look like this:
   "status": 401,
   "error": "Unauthorized",
   "message": "User credentials are required.",
-  "path": "/demouser/data/upload"
+  "path": "/22/data/upload"
 }
 ````
 
@@ -179,9 +180,9 @@ and resumable uploads via the HTML5 File API. You can also create your own clien
 API Endpoint URI pattern:
 
 ````
-GET https://cloud.ccd.pitt.edu/ccd-api/{username}/data/chunkUpload
+GET https://cloud.ccd.pitt.edu/ccd-api/{userId}/data/chunkUpload
 
-POST https://cloud.ccd.pitt.edu/ccd-api/{username}/data/chunkUpload
+POST https://cloud.ccd.pitt.edu/ccd-api/{userId}/data/chunkUpload
 ````
 
 In this example, the data file is splited into 3 chunks. The upload of each chunk consists of a GET request and a POST request. To handle the state of upload chunks, a number of extra parameters are sent along with all requests:
@@ -199,7 +200,7 @@ In this example, the data file is splited into 3 chunks. The upload of each chun
 Generated HTTP request code example:
 
 ````
-GET /ccd-api/demouser/data/chunkUpload?resumableChunkNumber=2&resumableChunkSize=1048576&resumableCurrentChunkSize=1048576&resumableTotalSize=3309465&resumableType=text%2Fplain&resumableIdentifier=3309465-large-datatxt&resumableFilename=large-data.txt&resumableRelativePath=large-data.txt&resumableTotalChunks=3 HTTP/1.1
+GET /ccd-api/22/data/chunkUpload?resumableChunkNumber=2&resumableChunkSize=1048576&resumableCurrentChunkSize=1048576&resumableTotalSize=3309465&resumableType=text%2Fplain&resumableIdentifier=3309465-large-datatxt&resumableFilename=large-data.txt&resumableRelativePath=large-data.txt&resumableTotalChunks=3 HTTP/1.1
 Host: cloud.ccd.pitt.edu
 Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL2Nsb3VkLmNjZC5waXR0LmVkdS8iLCJuYW1lIjoiemh5MTkiLCJleHAiOjE0NzU4NTA2NzY4MDQsImlhdCI6MTQ3NTg0NzA3NjgwNH0.8azVEoNPfETczXb-vn7dfyDd98eRt7iiLBXehGpPGzY
 ````
@@ -209,7 +210,7 @@ This GET request checks if the data chunk is already on the server side. If the 
 Generated HTTP request code example:
 
 ````
-POST /ccd-api/demouser/data/chunkUpload HTTP/1.1
+POST /ccd-api/22/data/chunkUpload HTTP/1.1
 Host: cloud.ccd.pitt.edu
 Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL2Nsb3VkLmNjZC5waXR0LmVkdS8iLCJuYW1lIjoiemh5MTkiLCJleHAiOjE0NzU4NTA2NzY4MDQsImlhdCI6MTQ3NTg0NzA3NjgwNH0.8azVEoNPfETczXb-vn7dfyDd98eRt7iiLBXehGpPGzY
 Content-Type: multipart/form-data; boundary=----WebKitFormBoundaryMFjgApg56XGyeTnZ
@@ -272,19 +273,19 @@ b1db7511ee293d297e3055d9a7b46c5e
 API Endpoint URI pattern:
 
 ````
-POST https://cloud.ccd.pitt.edu/ccd-api/{username}/data
+POST https://cloud.ccd.pitt.edu/ccd-api/{userId}/data
 ````
 
 Generated HTTP request code example:
 
 ````
-GET /ccd-api/demouser/data HTTP/1.1
+GET /ccd-api/22/data HTTP/1.1
 Host: cloud.ccd.pitt.edu
 Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL2Nsb3VkLmNjZC5waXR0LmVkdS8iLCJuYW1lIjoiemh5MTkiLCJleHAiOjE0NzU4NTA2NzY4MDQsImlhdCI6MTQ3NTg0NzA3NjgwNH0.8azVEoNPfETczXb-vn7dfyDd98eRt7iiLBXehGpPGzY
 Accept: application/json
 ````
 
-A `JSON` formatted list of all the input data files that are associated with user `demouser` will be returned.
+A `JSON` formatted list of all the input data files that are associated with user `22` will be returned.
 
 ````javascript
 [
@@ -338,7 +339,7 @@ You can also specify the response format as XML in your request
 Generated HTTP request code example:
 
 ````
-GET /ccd-api/demouser/data HTTP/1.1
+GET /ccd-api/22/data HTTP/1.1
 Host: cloud.ccd.pitt.edu
 Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL2Nsb3VkLmNjZC5waXR0LmVkdS8iLCJuYW1lIjoiemh5MTkiLCJleHAiOjE0NzU4NTA2NzY4MDQsImlhdCI6MTQ3NTg0NzA3NjgwNH0.8azVEoNPfETczXb-vn7dfyDd98eRt7iiLBXehGpPGzY
 Accept: application/xml
@@ -401,13 +402,13 @@ Form the above output, we can also tell that data file with ID 10 doesn't have a
 API Endpoint URI pattern:
 
 ````
-GET https://cloud.ccd.pitt.edu/ccd-api/{username}/data/{id}
+GET https://cloud.ccd.pitt.edu/ccd-api/{userId}/data/{id}
 ````
 
 Generated HTTP request code example:
 
 ````
-GET /ccd-api/demouser/data/8 HTTP/1.1
+GET /ccd-api/22/data/8 HTTP/1.1
 Host: cloud.ccd.pitt.edu
 Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL2Nsb3VkLmNjZC5waXR0LmVkdS8iLCJuYW1lIjoiemh5MTkiLCJleHAiOjE0NzU4NTA2NzY4MDQsImlhdCI6MTQ3NTg0NzA3NjgwNH0.8azVEoNPfETczXb-vn7dfyDd98eRt7iiLBXehGpPGzY
 ````
@@ -436,13 +437,13 @@ And the resulting response looks like this:
 API Endpoint URI pattern:
 
 ````
-DELETE https://cloud.ccd.pitt.edu/ccd-api/{username}/data/{id}
+DELETE https://cloud.ccd.pitt.edu/ccd-api/{userId}/data/{id}
 ````
 
 Generated HTTP request code example:
 
 ````
-DELETE /ccd-api/demouser/data/8 HTTP/1.1
+DELETE /ccd-api/22/data/8 HTTP/1.1
 Host: cloud.ccd.pitt.edu
 Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL2Nsb3VkLmNjZC5waXR0LmVkdS8iLCJuYW1lIjoiemh5MTkiLCJleHAiOjE0NzU4NTA2NzY4MDQsImlhdCI6MTQ3NTg0NzA3NjgwNH0.8azVEoNPfETczXb-vn7dfyDd98eRt7iiLBXehGpPGzY
 ````
@@ -465,13 +466,13 @@ Before we can go ahead to run the desired algorithm with the newly uploaded data
 API Endpoint URI pattern:
 
 ````
-POST https://cloud.ccd.pitt.edu/ccd-api/{username}/data/summarize
+POST https://cloud.ccd.pitt.edu/ccd-api/{userId}/data/summarize
 ````
 
 Generated HTTP request code example:
 
 ````
-POST /ccd-api/demouser/data/summarize HTTP/1.1
+POST /ccd-api/22/data/summarize HTTP/1.1
 Host: cloud.ccd.pitt.edu
 Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL2Nsb3VkLmNjZC5waXR0LmVkdS8iLCJuYW1lIjoiemh5MTkiLCJleHAiOjE0NzU4NTA2NzY4MDQsImlhdCI6MTQ3NTg0NzA3NjgwNH0.8azVEoNPfETczXb-vn7dfyDd98eRt7iiLBXehGpPGzY
 Content-Type: application/json
@@ -511,13 +512,13 @@ Once the data file is uploaded and summaried, you can start running a Causal Dis
 API Endpoint URI pattern:
 
 ````
-GET https://cloud.ccd.pitt.edu/ccd-api/{username}/algorithms
+GET https://cloud.ccd.pitt.edu/ccd-api/{userId}/algorithms
 ````
 
 Generated HTTP request code example:
 
 ````
-GET /ccd-api/demouser/algorithms HTTP/1.1
+GET /ccd-api/22/algorithms HTTP/1.1
 Host: cloud.ccd.pitt.edu
 Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL2Nsb3VkLmNjZC5waXR0LmVkdS8iLCJuYW1lIjoiemh5MTkiLCJleHAiOjE0NzU4NTA2NzY4MDQsImlhdCI6MTQ3NTg0NzA3NjgwNH0.8azVEoNPfETczXb-vn7dfyDd98eRt7iiLBXehGpPGzY
 ````
@@ -622,13 +623,13 @@ This is a POST request and the algorithm details and data file id will need to b
 API Endpoint URI pattern:
 
 ````
-POST https://cloud.ccd.pitt.edu/ccd-api/{username}/jobs/fgsc
+POST https://cloud.ccd.pitt.edu/ccd-api/{userId}/jobs/fgsc
 ````
 
 Generated HTTP request code example:
 
 ````
-POST /ccd-api/demouser/jobs/fgsc HTTP/1.1
+POST /ccd-api/22/jobs/fgsc HTTP/1.1
 Host: cloud.ccd.pitt.edu
 Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL2Nsb3VkLmNjZC5waXR0LmVkdS8iLCJuYW1lIjoiemh5MTkiLCJleHAiOjE0NzU4NTA2NzY4MDQsImlhdCI6MTQ3NTg0NzA3NjgwNH0.8azVEoNPfETczXb-vn7dfyDd98eRt7iiLBXehGpPGzY
 Content-Type: application/json
@@ -668,13 +669,13 @@ When you need to run "FGS discrete", just send the request to a different endpon
 API Endpoint URI pattern:
 
 ````
-POST https://cloud.ccd.pitt.edu/ccd-api/{username}/jobs/fgsd
+POST https://cloud.ccd.pitt.edu/ccd-api/{userId}/jobs/fgsd
 ````
 
 Generated HTTP request code example:
 
 ````
-POST /ccd-api/demouser/jobs/fgsd HTTP/1.1
+POST /ccd-api/22/jobs/fgsd HTTP/1.1
 Host: cloud.ccd.pitt.edu
 Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL2Nsb3VkLmNjZC5waXR0LmVkdS8iLCJuYW1lIjoiemh5MTkiLCJleHAiOjE0NzU4NTA2NzY4MDQsImlhdCI6MTQ3NTg0NzA3NjgwNH0.8azVEoNPfETczXb-vn7dfyDd98eRt7iiLBXehGpPGzY
 Content-Type: application/json
@@ -701,13 +702,13 @@ Content-Type: application/json
 API Endpoint URI pattern:
 
 ````
-GET https://cloud.ccd.pitt.edu/ccd-api/{username}/jobs
+GET https://cloud.ccd.pitt.edu/ccd-api/{userId}/jobs
 ````
 
 Generated HTTP request code example:
 
 ````
-GET /ccd-api/demouser/jobs/ HTTP/1.1
+GET /ccd-api/22/jobs/ HTTP/1.1
 Host: cloud.ccd.pitt.edu
 Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL2Nsb3VkLmNjZC5waXR0LmVkdS8iLCJuYW1lIjoiemh5MTkiLCJleHAiOjE0NzU4NTA2NzY4MDQsImlhdCI6MTQ3NTg0NzA3NjgwNH0.8azVEoNPfETczXb-vn7dfyDd98eRt7iiLBXehGpPGzY
 Content-Type: application/json
@@ -738,13 +739,13 @@ Once the new job is submitted, it takes time and resources to run the algorithm 
 API Endpoint URI pattern:
 
 ````
-GET https://cloud.ccd.pitt.edu/ccd-api/{username}/jobs/{id}
+GET https://cloud.ccd.pitt.edu/ccd-api/{userId}/jobs/{id}
 ````
 
 Generated HTTP request code example:
 
 ````
-GET /ccd-api/demouser/jobs/32 HTTP/1.1
+GET /ccd-api/22/jobs/32 HTTP/1.1
 Host: cloud.ccd.pitt.edu
 Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL2Nsb3VkLmNjZC5waXR0LmVkdS8iLCJuYW1lIjoiemh5MTkiLCJleHAiOjE0NzU4NTA2NzY4MDQsImlhdCI6MTQ3NTg0NzA3NjgwNH0.8azVEoNPfETczXb-vn7dfyDd98eRt7iiLBXehGpPGzY
 ````
@@ -758,13 +759,13 @@ Sometimes you may want to cancel a submitted job.
 API Endpoint URI pattern:
 
 ````
-DELETE https://cloud.ccd.pitt.edu/ccd-api/{username}/jobs/{id}
+DELETE https://cloud.ccd.pitt.edu/ccd-api/{userId}/jobs/{id}
 ````
 
 Generated HTTP request code example:
 
 ````
-DELETE /ccd-api/demouser/jobs/8 HTTP/1.1
+DELETE /ccd-api/22/jobs/8 HTTP/1.1
 Host: cloud.ccd.pitt.edu
 Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL2Nsb3VkLmNjZC5waXR0LmVkdS8iLCJuYW1lIjoiemh5MTkiLCJleHAiOjE0NzU4NTA2NzY4MDQsImlhdCI6MTQ3NTg0NzA3NjgwNH0.8azVEoNPfETczXb-vn7dfyDd98eRt7iiLBXehGpPGzY
 ````
@@ -778,13 +779,13 @@ This call will response either "Job 8 has been canceled" or "Unable to cancel jo
 API Endpoint URI pattern:
 
 ````
-GET https://cloud.ccd.pitt.edu/ccd-api/{username}/results
+GET https://cloud.ccd.pitt.edu/ccd-api/{userId}/results
 ````
 
 Generated HTTP request code example:
 
 ````
-GET /ccd-api/demouser/results HTTP/1.1
+GET /ccd-api/22/results HTTP/1.1
 Host: cloud.ccd.pitt.edu
 Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL2Nsb3VkLmNjZC5waXR0LmVkdS8iLCJuYW1lIjoiemh5MTkiLCJleHAiOjE0NzU4NTA2NzY4MDQsImlhdCI6MTQ3NTg0NzA3NjgwNH0.8azVEoNPfETczXb-vn7dfyDd98eRt7iiLBXehGpPGzY
 ````
@@ -813,13 +814,13 @@ The response to this request will look like this:
 API Endpoint URI pattern:
 
 ````
-GET https://cloud.ccd.pitt.edu/ccd-api/{username}/results/{result_file_name}
+GET https://cloud.ccd.pitt.edu/ccd-api/{userId}/results/{result_file_name}
 ````
 
 Generated HTTP request code example:
 
 ````
-GET /ccd-api/demouser/results/fgs_data_small.txt_1466172140585.txt HTTP/1.1
+GET /ccd-api/22/results/fgs_data_small.txt_1466172140585.txt HTTP/1.1
 Host: cloud.ccd.pitt.edu
 Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL2Nsb3VkLmNjZC5waXR0LmVkdS8iLCJuYW1lIjoiemh5MTkiLCJleHAiOjE0NzU4NTA2NzY4MDQsImlhdCI6MTQ3NTg0NzA3NjgwNH0.8azVEoNPfETczXb-vn7dfyDd98eRt7iiLBXehGpPGzY
 ````
@@ -833,7 +834,7 @@ The response to this request will look like this:
   "status": 404,
   "error": "Not Found",
   "message": "Resource not found.",
-  "path": "/demouser/results/fgs_data_small.txt_146172140585.txt"
+  "path": "/22/results/fgs_data_small.txt_146172140585.txt"
 }
 ````
 
@@ -845,13 +846,13 @@ Since we can list all the algorithm result files, based on the results, we can a
 API Endpoint URI pattern:
 
 ````
-GET https://cloud.ccd.pitt.edu/ccd-api/{username}/results/compare/{result_file_name}!!{another_result_file_name}
+GET https://cloud.ccd.pitt.edu/ccd-api/{userId}/results/compare/{result_file_name}!!{another_result_file_name}
 ````
 
 Generated HTTP request code example:
 
 ````
-GET /ccd-api/demouser/results/compare/fgs_sim_data_20vars_100cases.csv_1466171729046.txt!!fgs_data_small.txt_1467305104859.txt HTTP/1.1
+GET /ccd-api/22/results/compare/fgs_sim_data_20vars_100cases.csv_1466171729046.txt!!fgs_data_small.txt_1467305104859.txt HTTP/1.1
 Host: cloud.ccd.pitt.edu
 Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL2Nsb3VkLmNjZC5waXR0LmVkdS8iLCJuYW1lIjoiemh5MTkiLCJleHAiOjE0NzU4NTA2NzY4MDQsImlhdCI6MTQ3NTg0NzA3NjgwNH0.8azVEoNPfETczXb-vn7dfyDd98eRt7iiLBXehGpPGzY
 ````
@@ -881,13 +882,13 @@ From this comparison, you can see if the two algorithm graphs have common edges 
 API Endpoint URI pattern:
 
 ````
-GET https://cloud.ccd.pitt.edu/ccd-api/{username}/results/comparisons
+GET https://cloud.ccd.pitt.edu/ccd-api/{userId}/results/comparisons
 ````
 
 Generated HTTP request code example:
 
 ````
-GET /ccd-api/demouser/results/comparisons HTTP/1.1
+GET /ccd-api/22/results/comparisons HTTP/1.1
 Host: cloud.ccd.pitt.edu
 Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL2Nsb3VkLmNjZC5waXR0LmVkdS8iLCJuYW1lIjoiemh5MTkiLCJleHAiOjE0NzU4NTA2NzY4MDQsImlhdCI6MTQ3NTg0NzA3NjgwNH0.8azVEoNPfETczXb-vn7dfyDd98eRt7iiLBXehGpPGzY
 ````
@@ -922,13 +923,13 @@ The response will show a list of comparison files:
 API Endpoint URI pattern:
 
 ````
-GET https://cloud.ccd.pitt.edu/ccd-api/{username}/results/comparisons/{comparison_file_name}
+GET https://cloud.ccd.pitt.edu/ccd-api/{userId}/results/comparisons/{comparison_file_name}
 ````
 
 Generated HTTP request code example:
 
 ````
-GET /ccd-api/demouser/results/comparisons/result_comparison_1467388042261.txt HTTP/1.1
+GET /ccd-api/22/results/comparisons/result_comparison_1467388042261.txt HTTP/1.1
 Host: cloud.ccd.pitt.edu
 Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL2Nsb3VkLmNjZC5waXR0LmVkdS8iLCJuYW1lIjoiemh5MTkiLCJleHAiOjE0NzU4NTA2NzY4MDQsImlhdCI6MTQ3NTg0NzA3NjgwNH0.8azVEoNPfETczXb-vn7dfyDd98eRt7iiLBXehGpPGzY
 ````
