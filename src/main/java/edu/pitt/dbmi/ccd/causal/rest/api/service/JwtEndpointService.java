@@ -82,7 +82,7 @@ public class JwtEndpointService {
 
         // We store this JWT into `public_key` field of the user account table
         userAccount.setPublicKey(jwt);
-        userAccountService.saveUserAccount(userAccount);
+        userAccountService.save(userAccount);
 
         // Return the jwt to API consumer
         JwtDTO jwtDTO = new JwtDTO();

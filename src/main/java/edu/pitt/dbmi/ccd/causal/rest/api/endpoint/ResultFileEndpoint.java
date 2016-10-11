@@ -94,7 +94,7 @@ public class ResultFileEndpoint {
     /**
      * List all the comparison files
      *
-     * @param username
+     * @param uid
      * @return
      * @throws IOException
      */
@@ -132,7 +132,7 @@ public class ResultFileEndpoint {
     /**
      * Compare multi result files
      *
-     * @param username
+     * @param uid
      * @param fileNames
      * @return The comparison result text file content
      * @throws IOException
