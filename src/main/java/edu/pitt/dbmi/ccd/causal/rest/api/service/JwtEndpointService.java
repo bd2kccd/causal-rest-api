@@ -48,6 +48,11 @@ public class JwtEndpointService {
         StringTokenizer tokenizer = new StringTokenizer(credentials, ":");
         String username = tokenizer.nextToken();
 
+        // No need to check if the user exists, since the AuthFiter also done that check.
+        UserAccount userAccount = userAccountService.findByUsername(username);
+
+        Long uid = userAccount.getId();
+
         // Generate JWT (JSON Web Token, for API authentication)
         // Each jwt is issued at claim (per API request)
         // When refresh the request, the new jwt will overwrite the old one
@@ -69,19 +74,18 @@ public class JwtEndpointService {
         claims.put("iat", iatDate.getTime());
         claims.put("exp", expDate.getTime());
         // Private/custom claim
-        claims.put("name", username);
+        claims.put("uid", uid);
 
         // Generate the token string
         String jwt = signer.sign(claims);
 
-        // No need to check if the user exists, since the AuthFiter also done that check.
-        UserAccount userAccount = userAccountService.findByUsername(username);
         // We store this JWT into `public_key` field of the user account table
         userAccount.setPublicKey(jwt);
         userAccountService.saveUserAccount(userAccount);
 
         // Return the jwt to API consumer
         JwtDTO jwtDTO = new JwtDTO();
+        jwtDTO.setUserId(uid);
         jwtDTO.setJwt(jwt);
         jwtDTO.setIssuedTime(iatDate);
         jwtDTO.setLifetime(causalRestProperties.getJwtLifetime());

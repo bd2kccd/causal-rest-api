@@ -133,9 +133,9 @@ public class AuthFilterService {
             // Verify both secret and issuer
             final JWTVerifier jwtVerifier = new JWTVerifier(jwtSecret, null, jwtIssuer);
             final Map<String, Object> claims = jwtVerifier.verify(jwt);
-            // In the jwt bearer schema, we can simply get the user account based on the username
-            String username = claims.get("name").toString();
-            UserAccount userAccount = userAccountService.findByUsername(username);
+            // In the jwt bearer schema, we can simply get the user account based on the user id
+            long uid = (long) claims.get("uid");
+            UserAccount userAccount = userAccountService.findById(uid);
 
             if (userAccount == null) {
                 throw BEARER_AUTH_INVALID_JWT;
@@ -162,9 +162,9 @@ public class AuthFilterService {
 
     private boolean isAccountMatchesRequest(UserAccount userAccount, ContainerRequestContext requestContext) {
         MultivaluedMap<String, String> pathParams = requestContext.getUriInfo().getPathParameters();
-        String username = pathParams.getFirst("username");
+        long uid = Long.parseLong(pathParams.getFirst("uid"));
 
-        return userAccount.getUsername().equals(username);
+        return userAccount.getId().equals(uid);
     }
 
     private SecurityContext createSecurityContext(UserAccount userAccount, ContainerRequestContext requestContext, String authScheme) {

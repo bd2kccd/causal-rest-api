@@ -21,6 +21,9 @@ import org.springframework.beans.factory.annotation.Value;
 public class JwtDTO {
 
     @XmlElement
+    private Long userId;
+
+    @XmlElement
     private String jwt;
 
     @XmlElement
@@ -34,6 +37,14 @@ public class JwtDTO {
     private Date expireTime;
 
     public JwtDTO() {
+    }
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
     }
 
     public String getJwt() {
