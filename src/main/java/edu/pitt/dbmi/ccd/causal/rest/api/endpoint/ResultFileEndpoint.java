@@ -19,8 +19,8 @@
 package edu.pitt.dbmi.ccd.causal.rest.api.endpoint;
 
 import edu.pitt.dbmi.ccd.causal.rest.api.Role;
-import edu.pitt.dbmi.ccd.causal.rest.api.dto.ResultFileDTO;
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.ResultComparisonFileDTO;
+import edu.pitt.dbmi.ccd.causal.rest.api.dto.ResultFileDTO;
 import edu.pitt.dbmi.ccd.causal.rest.api.service.ResultFileEndpointService;
 import java.io.File;
 import java.io.IOException;
@@ -44,7 +44,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @PermitAll
-@Path("/{username}/results")
+@Path("/{uid}/results")
 public class ResultFileEndpoint {
 
     private final ResultFileEndpointService algorithmResultEndpointService;
@@ -57,15 +57,15 @@ public class ResultFileEndpoint {
     /**
      * List all the algorithm result files
      *
-     * @param username
+     * @param uid
      * @return 200 with a list of existing result files
      * @throws IOException
      */
     @GET
     @Produces({APPLICATION_JSON, APPLICATION_XML})
     @RolesAllowed(Role.USER)
-    public Response listAlgorithmResultFiles(@PathParam("username") String username) throws IOException {
-        List<ResultFileDTO> algorithmResultDTOs = algorithmResultEndpointService.listAlgorithmResults(username);
+    public Response listAlgorithmResultFiles(@PathParam("uid") Long uid) throws IOException {
+        List<ResultFileDTO> algorithmResultDTOs = algorithmResultEndpointService.listAlgorithmResults(uid);
         GenericEntity<List<ResultFileDTO>> entity = new GenericEntity<List<ResultFileDTO>>(algorithmResultDTOs) {
         };
 
@@ -75,7 +75,7 @@ public class ResultFileEndpoint {
     /**
      * Download the content of a result file for a given file name
      *
-     * @param username
+     * @param uid
      * @param fileName
      * @return Plain text file content
      * @throws IOException
@@ -83,8 +83,8 @@ public class ResultFileEndpoint {
     @GET
     @Path("/{fileName}")
     @RolesAllowed(Role.USER)
-    public Response downloadAlgorithmResultFile(@PathParam("username") String username, @PathParam("fileName") String fileName) throws IOException {
-        File file = algorithmResultEndpointService.getAlgorithmResultFile(username, fileName);
+    public Response downloadAlgorithmResultFile(@PathParam("uid") Long uid, @PathParam("fileName") String fileName) throws IOException {
+        File file = algorithmResultEndpointService.getAlgorithmResultFile(uid, fileName);
 
         return Response.ok(file)
                 .header("Content-Disposition", "attachment; filename=" + fileName)
@@ -102,8 +102,8 @@ public class ResultFileEndpoint {
     @Path("/comparisons")
     @Produces({APPLICATION_JSON, APPLICATION_XML})
     @RolesAllowed(Role.USER)
-    public Response listAlgorithmResultComparisonFiles(@PathParam("username") String username) throws IOException {
-        List<ResultFileDTO> algorithmResultDTOs = algorithmResultEndpointService.listAlgorithmResultComparisons(username);
+    public Response listAlgorithmResultComparisonFiles(@PathParam("uid") Long uid) throws IOException {
+        List<ResultFileDTO> algorithmResultDTOs = algorithmResultEndpointService.listAlgorithmResultComparisons(uid);
         GenericEntity<List<ResultFileDTO>> entity = new GenericEntity<List<ResultFileDTO>>(algorithmResultDTOs) {
         };
 
@@ -113,7 +113,7 @@ public class ResultFileEndpoint {
     /**
      * Download the content of a results comparison file for a given file name
      *
-     * @param username
+     * @param uid
      * @param fileName
      * @return Plain text file content
      * @throws IOException
@@ -121,8 +121,8 @@ public class ResultFileEndpoint {
     @GET
     @Path("/comparisons/{fileName}")
     @RolesAllowed(Role.USER)
-    public Response downloadAlgorithmResultsComparisonFile(@PathParam("username") String username, @PathParam("fileName") String fileName) throws IOException {
-        File file = algorithmResultEndpointService.getAlgorithmResultsComparisonFile(username, fileName);
+    public Response downloadAlgorithmResultsComparisonFile(@PathParam("uid") Long uid, @PathParam("fileName") String fileName) throws IOException {
+        File file = algorithmResultEndpointService.getAlgorithmResultsComparisonFile(uid, fileName);
 
         return Response.ok(file)
                 .header("Content-Disposition", "attachment; filename=" + fileName)
@@ -140,9 +140,9 @@ public class ResultFileEndpoint {
     @GET
     @Path("/compare/{fileNames}")
     @RolesAllowed(Role.USER)
-    public Response compareAlgorithmResults(@PathParam("username") String username, @PathParam("fileNames") String fileNames) throws IOException {
+    public Response compareAlgorithmResults(@PathParam("uid") Long uid, @PathParam("fileNames") String fileNames) throws IOException {
         // Get the result comparsion file content and file name
-        ResultComparisonFileDTO comparisonFileDTO = algorithmResultEndpointService.compareAlgorithmResults(username, fileNames);
+        ResultComparisonFileDTO comparisonFileDTO = algorithmResultEndpointService.compareAlgorithmResults(uid, fileNames);
 
         return Response.ok(comparisonFileDTO.getFile())
                 .header("Content-Disposition", "attachment; filename=" + comparisonFileDTO.getFileName())

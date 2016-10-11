@@ -31,8 +31,8 @@ public class UserNotFoundException extends WebApplicationException {
 
     private static final long serialVersionUID = 1509866160324624758L;
 
-    public UserNotFoundException(String username) {
-        super(String.format("User '%s' not found.", username), Status.NOT_FOUND);
+    public UserNotFoundException(Long uid) {
+        super(String.format("User ID '%s' not found.", uid), Status.NOT_FOUND);
     }
 
 }

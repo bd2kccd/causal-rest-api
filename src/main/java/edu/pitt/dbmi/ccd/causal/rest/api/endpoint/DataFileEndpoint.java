@@ -57,7 +57,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @PermitAll
-@Path("/{username}/data")
+@Path("/{uid}/data")
 public class DataFileEndpoint {
 
     private final DataFileEndpointService dataFileEndpointService;
@@ -70,15 +70,15 @@ public class DataFileEndpoint {
     /**
      * Delete a data file based on a given ID
      *
-     * @param username
+     * @param uid
      * @param id
      * @return 204 No content
      */
     @DELETE
     @Path("/{id}")
     @RolesAllowed(Role.USER)
-    public Response deleteById(@PathParam("username") String username, @PathParam("id") Long id) {
-        dataFileEndpointService.deleteByIdAndUsername(id, username);
+    public Response deleteById(@PathParam("uid") Long uid, @PathParam("id") Long id) {
+        dataFileEndpointService.deleteByIdAndUid(id, uid);
 
         return Response.noContent().build();
     }
@@ -86,7 +86,7 @@ public class DataFileEndpoint {
     /**
      * Get data file info for a given ID
      *
-     * @param username
+     * @param uid
      * @param id
      * @return 200 with data file info
      */
@@ -94,8 +94,8 @@ public class DataFileEndpoint {
     @Path("/{id}")
     @Produces({APPLICATION_JSON, APPLICATION_XML})
     @RolesAllowed(Role.USER)
-    public Response findById(@PathParam("username") String username, @PathParam("id") Long id) {
-        DataFileDTO dataFileDTO = dataFileEndpointService.findByIdAndUsername(id, username);
+    public Response findById(@PathParam("username") Long uid, @PathParam("id") Long id) {
+        DataFileDTO dataFileDTO = dataFileEndpointService.findByIdAndUid(id, uid);
 
         return Response.ok(dataFileDTO).build();
     }
@@ -103,14 +103,14 @@ public class DataFileEndpoint {
     /**
      * List all the existing data files
      *
-     * @param username
+     * @param uid
      * @return 200 with file list
      */
     @GET
     @Produces({APPLICATION_JSON, APPLICATION_XML})
     @RolesAllowed(Role.USER)
-    public Response listDataFiles(@PathParam("username") String username) {
-        List<DataFileDTO> dataFileDTOs = dataFileEndpointService.listDataFiles(username);
+    public Response listDataFiles(@PathParam("uid") Long uid) {
+        List<DataFileDTO> dataFileDTOs = dataFileEndpointService.listDataFiles(uid);
         GenericEntity<List<DataFileDTO>> entity = new GenericEntity<List<DataFileDTO>>(dataFileDTOs) {
         };
 
@@ -129,7 +129,7 @@ public class DataFileEndpoint {
      *
      * Client must use name="file" for their file upload
      *
-     * @param username
+     * @param uid
      * @param inputStream
      * @param fileDetail
      * @return 200 with uploaded file info
@@ -140,11 +140,11 @@ public class DataFileEndpoint {
     @Consumes(MULTIPART_FORM_DATA)
     @RolesAllowed(Role.USER)
     public Response upload(
-            @PathParam("username") String username,
+            @PathParam("uid") Long uid,
             @FormDataParam("file") InputStream inputStream,
             @FormDataParam("file") FormDataContentDisposition fileDetail) throws IOException {
 
-        DataFileDTO dataFileDTO = dataFileEndpointService.upload(username, inputStream, fileDetail);
+        DataFileDTO dataFileDTO = dataFileEndpointService.upload(uid, inputStream, fileDetail);
 
         return Response.ok(dataFileDTO).build();
     }
@@ -155,7 +155,7 @@ public class DataFileEndpoint {
      * needs resumable client (either resumable.js via the HTML5 File API or
      * resumable upload java client) based on https://github.com/bd2kccd/ccd-ws
      *
-     * @param username
+     * @param uid
      * @param chunkViaGet
      * @return 200 or 404
      * @throws IOException
@@ -163,8 +163,8 @@ public class DataFileEndpoint {
     @GET
     @Path("/chunkUpload")
     @RolesAllowed(Role.USER)
-    public Response checkChunkExistence(@PathParam("username") String username, @Valid @BeanParam ResumableChunkViaGet chunkViaGet) throws IOException {
-        if (dataFileEndpointService.chunkExists(chunkViaGet, username)) {
+    public Response checkChunkExistence(@PathParam("uid") Long uid, @Valid @BeanParam ResumableChunkViaGet chunkViaGet) throws IOException {
+        if (dataFileEndpointService.chunkExists(chunkViaGet, uid)) {
             // No need to re-upload the same chunk
             // This is used by the resumable clinet internally
             return Response.status(Status.OK).build();
@@ -187,7 +187,7 @@ public class DataFileEndpoint {
      * "multipart/form-data" should be used for submitting and consuming forms
      * that contain files, non-ASCII data, and binary data.
      *
-     * @param username
+     * @param uid
      * @param chunkViaPost
      * @return 200 OK status code with md5checkSum string
      * @throws IOException
@@ -196,8 +196,8 @@ public class DataFileEndpoint {
     @Path("/chunkUpload")
     @Consumes(MULTIPART_FORM_DATA)
     @RolesAllowed(Role.USER)
-    public Response processChunkUpload(@PathParam("username") String username, @Valid @BeanParam ResumableChunkViaPost chunkViaPost) throws IOException {
-        String md5checkSum = dataFileEndpointService.uploadChunk(chunkViaPost, username);
+    public Response processChunkUpload(@PathParam("uid") Long uid, @Valid @BeanParam ResumableChunkViaPost chunkViaPost) throws IOException {
+        String md5checkSum = dataFileEndpointService.uploadChunk(chunkViaPost, uid);
         // Only the last POST request will get a md5checksum on the completion of whole file
         // all requests before the last chunk will only get a 200 status code without response body
         return Response.ok(md5checkSum).build();
@@ -206,7 +206,7 @@ public class DataFileEndpoint {
     /**
      * Data Summary
      *
-     * @param username
+     * @param uid
      * @param dataFileSummarization
      * @return
      * @throws IOException
@@ -216,8 +216,8 @@ public class DataFileEndpoint {
     @Consumes(APPLICATION_JSON)
     @Produces({APPLICATION_JSON, APPLICATION_XML})
     @RolesAllowed(Role.USER)
-    public Response summarizeDataFile(@PathParam("username") String username, @Valid DataFileSummarization dataFileSummarization) throws IOException {
-        DataFileDTO dataFileDTO = dataFileEndpointService.summarizeDataFile(username, dataFileSummarization);
+    public Response summarizeDataFile(@PathParam("uid") Long uid, @Valid DataFileSummarization dataFileSummarization) throws IOException {
+        DataFileDTO dataFileDTO = dataFileEndpointService.summarizeDataFile(uid, dataFileSummarization);
         return Response.ok(dataFileDTO).build();
     }
 }

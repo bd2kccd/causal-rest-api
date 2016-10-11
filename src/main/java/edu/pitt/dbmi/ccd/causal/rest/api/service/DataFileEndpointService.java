@@ -102,12 +102,12 @@ public class DataFileEndpointService {
      * Delete a data file for a given file ID
      *
      * @param id
-     * @param username
+     * @param uid
      */
-    public void deleteByIdAndUsername(Long id, String username) {
-        UserAccount userAccount = userAccountService.findByUsername(username);
+    public void deleteByIdAndUid(Long id, Long uid) {
+        UserAccount userAccount = userAccountService.findById(uid);
         if (userAccount == null) {
-            throw new UserNotFoundException(username);
+            throw new UserNotFoundException(uid);
         }
 
         DataFile dataFile = dataFileService.findByIdAndUserAccount(id, userAccount);
@@ -132,13 +132,13 @@ public class DataFileEndpointService {
      * Get a data file info for a given file ID
      *
      * @param id
-     * @param username
+     * @param uid
      * @return
      */
-    public DataFileDTO findByIdAndUsername(Long id, String username) {
-        UserAccount userAccount = userAccountService.findByUsername(username);
+    public DataFileDTO findByIdAndUid(Long id, Long uid) {
+        UserAccount userAccount = userAccountService.findById(uid);
         if (userAccount == null) {
-            throw new UserNotFoundException(username);
+            throw new UserNotFoundException(uid);
         }
 
         DataFile dataFile = dataFileService.findByIdAndUserAccount(id, userAccount);
@@ -186,15 +186,15 @@ public class DataFileEndpointService {
     /**
      * List all the available data files for a given user
      *
-     * @param username
+     * @param uid
      * @return
      */
-    public List<DataFileDTO> listDataFiles(String username) {
+    public List<DataFileDTO> listDataFiles(Long uid) {
         List<DataFileDTO> dataFileDTOs = new LinkedList<>();
 
-        UserAccount userAccount = userAccountService.findByUsername(username);
+        UserAccount userAccount = userAccountService.findById(uid);
         if (userAccount == null) {
-            throw new UserNotFoundException(username);
+            throw new UserNotFoundException(uid);
         }
 
         List<DataFile> dataFiles = dataFileService.findByUserAccount(userAccount);
@@ -242,14 +242,22 @@ public class DataFileEndpointService {
     /**
      * Small file upload, not resumable
      *
-     * @param username
+     * @param uid
      * @param inputStream
      * @param fileDetail
      * @return Info of just uploaded file
      * @throws FileNotFoundException
      * @throws IOException
      */
-    public DataFileDTO upload(String username, InputStream inputStream, FormDataContentDisposition fileDetail) throws FileNotFoundException, IOException {
+    public DataFileDTO upload(Long uid, InputStream inputStream, FormDataContentDisposition fileDetail) throws FileNotFoundException, IOException {
+        UserAccount userAccount = userAccountService.findById(uid);
+        if (userAccount == null) {
+            throw new UserNotFoundException(uid);
+        }
+
+        // Get the username since it's used as the data file folder name
+        String username = userAccount.getUsername();
+
         String workspaceDir = causalRestProperties.getWorkspaceDir();
         String dataFolder = causalRestProperties.getDataFolder();
         String fileName = fileDetail.getFileName();
@@ -270,9 +278,6 @@ public class DataFileEndpointService {
         // Now if everything worked fine, the new file should have been uploaded
         // Then we'll also need to insert the data file info into three database tables:
         // `data_file_info`, `data_file`, and `user_account_data_file_rel`
-        // First we'll need to know who uploaded this file
-        UserAccount userAccount = userAccountService.findByUsername(username);
-
         // Get file information with FileInfos of ccd-commons
         BasicFileInfo fileInfo = FileInfos.basicPathInfo(uploadedFile);
 
@@ -347,11 +352,19 @@ public class DataFileEndpointService {
      * Chunk upload, check chunk existence
      *
      * @param chunk
-     * @param username
+     * @param uid
      * @return true or false
      * @throws IOException
      */
-    public boolean chunkExists(ResumableChunkViaGet chunk, String username) throws IOException {
+    public boolean chunkExists(ResumableChunkViaGet chunk, Long uid) throws IOException {
+        UserAccount userAccount = userAccountService.findById(uid);
+        if (userAccount == null) {
+            throw new UserNotFoundException(uid);
+        }
+
+        // Get the username since it's used as the data file folder name
+        String username = userAccount.getUsername();
+
         String identifier = chunk.getResumableIdentifier();
         int chunkNumber = chunk.getResumableChunkNumber();
 
@@ -373,11 +386,19 @@ public class DataFileEndpointService {
      * completion of the whole file
      *
      * @param chunk
-     * @param username
+     * @param uid
      * @return md5checksum string
      * @throws IOException
      */
-    public String uploadChunk(ResumableChunkViaPost chunk, String username) throws IOException {
+    public String uploadChunk(ResumableChunkViaPost chunk, Long uid) throws IOException {
+        UserAccount userAccount = userAccountService.findById(uid);
+        if (userAccount == null) {
+            throw new UserNotFoundException(uid);
+        }
+
+        // Get the username since it's used as the data file folder name
+        String username = userAccount.getUsername();
+
         String fileName = chunk.getResumableFilename();
         String md5checkSum = null;
 
@@ -558,17 +579,17 @@ public class DataFileEndpointService {
      * Summarize data file by adding fileDelimiter, variableType, numOfRows,
      * numOfColumns, and missingValue
      *
-     * @param username
+     * @param uid
      * @param dataFileSummarization
      * @return The info of just summarized file
      * @throws IOException
      */
-    public DataFileDTO summarizeDataFile(String username, DataFileSummarization dataFileSummarization) throws IOException {
+    public DataFileDTO summarizeDataFile(Long uid, DataFileSummarization dataFileSummarization) throws IOException {
         Long id = dataFileSummarization.getId();
 
-        UserAccount userAccount = userAccountService.findByUsername(username);
+        UserAccount userAccount = userAccountService.findById(uid);
         if (userAccount == null) {
-            throw new UserNotFoundException(username);
+            throw new UserNotFoundException(uid);
         }
 
         DataFile dataFile = dataFileService.findByIdAndUserAccount(id, userAccount);

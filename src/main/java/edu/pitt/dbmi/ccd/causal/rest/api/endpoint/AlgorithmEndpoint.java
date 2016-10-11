@@ -41,7 +41,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @PermitAll
-@Path("/{username}/algorithms")
+@Path("/{uid}/algorithms")
 public class AlgorithmEndpoint {
 
     private final AlgorithmEndpointService algorithmEndpointService;

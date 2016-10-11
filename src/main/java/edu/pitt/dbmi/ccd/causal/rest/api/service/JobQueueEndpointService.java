@@ -18,14 +18,13 @@
  */
 package edu.pitt.dbmi.ccd.causal.rest.api.service;
 
-import edu.pitt.dbmi.ccd.causal.rest.api.dto.GfciContinuousDataValidation;
-import edu.pitt.dbmi.ccd.causal.rest.api.dto.BasicDataValidation;
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.FgsContinuousDataValidation;
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.FgsContinuousNewJob;
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.FgsContinuousParameters;
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.FgsDiscreteDataValidation;
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.FgsDiscreteNewJob;
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.FgsDiscreteParameters;
+import edu.pitt.dbmi.ccd.causal.rest.api.dto.GfciContinuousDataValidation;
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.GfciContinuousNewJob;
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.GfciContinuousParameters;
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.JobInfoDTO;
@@ -41,7 +40,6 @@ import edu.pitt.dbmi.ccd.db.entity.UserAccount;
 import edu.pitt.dbmi.ccd.db.service.DataFileService;
 import edu.pitt.dbmi.ccd.db.service.JobQueueInfoService;
 import edu.pitt.dbmi.ccd.db.service.UserAccountService;
-
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collections;
@@ -50,7 +48,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -78,15 +75,15 @@ public class JobQueueEndpointService {
 
     @Autowired
     private Environment env;
-    
+
     @Autowired
-    @Value("${ccd.remote.server.dataspace:}") 
+    @Value("${ccd.remote.server.dataspace:}")
     private String remotedataspace;
-    
+
     @Autowired
-    @Value("${ccd.remote.server.workspace:}") 
+    @Value("${ccd.remote.server.workspace:}")
     private String remoteworkspace;
-    
+
     @Autowired
     public JobQueueEndpointService(
             CausalRestProperties causalRestProperties,
@@ -98,25 +95,25 @@ public class JobQueueEndpointService {
         this.dataFileService = dataFileService;
         this.jobQueueInfoService = jobQueueInfoService;
     }
-    
+
     /**
      * Add a new job to the job queue and run the GFCI Continuous algorithm
      *
-     * @param username
+     * @param uid
      * @param newJob
      * @return JobInfoDTO
      */
-    public JobInfoDTO addGfciContinuousNewJob(String username, GfciContinuousNewJob newJob) {
+    public JobInfoDTO addGfciContinuousNewJob(Long uid, GfciContinuousNewJob newJob) {
         String algorithm = causalRestProperties.getGfci();
 
-        UserAccount userAccount = userAccountService.findByUsername(username);
+        UserAccount userAccount = userAccountService.findById(uid);
         if (userAccount == null) {
-            throw new UserNotFoundException(username);
+            throw new UserNotFoundException(uid);
         }
 
         // algorithmJarPath, dataDir, tmpDir, resultDir
         // will be used in all algorithms
-        Map<String, String> map = createSharedMapping(username);
+        Map<String, String> map = createSharedMapping(uid);
 
         // Building the command line
         List<String> commands = new LinkedList<>();
@@ -223,7 +220,7 @@ public class JobQueueEndpointService {
         String resultJsonFileName = fileName + ".json";
         fileName = fileName + ".txt";
         String errorFileName = String.format("error_%s", fileName);
-        
+
         JobInfoDTO jobInfo = new JobInfoDTO();
         jobInfo.setStatus(0);
         jobInfo.setAddedTime(jobQueueInfo.getAddedTime());
@@ -232,28 +229,28 @@ public class JobQueueEndpointService {
         jobInfo.setResultJsonFileName(resultJsonFileName);
         jobInfo.setErrorResultFileName(errorFileName);
         jobInfo.setId(jobQueueInfo.getId());
-        
+
         return jobInfo;
     }
 
     /**
      * Add a new job to the job queue and run the FGS Discrete algorithm
      *
-     * @param username
+     * @param uid
      * @param newJob
      * @return Job ID
      */
-    public JobInfoDTO addFgsDiscreteNewJob(String username, FgsDiscreteNewJob newJob) {
+    public JobInfoDTO addFgsDiscreteNewJob(Long uid, FgsDiscreteNewJob newJob) {
         String algorithm = causalRestProperties.getFgsDiscrete();
 
-        UserAccount userAccount = userAccountService.findByUsername(username);
+        UserAccount userAccount = userAccountService.findById(uid);
         if (userAccount == null) {
-            throw new UserNotFoundException(username);
+            throw new UserNotFoundException(uid);
         }
 
         // algorithmJarPath, dataDir, tmpDir, resultDir
         // will be used in both "fgs" and "fgs-discrete"
-        Map<String, String> map = createSharedMapping(username);
+        Map<String, String> map = createSharedMapping(uid);
 
         // Building the command line
         List<String> commands = new LinkedList<>();
@@ -360,7 +357,7 @@ public class JobQueueEndpointService {
         String resultJsonFileName = fileName + ".json";
         fileName = fileName + ".txt";
         String errorFileName = String.format("error_%s", fileName);
-        
+
         JobInfoDTO jobInfo = new JobInfoDTO();
         jobInfo.setStatus(0);
         jobInfo.setAddedTime(jobQueueInfo.getAddedTime());
@@ -369,28 +366,28 @@ public class JobQueueEndpointService {
         jobInfo.setResultJsonFileName(resultJsonFileName);
         jobInfo.setErrorResultFileName(errorFileName);
         jobInfo.setId(jobQueueInfo.getId());
-        
+
         return jobInfo;
     }
 
     /**
      * Add a new job to the job queue and run the FGS Continuous algorithm
      *
-     * @param username
+     * @param uid
      * @param newJob
      * @return JobInfoDTO
      */
-    public JobInfoDTO addFgsContinuousNewJob(String username, FgsContinuousNewJob newJob) {
+    public JobInfoDTO addFgsContinuousNewJob(Long uid, FgsContinuousNewJob newJob) {
         String algorithm = causalRestProperties.getFgs();
 
-        UserAccount userAccount = userAccountService.findByUsername(username);
+        UserAccount userAccount = userAccountService.findById(uid);
         if (userAccount == null) {
-            throw new UserNotFoundException(username);
+            throw new UserNotFoundException(uid);
         }
 
         // algorithmJarPath, dataDir, tmpDir, resultDir
         // will be used in both "fgs" and "fgs-discrete"
-        Map<String, String> map = createSharedMapping(username);
+        Map<String, String> map = createSharedMapping(uid);
 
         // Building the command line
         List<String> commands = new LinkedList<>();
@@ -494,7 +491,7 @@ public class JobQueueEndpointService {
         String resultJsonFileName = fileName + ".json";
         fileName = fileName + ".txt";
         String errorFileName = String.format("error_%s", fileName);
-        
+
         JobInfoDTO jobInfo = new JobInfoDTO();
         jobInfo.setStatus(0);
         jobInfo.setAddedTime(jobQueueInfo.getAddedTime());
@@ -503,17 +500,25 @@ public class JobQueueEndpointService {
         jobInfo.setResultJsonFileName(resultJsonFileName);
         jobInfo.setErrorResultFileName(errorFileName);
         jobInfo.setId(jobQueueInfo.getId());
-        
+
         return jobInfo;
     }
 
     /**
      * Shared values to be used in both algorithms
      *
-     * @param username
+     * @param uid
      * @return key-value mapping
      */
-    private Map<String, String> createSharedMapping(String username) {
+    private Map<String, String> createSharedMapping(Long uid) {
+        UserAccount userAccount = userAccountService.findById(uid);
+        if (userAccount == null) {
+            throw new UserNotFoundException(uid);
+        }
+
+        // Get the username
+        String username = userAccount.getUsername();
+
         Map<String, String> map = new HashMap<>();
 
         String workspaceDir = causalRestProperties.getWorkspaceDir();
@@ -529,10 +534,10 @@ public class JobQueueEndpointService {
         Path tmpDir = Paths.get(workspaceDir, username, tmpFolder);
         Path resultDir = Paths.get(workspaceDir, username, resultsFolder, algorithmFolder);
 
-        if(env.acceptsProfiles("slurm")){
-    		tmpDir = Paths.get(remoteworkspace, username, tmpFolder);
-    		algorithmJarPath = Paths.get(remoteworkspace, libFolder, algorithmJar);
-    		dataDir = Paths.get(remotedataspace, username, dataFolder);
+        if (env.acceptsProfiles("slurm")) {
+            tmpDir = Paths.get(remoteworkspace, username, tmpFolder);
+            algorithmJarPath = Paths.get(remoteworkspace, libFolder, algorithmJar);
+            dataDir = Paths.get(remotedataspace, username, dataFolder);
         }
 
         // The following keys will be shared when running each algorithm
@@ -547,15 +552,15 @@ public class JobQueueEndpointService {
     /**
      * List all Queued or Running jobs of a certain user
      *
-     * @param username
+     * @param uid
      * @return
      */
-    public List<JobInfoDTO> listAllJobs(String username) {
+    public List<JobInfoDTO> listAllJobs(Long uid) {
         List<JobInfoDTO> jobInfoDTOs = new LinkedList<>();
 
-        UserAccount userAccount = userAccountService.findByUsername(username);
+        UserAccount userAccount = userAccountService.findById(uid);
         if (userAccount == null) {
-            throw new UserNotFoundException(username);
+            throw new UserNotFoundException(uid);
         }
 
         List<JobQueueInfo> jobs = jobQueueInfoService.findByUserAccounts(Collections.singleton(userAccount));
@@ -576,7 +581,7 @@ public class JobQueueEndpointService {
             jobInfoDTO.setResultFileName(fileName);
             jobInfoDTO.setResultJsonFileName(resultJsonFileName);
             jobInfoDTO.setErrorResultFileName(errorFileName);
-            
+
             jobInfoDTOs.add(jobInfoDTO);
         });
 
@@ -589,16 +594,16 @@ public class JobQueueEndpointService {
      *
      * Do we really care if a user can see the status of jobs created by others?
      *
-     * @param username
+     * @param uid
      * @param id
      * @return jobInfoDTO
      */
-    public JobInfoDTO checkJobStatus(String username, Long id) {
+    public JobInfoDTO checkJobStatus(Long uid, Long id) {
         JobQueueInfo job = jobQueueInfoService.findOne(id);
-        
+
         JobInfoDTO jobInfoDTO = null;
-        
-        if(job != null){
+
+        if (job != null) {
             jobInfoDTO = new JobInfoDTO();
 
             // Not listing data file name nor ID in response at this moment
@@ -616,7 +621,7 @@ public class JobQueueEndpointService {
             jobInfoDTO.setResultJsonFileName(resultJsonFileName);
             jobInfoDTO.setErrorResultFileName(errorFileName);
         }
-        
+
         return jobInfoDTO;
     }
 
@@ -625,14 +630,14 @@ public class JobQueueEndpointService {
      *
      * We'll need to make sure this job is created by this user
      *
-     * @param username
+     * @param uid
      * @param id
      * @return true on canceled or false if job is already completed
      */
-    public boolean cancelJob(String username, Long id) {
-        UserAccount userAccount = userAccountService.findByUsername(username);
+    public boolean cancelJob(Long uid, Long id) {
+        UserAccount userAccount = userAccountService.findById(uid);
         if (userAccount == null) {
-            throw new UserNotFoundException(username);
+            throw new UserNotFoundException(uid);
         }
 
         JobQueueInfo job = jobQueueInfoService.findByIdAndUseraccount(id, userAccount);

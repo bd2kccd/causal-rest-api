@@ -23,12 +23,15 @@ import edu.pitt.dbmi.ccd.causal.rest.api.dto.ResultComparisonData;
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.ResultComparisonFileDTO;
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.ResultFileDTO;
 import edu.pitt.dbmi.ccd.causal.rest.api.exception.ResourceNotFoundException;
+import edu.pitt.dbmi.ccd.causal.rest.api.exception.UserNotFoundException;
 import edu.pitt.dbmi.ccd.causal.rest.api.prop.CausalRestProperties;
 import edu.pitt.dbmi.ccd.commons.file.info.BasicFileInfo;
 import edu.pitt.dbmi.ccd.commons.file.info.FileInfos;
 import edu.pitt.dbmi.ccd.commons.graph.SimpleGraph;
 import edu.pitt.dbmi.ccd.commons.graph.SimpleGraphComparison;
 import edu.pitt.dbmi.ccd.commons.graph.SimpleGraphUtil;
+import edu.pitt.dbmi.ccd.db.entity.UserAccount;
+import edu.pitt.dbmi.ccd.db.service.UserAccountService;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -58,19 +61,29 @@ public class ResultFileEndpointService {
 
     private final CausalRestProperties causalRestProperties;
 
+    private final UserAccountService userAccountService;
+
     @Autowired
-    public ResultFileEndpointService(CausalRestProperties causalRestProperties) {
+    public ResultFileEndpointService(CausalRestProperties causalRestProperties, UserAccountService userAccountService) {
         this.causalRestProperties = causalRestProperties;
+        this.userAccountService = userAccountService;
     }
 
     /**
      * List all the algorithm result files for a given user
      *
-     * @param username
+     * @param uid
      * @return A list of result files
      * @throws IOException
      */
-    public List<ResultFileDTO> listAlgorithmResults(String username) throws IOException {
+    public List<ResultFileDTO> listAlgorithmResults(Long uid) throws IOException {
+        UserAccount userAccount = userAccountService.findById(uid);
+        if (userAccount == null) {
+            throw new UserNotFoundException(uid);
+        }
+
+        String username = userAccount.getUsername();
+
         String workspaceDir = causalRestProperties.getWorkspaceDir();
         String resultsFolder = causalRestProperties.getResultsFolder();
         String algorithmFolder = causalRestProperties.getAlgorithmFolder();
@@ -103,11 +116,18 @@ public class ResultFileEndpointService {
     /**
      * Get the result file content based on user and the file name
      *
-     * @param username
+     * @param uid
      * @param fileName
      * @return The algorithm result file
      */
-    public File getAlgorithmResultFile(String username, String fileName) {
+    public File getAlgorithmResultFile(Long uid, String fileName) {
+        UserAccount userAccount = userAccountService.findById(uid);
+        if (userAccount == null) {
+            throw new UserNotFoundException(uid);
+        }
+
+        String username = userAccount.getUsername();
+
         String workspaceDir = causalRestProperties.getWorkspaceDir();
         String resultsFolder = causalRestProperties.getResultsFolder();
         String algorithmFolder = causalRestProperties.getAlgorithmFolder();
@@ -125,11 +145,18 @@ public class ResultFileEndpointService {
     /**
      * List all the algorithm results comparison files for a given user
      *
-     * @param username
+     * @param uid
      * @return A list of result comparison files
      * @throws IOException
      */
-    public List<ResultFileDTO> listAlgorithmResultComparisons(String username) throws IOException {
+    public List<ResultFileDTO> listAlgorithmResultComparisons(Long uid) throws IOException {
+        UserAccount userAccount = userAccountService.findById(uid);
+        if (userAccount == null) {
+            throw new UserNotFoundException(uid);
+        }
+
+        String username = userAccount.getUsername();
+
         String workspaceDir = causalRestProperties.getWorkspaceDir();
         String resultsFolder = causalRestProperties.getResultsFolder();
         String comparisonFolder = causalRestProperties.getComparisonFolder();
@@ -162,11 +189,18 @@ public class ResultFileEndpointService {
     /**
      * Get the result comparison file content based on user and the file name
      *
-     * @param username
+     * @param uid
      * @param fileName
      * @return The comparison file
      */
-    public File getAlgorithmResultsComparisonFile(String username, String fileName) {
+    public File getAlgorithmResultsComparisonFile(Long uid, String fileName) {
+        UserAccount userAccount = userAccountService.findById(uid);
+        if (userAccount == null) {
+            throw new UserNotFoundException(uid);
+        }
+
+        String username = userAccount.getUsername();
+
         String workspaceDir = causalRestProperties.getWorkspaceDir();
         String resultsFolder = causalRestProperties.getResultsFolder();
         String comparisonFolder = causalRestProperties.getComparisonFolder();
@@ -184,11 +218,18 @@ public class ResultFileEndpointService {
     /**
      * Handles the comparison of multi result files
      *
-     * @param username
+     * @param uid
      * @param fileNames
      * @return Comparison result
      */
-    public ResultComparisonFileDTO compareAlgorithmResults(String username, String fileNames) {
+    public ResultComparisonFileDTO compareAlgorithmResults(Long uid, String fileNames) {
+        UserAccount userAccount = userAccountService.findById(uid);
+        if (userAccount == null) {
+            throw new UserNotFoundException(uid);
+        }
+
+        String username = userAccount.getUsername();
+
         String workspaceDir = causalRestProperties.getWorkspaceDir();
         String resultsFolder = causalRestProperties.getResultsFolder();
         String algorithmFolder = causalRestProperties.getAlgorithmFolder();
