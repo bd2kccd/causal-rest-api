@@ -133,7 +133,7 @@ public class AuthFilterService {
             // Verify both secret and issuer
             final JWTVerifier jwtVerifier = new JWTVerifier(jwtSecret, null, jwtIssuer);
             final Map<String, Object> claims = jwtVerifier.verify(jwt);
-            // In the jwt bearer schema, we can simply get the user account based on the user id
+            // We can simply get the user account based on the user id
             long uid = (long) claims.get("uid");
             UserAccount userAccount = userAccountService.findById(uid);
 
@@ -141,9 +141,9 @@ public class AuthFilterService {
                 throw BEARER_AUTH_INVALID_JWT;
             }
 
-            // Also make sure the username found in jwt matches the one in URI
+            // Also make sure the uid found in jwt matches the one in URI
             SecurityContext securityContext = createSecurityContext(userAccount, requestContext, AUTH_SCHEME_BEARER);
-            if (!(securityContext.isUserInRole("admin") || isAccountMatchesRequest(userAccount, requestContext))) {
+            if (!(securityContext.isUserInRole("admin") || isAccountMatchesRequest(uid, requestContext))) {
                 throw FORBIDDEN_ACCESS;
             }
 
@@ -160,11 +160,11 @@ public class AuthFilterService {
         }
     }
 
-    private boolean isAccountMatchesRequest(UserAccount userAccount, ContainerRequestContext requestContext) {
+    private boolean isAccountMatchesRequest(Long uid, ContainerRequestContext requestContext) {
         MultivaluedMap<String, String> pathParams = requestContext.getUriInfo().getPathParameters();
-        long uid = Long.parseLong(pathParams.getFirst("uid"));
+        long reqUid = Long.parseLong(pathParams.getFirst("uid"));
 
-        return userAccount.getId().equals(uid);
+        return uid.equals(reqUid);
     }
 
     private SecurityContext createSecurityContext(UserAccount userAccount, ContainerRequestContext requestContext, String authScheme) {

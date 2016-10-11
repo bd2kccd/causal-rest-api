@@ -37,11 +37,12 @@ import org.springframework.stereotype.Component;
 
 /**
  *
- * @author Zhou Yuan (zhy19@pitt.edu)
+ * @author Zhou Yuan (zhy19@pitt.edu) We need this uid in the URI since JWT
+ * compares the uid
  */
 @Component
 @PermitAll
-@Path("/algorithms")
+@Path("/{uid}/algorithms")
 public class AlgorithmEndpoint {
 
     private final AlgorithmEndpointService algorithmEndpointService;

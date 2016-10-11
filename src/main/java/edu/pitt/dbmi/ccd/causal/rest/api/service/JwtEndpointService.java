@@ -51,6 +51,7 @@ public class JwtEndpointService {
         // No need to check if the user exists, since the AuthFiter also done that check.
         UserAccount userAccount = userAccountService.findByUsername(username);
 
+        // Add the user id into JWT claims
         Long uid = userAccount.getId();
 
         // Generate JWT (JSON Web Token, for API authentication)
