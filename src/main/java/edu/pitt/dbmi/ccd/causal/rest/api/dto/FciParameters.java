@@ -11,7 +11,7 @@ import org.springframework.beans.factory.annotation.Value;
  */
 public class FciParameters {
 
-    @Value("3")
+    @Value("100")
     protected int maxInDegree;
 
     @Value("true")
