@@ -19,9 +19,11 @@
 package edu.pitt.dbmi.ccd.causal.rest.api.service;
 
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.AlgorithmDTO;
+import edu.pitt.dbmi.ccd.causal.rest.api.prop.CausalRestProperties;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
@@ -31,12 +33,11 @@ import org.springframework.stereotype.Service;
 @Service
 public class AlgorithmEndpointService {
 
-    private static final List<AlgorithmDTO> ALGORITHMS = new LinkedList<>();
+    private final CausalRestProperties causalRestProperties;
 
-    static {
-        ALGORITHMS.add(new AlgorithmDTO(1, "fgsc", "FGS continuous"));
-        ALGORITHMS.add(new AlgorithmDTO(2, "fgsd", "FGS discrete"));
-        ALGORITHMS.add(new AlgorithmDTO(3, "gfcic", "GFCI continuous"));
+    @Autowired
+    public AlgorithmEndpointService(CausalRestProperties causalRestProperties) {
+        this.causalRestProperties = causalRestProperties;
     }
 
     /**
@@ -46,6 +47,13 @@ public class AlgorithmEndpointService {
      * @throws IOException
      */
     public List<AlgorithmDTO> listAlgorithms() throws IOException {
+        List<AlgorithmDTO> ALGORITHMS = new LinkedList<>();
+
+        // Get the actual algorithm short name from the properties file
+        ALGORITHMS.add(new AlgorithmDTO(1, causalRestProperties.getFgs(), "FGS continuous"));
+        ALGORITHMS.add(new AlgorithmDTO(2, causalRestProperties.getFgsDiscrete(), "FGS discrete"));
+        ALGORITHMS.add(new AlgorithmDTO(3, causalRestProperties.getGfci(), "GFCI continuous"));
+
         return ALGORITHMS;
     }
 }

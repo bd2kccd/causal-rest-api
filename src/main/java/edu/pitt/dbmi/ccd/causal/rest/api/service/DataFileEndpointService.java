@@ -99,7 +99,7 @@ public class DataFileEndpointService {
     }
 
     /**
-     * Delete a data file for a given file ID
+     * Delete a data file for a given file ID of a given user
      *
      * @param id
      * @param uid
@@ -129,7 +129,7 @@ public class DataFileEndpointService {
     }
 
     /**
-     * Get a data file info for a given file ID
+     * Get a data file info for a given file ID of a given user
      *
      * @param id
      * @param uid
@@ -143,7 +143,7 @@ public class DataFileEndpointService {
 
         DataFile dataFile = dataFileService.findByIdAndUserAccount(id, userAccount);
         if (dataFile == null) {
-            LOGGER.warn(String.format("Can not find data file id=%d.", id));
+            LOGGER.warn(String.format("Can not find data file id=%d for user id=%d.", id, uid));
             throw new NotFoundByIdException(id);
         }
 
@@ -184,7 +184,7 @@ public class DataFileEndpointService {
     }
 
     /**
-     * List all the available data files for a given user
+     * List all the available data files for a given user ID
      *
      * @param uid
      * @return

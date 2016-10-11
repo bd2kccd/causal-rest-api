@@ -59,7 +59,7 @@ public class JobQueueEndpoint {
     /**
      * Adding a new job and run GFCI continuous
      *
-     * @param username
+     * @param uid
      * @param newJob
      * @return 201 Created status code with new job ID
      * @throws IOException
@@ -164,7 +164,7 @@ public class JobQueueEndpoint {
     /**
      * Cancel a job (job status can be Queued or Running)
      *
-     * @param username
+     * @param uid
      * @param id
      * @return
      * @throws IOException
