@@ -134,7 +134,11 @@ public class AuthFilterService {
             final JWTVerifier jwtVerifier = new JWTVerifier(jwtSecret, null, jwtIssuer);
             final Map<String, Object> claims = jwtVerifier.verify(jwt);
             // We can simply get the user account based on the user id
-            long uid = (long) claims.get("uid");
+            // Turned out jwt library returns claims.get("uid") as java.lang.Integer
+            //System.out.println(claims.get("uid").getClass().getName());
+            Integer uidInteger = (Integer) claims.get("uid");
+            Long uid = uidInteger.longValue();
+
             UserAccount userAccount = userAccountService.findById(uid);
 
             if (userAccount == null) {

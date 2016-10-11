@@ -51,7 +51,8 @@ public class JwtEndpointService {
         // No need to check if the user exists, since the AuthFiter also done that check.
         UserAccount userAccount = userAccountService.findByUsername(username);
 
-        // Add the user id into JWT claims
+        // Note this uid is Long object, we'll need to use the numeric primitive long
+        // to store it into JWT claims
         Long uid = userAccount.getId();
 
         // Generate JWT (JSON Web Token, for API authentication)
@@ -71,7 +72,7 @@ public class JwtEndpointService {
         HashMap<String, Object> claims = new HashMap<>();
         // Add reserved claims
         claims.put("iss", causalRestProperties.getJwtIssuer());
-        // Convert iatDate and expDate into long
+        // Convert iatDate and expDate into long primitive
         claims.put("iat", iatDate.getTime());
         claims.put("exp", expDate.getTime());
         // Private/custom claim
