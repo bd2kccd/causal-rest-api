@@ -135,22 +135,33 @@ public class JobQueueEndpointService {
         commands.add("--algorithm");
         commands.add(algorithm);
 
-        // Get data file name by file id
-        Long dataFileId = newJob.getDataFileId();
-        DataFile dataFile = dataFileService.findByIdAndUserAccount(dataFileId, userAccount);
-        if (dataFile == null) {
-            throw new NotFoundByIdException(dataFileId);
+        // Get dataset file name by file id
+        Long datasetFileId = newJob.getDatasetFileId();
+        DataFile datasetFile = dataFileService.findByIdAndUserAccount(datasetFileId, userAccount);
+        if (datasetFile == null) {
+            throw new NotFoundByIdException(datasetFileId);
         }
-        Path dataPath = Paths.get(map.get("dataDir"), dataFile.getName());
+        Path datasetPath = Paths.get(map.get("dataDir"), datasetFile.getName());
 
         commands.add("--data");
-        commands.add(dataPath.toAbsolutePath().toString());
+        commands.add(datasetPath.toAbsolutePath().toString());
+
+        // Get prior knowledge file name by file id
+        Long priorKnowledgeFileId = newJob.getPriorKnowledgeFileId();
+        DataFile priorKnowledgeFile = dataFileService.findByIdAndUserAccount(priorKnowledgeFileId, userAccount);
+        if (priorKnowledgeFile == null) {
+            throw new NotFoundByIdException(priorKnowledgeFileId);
+        }
+        Path priorKnowledgePath = Paths.get(map.get("dataDir"), priorKnowledgeFile.getName());
+
+        commands.add("--knowledge");
+        commands.add(priorKnowledgePath.toAbsolutePath().toString());
 
         // Algorithm parameters
         GfciContinuousParameters algorithmParameters = newJob.getAlgorithmParameters();
 
         commands.add("--delimiter");
-        commands.add(getFileDelimiter(newJob.getDataFileId()));
+        commands.add(getFileDelimiter(newJob.getDatasetFileId()));
 
         commands.add("--alpha");
         commands.add(Double.toString(algorithmParameters.getAlpha()));
@@ -189,7 +200,7 @@ public class JobQueueEndpointService {
         // Algorithm result file name
         String fileName;
 
-        DataFile df = dataFileService.findByIdAndUserAccount(dataFileId, userAccount);
+        DataFile df = dataFileService.findByIdAndUserAccount(datasetFileId, userAccount);
         fileName = String.format("%s_%s_%d", algorithm, df.getName(), currentTime);
 
         commands.add("--output-prefix");
@@ -272,22 +283,33 @@ public class JobQueueEndpointService {
         commands.add("--algorithm");
         commands.add(algorithm);
 
-        // Get data file name by file id
-        Long dataFileId = newJob.getDataFileId();
-        DataFile dataFile = dataFileService.findByIdAndUserAccount(dataFileId, userAccount);
-        if (dataFile == null) {
-            throw new NotFoundByIdException(dataFileId);
+        // Get dataset file name by file id
+        Long datasetFileId = newJob.getDatasetFileId();
+        DataFile datasetFile = dataFileService.findByIdAndUserAccount(datasetFileId, userAccount);
+        if (datasetFile == null) {
+            throw new NotFoundByIdException(datasetFileId);
         }
-        Path dataPath = Paths.get(map.get("dataDir"), dataFile.getName());
+        Path datasetPath = Paths.get(map.get("dataDir"), datasetFile.getName());
 
         commands.add("--data");
-        commands.add(dataPath.toAbsolutePath().toString());
+        commands.add(datasetPath.toAbsolutePath().toString());
+
+        // Get prior knowledge file name by file id
+        Long priorKnowledgeFileId = newJob.getPriorKnowledgeFileId();
+        DataFile priorKnowledgeFile = dataFileService.findByIdAndUserAccount(priorKnowledgeFileId, userAccount);
+        if (priorKnowledgeFile == null) {
+            throw new NotFoundByIdException(priorKnowledgeFileId);
+        }
+        Path priorKnowledgePath = Paths.get(map.get("dataDir"), priorKnowledgeFile.getName());
+
+        commands.add("--knowledge");
+        commands.add(priorKnowledgePath.toAbsolutePath().toString());
 
         // Algorithm parameters
         FgsDiscreteParameters algorithmParameters = newJob.getAlgorithmParameters();
 
         commands.add("--delimiter");
-        commands.add(getFileDelimiter(newJob.getDataFileId()));
+        commands.add(getFileDelimiter(newJob.getDatasetFileId()));
 
         commands.add("--structure-prior");
         commands.add(Double.toString(algorithmParameters.getStructurePrior()));
@@ -326,7 +348,7 @@ public class JobQueueEndpointService {
         // Algorithm result file name
         String fileName;
 
-        DataFile df = dataFileService.findByIdAndUserAccount(dataFileId, userAccount);
+        DataFile df = dataFileService.findByIdAndUserAccount(datasetFileId, userAccount);
         fileName = String.format("%s_%s_%d", algorithm, df.getName(), currentTime);
 
         commands.add("--output-prefix");
@@ -409,22 +431,33 @@ public class JobQueueEndpointService {
         commands.add("--algorithm");
         commands.add(algorithm);
 
-        // Get data file name by file id
-        Long dataFileId = newJob.getDataFileId();
-        DataFile dataFile = dataFileService.findByIdAndUserAccount(dataFileId, userAccount);
-        if (dataFile == null) {
-            throw new NotFoundByIdException(dataFileId);
+        // Get dataset file name by file id
+        Long datasetFileId = newJob.getDatasetFileId();
+        DataFile datasetFile = dataFileService.findByIdAndUserAccount(datasetFileId, userAccount);
+        if (datasetFile == null) {
+            throw new NotFoundByIdException(datasetFileId);
         }
-        Path dataPath = Paths.get(map.get("dataDir"), dataFile.getName());
+        Path datasetPath = Paths.get(map.get("dataDir"), datasetFile.getName());
 
         commands.add("--data");
-        commands.add(dataPath.toAbsolutePath().toString());
+        commands.add(datasetPath.toAbsolutePath().toString());
+
+        // Get prior knowledge file name by file id
+        Long priorKnowledgeFileId = newJob.getPriorKnowledgeFileId();
+        DataFile priorKnowledgeFile = dataFileService.findByIdAndUserAccount(priorKnowledgeFileId, userAccount);
+        if (priorKnowledgeFile == null) {
+            throw new NotFoundByIdException(priorKnowledgeFileId);
+        }
+        Path priorKnowledgePath = Paths.get(map.get("dataDir"), priorKnowledgeFile.getName());
+
+        commands.add("--knowledge");
+        commands.add(priorKnowledgePath.toAbsolutePath().toString());
 
         // Algorithm parameters
         FgsContinuousParameters algorithmParameters = newJob.getAlgorithmParameters();
 
         commands.add("--delimiter");
-        commands.add(getFileDelimiter(newJob.getDataFileId()));
+        commands.add(getFileDelimiter(newJob.getDatasetFileId()));
 
         commands.add("--penalty-discount");
         commands.add(Double.toString(algorithmParameters.getPenaltyDiscount()));
@@ -460,7 +493,7 @@ public class JobQueueEndpointService {
         // Algorithm result file name
         String fileName;
 
-        DataFile df = dataFileService.findByIdAndUserAccount(dataFileId, userAccount);
+        DataFile df = dataFileService.findByIdAndUserAccount(datasetFileId, userAccount);
         fileName = String.format("%s_%s_%d", algorithm, df.getName(), currentTime);
 
         commands.add("--output-prefix");

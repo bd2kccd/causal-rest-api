@@ -515,8 +515,8 @@ This POST request will summarize the dataset file and generate a response (JSON 
   "creationTime": 1467134048000,
   "lastModifiedTime": 1467134048000,
   "fileSize": 3309465,
+  "md5checkSum": "b1db7511ee293d297e3055d9a7b46c5e",
   "fileSummary": {
-    "md5checkSum": "b1db7511ee293d297e3055d9a7b46c5e",
     "variableType": "continuous",
     "fileDelimiter": "tab",
     "numOfRows": 302,
@@ -657,7 +657,8 @@ Currently we support "FGS continuous", "FGS discrete" and "GFCI continuous". The
 
 | Input JSON Fields | Description |
 | --- | --- |
-| `dataFileId` | The data file ID, integer |
+| `datasetFileId` | The dataset file ID, integer |
+| `priorKnowledgeFileId` | The prior knowledge file ID, integer |
 | `dataValidation` | Algorithm specific input data validation flags, JSON object |
 | `algorithmParameters` | Algorithm specific parameters, JSON object |
 | `jvmOptions` | Advanced Options For Java Virtual Machine (JVM), JSON object. Currently only support `maxHeapSize` (Gigabyte, max value is 100) |
@@ -744,7 +745,8 @@ Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL
 Content-Type: application/json
 
 {
-    "dataFileId": 8,
+    "datasetFileId": 8,
+    "priorKnowledgeFileId": 9,
     "dataValidation": {
       "nonZeroVariance": false,
       "uniqueVarName": false
@@ -790,7 +792,8 @@ Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL
 Content-Type: application/json
 
 {
-    "dataFileId": 9,
+    "datasetFileId": 10,
+    "priorKnowledgeFileId": 12,
     "dataValidation": {
       "uniqueVarName": false,
       "limitNumOfCategory": false
