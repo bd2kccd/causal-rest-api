@@ -85,6 +85,8 @@ public class JwtEndpointService {
         userAccount.setPublicKey(jwt);
         userAccountService.save(userAccount);
 
+        LOGGER.info("Added JWT for user id %d", uid);
+
         // Return the jwt to API consumer
         JwtDTO jwtDTO = new JwtDTO();
         jwtDTO.setUserId(uid);
