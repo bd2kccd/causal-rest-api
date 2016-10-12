@@ -3,15 +3,15 @@ package edu.pitt.dbmi.ccd.causal.rest.api.dto;
 import org.springframework.beans.factory.annotation.Value;
 
 /**
- * 
+ *
  * Oct 3, 2016 6:18:45 PM
- * 
+ *
  * @author Chirayu (Kong) Wongchokprasitti, PhD (chw20@pitt.edu)
- * 
+ *
  */
 public class FciParameters {
 
-    @Value("3")
+    @Value("100")
     protected int maxInDegree;
 
     @Value("true")
@@ -43,6 +43,5 @@ public class FciParameters {
     public void setVerbose(boolean verbose) {
         this.verbose = verbose;
     }
-
 
 }
