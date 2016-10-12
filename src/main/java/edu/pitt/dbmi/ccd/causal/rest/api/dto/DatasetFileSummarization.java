@@ -18,44 +18,42 @@
  */
 package edu.pitt.dbmi.ccd.causal.rest.api.dto;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
+import javax.validation.constraints.NotNull;
+import org.hibernate.validator.constraints.NotBlank;
+import org.hibernate.validator.constraints.Range;
 
 /**
- * This DTO is used inside DataFileDTO
+ * This bean is used to get form data when user wants to summarize a data file
  *
  * @author Zhou Yuan (zhy19@pitt.edu)
  */
-@XmlRootElement(name = "fileSummary")
-@XmlAccessorType(XmlAccessType.FIELD)
-public class DataFileSummaryDTO {
+public class DatasetFileSummarization {
 
-    @XmlElement
-    private String md5checkSum;
+    @NotNull
+    @Range(min = 1, max = Long.MAX_VALUE)
+    private Long id;
 
-    @XmlElement(nillable = true)
+    /*
+     * We'll convert the string value to VariableType object
+     */
+    @NotBlank(message = "Please specify the variable type.")
     private String variableType;
 
-    @XmlElement(nillable = true)
+    /*
+     * We'll convert the string value to FileDelimiter object
+     */
+    @NotBlank(message = "Please specify the file delimiter.")
     private String fileDelimiter;
 
-    @XmlElement(nillable = true)
-    private Integer numOfRows;
-
-    @XmlElement(nillable = true)
-    private Integer numOfColumns;
-
-    public DataFileSummaryDTO() {
+    public DatasetFileSummarization() {
     }
 
-    public String getMd5checkSum() {
-        return md5checkSum;
+    public Long getId() {
+        return id;
     }
 
-    public void setMd5checkSum(String md5checkSum) {
-        this.md5checkSum = md5checkSum;
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getVariableType() {
@@ -72,21 +70,5 @@ public class DataFileSummaryDTO {
 
     public void setFileDelimiter(String fileDelimiter) {
         this.fileDelimiter = fileDelimiter;
-    }
-
-    public Integer getNumOfRows() {
-        return numOfRows;
-    }
-
-    public void setNumOfRows(Integer numOfRows) {
-        this.numOfRows = numOfRows;
-    }
-
-    public Integer getNumOfColumns() {
-        return numOfColumns;
-    }
-
-    public void setNumOfColumns(Integer numOfColumns) {
-        this.numOfColumns = numOfColumns;
     }
 }

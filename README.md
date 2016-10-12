@@ -117,10 +117,12 @@ And all the following examples will be issued by user `22` whose password is `12
 
 #### Upload small data file
 
+At this point, you can upload two types of data files: tabular dataset file(either tab delimited or comma delimited) and prior knowledge file.
+
 API Endpoint URI pattern:
 
 ````
-POST https://cloud.ccd.pitt.edu/ccd-api/{userId}/data/upload
+POST https://cloud.ccd.pitt.edu/ccd-api/{userId}/upload/dataset
 ````
 
 This is a multipart file upload via an HTML form, and the client is required to use `name="file"` to name their file upload field in their form.
@@ -128,7 +130,7 @@ This is a multipart file upload via an HTML form, and the client is required to 
 Generated HTTP request code example:
 
 ````
-POST /ccd-api/22/data/upload HTTP/1.1
+POST /ccd-api/22/upload/dataset HTTP/1.1
 Host: cloud.ccd.pitt.edu
 Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL2Nsb3VkLmNjZC5waXR0LmVkdS8iLCJuYW1lIjoiemh5MTkiLCJleHAiOjE0NzU4NTA2NzY4MDQsImlhdCI6MTQ3NTg0NzA3NjgwNH0.8azVEoNPfETczXb-vn7dfyDd98eRt7iiLBXehGpPGzY
 Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
@@ -149,11 +151,11 @@ If the Authorization header is not provided, the response will look like this:
   "status": 401,
   "error": "Unauthorized",
   "message": "User credentials are required.",
-  "path": "/22/data/upload"
+  "path": "/22/upload/dataset"
 }
 ````
 
-This POST request will upload the data file to the target server location and add corresponding records into database. And the response will contain the following pieces:
+This POST request will upload the dataset file to the target server location and add corresponding records into database. And the response will contain the following pieces:
 
 ````javascript
 {
@@ -162,13 +164,33 @@ This POST request will upload the data file to the target server location and ad
     "creationTime": 1466622267000,
     "lastModifiedTime": 1466622267000,
     "fileSize": 3309465,
+    "md5checkSum": "b1db7511ee293d297e3055d9a7b46c5e",
     "fileSummary": {
-      "md5checkSum": "b1db7511ee293d297e3055d9a7b46c5e",
       "variableType": null,
       "fileDelimiter": null,
       "numOfRows": null,
       "numOfColumns": null
     }
+  }
+````
+
+The prior knowledge file upload uses a similar API endpoint:
+
+````
+POST https://cloud.ccd.pitt.edu/ccd-api/{userId}/upload/priorknowledge
+````
+
+Due to there's no need to summarize a prior knowledge file, the response of a successful prior knowledge file upload will look like:
+
+
+````javascript
+{
+    "id": 6,
+    "name": "Lung-tetrad_hv.txt",
+    "creationTime": 1466622267000,
+    "lastModifiedTime": 1466622267000,
+    "fileSize": 3309465,
+    "md5checkSum": "ugdb7511rt293d29ke3055d9a7b46c9k"
   }
 ````
 
@@ -180,9 +202,9 @@ and resumable uploads via the HTML5 File API. You can also create your own clien
 API Endpoint URI pattern:
 
 ````
-GET https://cloud.ccd.pitt.edu/ccd-api/{userId}/data/chunkUpload
+GET https://cloud.ccd.pitt.edu/ccd-api/{userId}/upload/chunk
 
-POST https://cloud.ccd.pitt.edu/ccd-api/{userId}/data/chunkUpload
+POST https://cloud.ccd.pitt.edu/ccd-api/{userId}/upload/chunk
 ````
 
 In this example, the data file is splited into 3 chunks. The upload of each chunk consists of a GET request and a POST request. To handle the state of upload chunks, a number of extra parameters are sent along with all requests:
@@ -200,7 +222,7 @@ In this example, the data file is splited into 3 chunks. The upload of each chun
 Generated HTTP request code example:
 
 ````
-GET /ccd-api/22/data/chunkUpload?resumableChunkNumber=2&resumableChunkSize=1048576&resumableCurrentChunkSize=1048576&resumableTotalSize=3309465&resumableType=text%2Fplain&resumableIdentifier=3309465-large-datatxt&resumableFilename=large-data.txt&resumableRelativePath=large-data.txt&resumableTotalChunks=3 HTTP/1.1
+GET /ccd-api/22/upload/chunk?resumableChunkNumber=2&resumableChunkSize=1048576&resumableCurrentChunkSize=1048576&resumableTotalSize=3309465&resumableType=text%2Fplain&resumableIdentifier=3309465-large-datatxt&resumableFilename=large-data.txt&resumableRelativePath=large-data.txt&resumableTotalChunks=3 HTTP/1.1
 Host: cloud.ccd.pitt.edu
 Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL2Nsb3VkLmNjZC5waXR0LmVkdS8iLCJuYW1lIjoiemh5MTkiLCJleHAiOjE0NzU4NTA2NzY4MDQsImlhdCI6MTQ3NTg0NzA3NjgwNH0.8azVEoNPfETczXb-vn7dfyDd98eRt7iiLBXehGpPGzY
 ````
@@ -210,7 +232,7 @@ This GET request checks if the data chunk is already on the server side. If the 
 Generated HTTP request code example:
 
 ````
-POST /ccd-api/22/data/chunkUpload HTTP/1.1
+POST /ccd-api/22/upload/chunk HTTP/1.1
 Host: cloud.ccd.pitt.edu
 Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL2Nsb3VkLmNjZC5waXR0LmVkdS8iLCJuYW1lIjoiemh5MTkiLCJleHAiOjE0NzU4NTA2NzY4MDQsImlhdCI6MTQ3NTg0NzA3NjgwNH0.8azVEoNPfETczXb-vn7dfyDd98eRt7iiLBXehGpPGzY
 Content-Type: multipart/form-data; boundary=----WebKitFormBoundaryMFjgApg56XGyeTnZ
@@ -268,24 +290,24 @@ And finally the md5checkSum string of the reassemabled file will be returned onc
 b1db7511ee293d297e3055d9a7b46c5e
 ````
 
-#### List all data files of a user
+#### List all dataset files of a user
 
 API Endpoint URI pattern:
 
 ````
-POST https://cloud.ccd.pitt.edu/ccd-api/{userId}/data
+GET https://cloud.ccd.pitt.edu/ccd-api/{userId}/dataset
 ````
 
 Generated HTTP request code example:
 
 ````
-GET /ccd-api/22/data HTTP/1.1
+GET /ccd-api/22/dataset HTTP/1.1
 Host: cloud.ccd.pitt.edu
 Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL2Nsb3VkLmNjZC5waXR0LmVkdS8iLCJuYW1lIjoiemh5MTkiLCJleHAiOjE0NzU4NTA2NzY4MDQsImlhdCI6MTQ3NTg0NzA3NjgwNH0.8azVEoNPfETczXb-vn7dfyDd98eRt7iiLBXehGpPGzY
 Accept: application/json
 ````
 
-A `JSON` formatted list of all the input data files that are associated with user `22` will be returned.
+A `JSON` formatted list of all the input dataset files that are associated with user `22` will be returned.
 
 ````javascript
 [
@@ -295,8 +317,8 @@ A `JSON` formatted list of all the input data files that are associated with use
     "creationTime": 1467132449000,
     "lastModifiedTime": 1467132449000,
     "fileSize": 278428,
+    "md5checkSum": "ed5f27a2cf94fe3735a5d9ed9191c382",
     "fileSummary": {
-      "md5checkSum": "ed5f27a2cf94fe3735a5d9ed9191c382",
       "variableType": "continuous",
       "fileDelimiter": "tab",
       "numOfRows": 302,
@@ -309,8 +331,8 @@ A `JSON` formatted list of all the input data files that are associated with use
     "creationTime": 1467134048000,
     "lastModifiedTime": 1467134048000,
     "fileSize": 3309465,
+    "md5checkSum": "b1db7511ee293d297e3055d9a7b46c5e",
     "fileSummary": {
-      "md5checkSum": "b1db7511ee293d297e3055d9a7b46c5e",
       "variableType": null,
       "fileDelimiter": null,
       "numOfRows": null,
@@ -323,8 +345,8 @@ A `JSON` formatted list of all the input data files that are associated with use
     "creationTime": 1467140415000,
     "lastModifiedTime": 1467140415000,
     "fileSize": 3309465,
+    "md5checkSum": "b1db7511ee293d297e3055d9a7b46c5e",
     "fileSummary": {
-      "md5checkSum": "b1db7511ee293d297e3055d9a7b46c5e",
       "variableType": "continuous",
       "fileDelimiter": "tab",
       "numOfRows": 302,
@@ -339,7 +361,7 @@ You can also specify the response format as XML in your request
 Generated HTTP request code example:
 
 ````
-GET /ccd-api/22/data HTTP/1.1
+GET /ccd-api/22/dataset HTTP/1.1
 Host: cloud.ccd.pitt.edu
 Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL2Nsb3VkLmNjZC5waXR0LmVkdS8iLCJuYW1lIjoiemh5MTkiLCJleHAiOjE0NzU4NTA2NzY4MDQsImlhdCI6MTQ3NTg0NzA3NjgwNH0.8azVEoNPfETczXb-vn7dfyDd98eRt7iiLBXehGpPGzY
 Accept: application/xml
@@ -349,66 +371,66 @@ And the response will look like this:
 
 ````xml
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<dataFileDTOes>
-    <dataFile>
+<datasetFileDTOes>
+    <datasetFile>
         <id>8</id>
         <name>data_small.txt</name>
         <creationTime>2016-06-28T12:47:29-04:00</creationTime>
         <lastModifiedTime>2016-06-28T12:47:29-04:00</lastModifiedTime>
         <fileSize>278428</fileSize>
+        <md5checkSum>ed5f27a2cf94fe3735a5d9ed9191c382</md5checkSum>
         <fileSummary>
             <fileDelimiter>tab</fileDelimiter>
-            <md5checkSum>ed5f27a2cf94fe3735a5d9ed9191c382</md5checkSum>
             <numOfColumns>123</numOfColumns>
             <numOfRows>302</numOfRows>
             <variableType>continuous</variableType>
         </fileSummary>
-    </dataFile>
-    <dataFile>
+    </datasetFile>
+    <datasetFile>
         <id>10</id>
         <name>large-data.txt</name>
         <creationTime>2016-06-28T13:14:08-04:00</creationTime>
         <lastModifiedTime>2016-06-28T13:14:08-04:00</lastModifiedTime>
         <fileSize>3309465</fileSize>
+        <md5checkSum>b1db7511ee293d297e3055d9a7b46c5e</md5checkSum>
         <fileSummary>
-            <md5checkSum>b1db7511ee293d297e3055d9a7b46c5e</md5checkSum>
             <variableType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"/>
             <fileDelimiter xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"/>
             <numOfRows xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"/>
             <numOfColumns xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"/>
         </fileSummary>
-    </dataFile>
-    <dataFile>
+    </datasetFile>
+    <datasetFile>
         <id>11</id>
         <name>Lung-tetrad_hv (copy).txt</name>
         <creationTime>2016-06-28T15:00:15-04:00</creationTime>
         <lastModifiedTime>2016-06-28T15:00:15-04:00</lastModifiedTime>
         <fileSize>3309465</fileSize>
+        <md5checkSum>b1db7511ee293d297e3055d9a7b46c5e</md5checkSum>
         <fileSummary>
             <fileDelimiter>tab</fileDelimiter>
-            <md5checkSum>b1db7511ee293d297e3055d9a7b46c5e</md5checkSum>
             <numOfColumns>608</numOfColumns>
             <numOfRows>302</numOfRows>
             <variableType>continuous</variableType>
         </fileSummary>
-    </dataFile>
-</dataFileDTOes>
+    </datasetFile>
+</datasetFileDTOes>
 ````
 
-Form the above output, we can also tell that data file with ID 10 doesn't have all the `fileSummary` field values set, we'll cover this in the data summarization section.
+Form the above output, we can also tell that data file with ID 10 doesn't have all the `fileSummary` field values set, we'll cover this in the dataset summarization section.
 
-#### Get the deatil information of a data file based on ID
+#### Get the deatil information of a dataset file based on ID
 
 API Endpoint URI pattern:
 
 ````
-GET https://cloud.ccd.pitt.edu/ccd-api/{userId}/data/{id}
+GET https://cloud.ccd.pitt.edu/ccd-api/{userId}/dataset/{id}
 ````
 
 Generated HTTP request code example:
 
 ````
-GET /ccd-api/22/data/8 HTTP/1.1
+GET /ccd-api/22/dataset/8 HTTP/1.1
 Host: cloud.ccd.pitt.edu
 Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL2Nsb3VkLmNjZC5waXR0LmVkdS8iLCJuYW1lIjoiemh5MTkiLCJleHAiOjE0NzU4NTA2NzY4MDQsImlhdCI6MTQ3NTg0NzA3NjgwNH0.8azVEoNPfETczXb-vn7dfyDd98eRt7iiLBXehGpPGzY
 ````
@@ -432,18 +454,18 @@ And the resulting response looks like this:
 }
 ````
 
-#### Delete physical data file and all records from database for a given file ID
+#### Delete physical dataset file and all records from database for a given file ID
 
 API Endpoint URI pattern:
 
 ````
-DELETE https://cloud.ccd.pitt.edu/ccd-api/{userId}/data/{id}
+DELETE https://cloud.ccd.pitt.edu/ccd-api/{userId}/dataset/{id}
 ````
 
 Generated HTTP request code example:
 
 ````
-DELETE /ccd-api/22/data/8 HTTP/1.1
+DELETE /ccd-api/22/dataset/8 HTTP/1.1
 Host: cloud.ccd.pitt.edu
 Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL2Nsb3VkLmNjZC5waXR0LmVkdS8iLCJuYW1lIjoiemh5MTkiLCJleHAiOjE0NzU4NTA2NzY4MDQsImlhdCI6MTQ3NTg0NzA3NjgwNH0.8azVEoNPfETczXb-vn7dfyDd98eRt7iiLBXehGpPGzY
 ````
@@ -451,7 +473,7 @@ Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL
 And this will result a HTTP 204 No Content status in response on success, which means the server successfully processed the deletion request but there's no content to response.
 
 
-#### Summarize data file
+#### Summarize dataset file
 
 So from the first example we can tell that file with ID 10 doesn't have `variableType`, `fileDelimiter`, `numOfRows`, and `numOfColumns` specified under `fileSummary`. Among these attributes, variableType` and `fileDelimiter` are the ones that users will need to provide during this summarization process.
 
@@ -466,13 +488,13 @@ Before we can go ahead to run the desired algorithm with the newly uploaded data
 API Endpoint URI pattern:
 
 ````
-POST https://cloud.ccd.pitt.edu/ccd-api/{userId}/data/summarize
+POST https://cloud.ccd.pitt.edu/ccd-api/{userId}/dataset/summarize
 ````
 
 Generated HTTP request code example:
 
 ````
-POST /ccd-api/22/data/summarize HTTP/1.1
+POST /ccd-api/22/dataset/summarize HTTP/1.1
 Host: cloud.ccd.pitt.edu
 Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL2Nsb3VkLmNjZC5waXR0LmVkdS8iLCJuYW1lIjoiemh5MTkiLCJleHAiOjE0NzU4NTA2NzY4MDQsImlhdCI6MTQ3NTg0NzA3NjgwNH0.8azVEoNPfETczXb-vn7dfyDd98eRt7iiLBXehGpPGzY
 Content-Type: application/json
@@ -484,7 +506,7 @@ Content-Type: application/json
 }
 ````
 
-This POST request will summarize the data file and generate a response (JSON or XML) like below:
+This POST request will summarize the dataset file and generate a response (JSON or XML) like below:
 
 ````javascript
 {
@@ -502,6 +524,93 @@ This POST request will summarize the data file and generate a response (JSON or 
   }
 }
 ````
+
+#### List all prior knowledge files of a given user
+
+API Endpoint URI pattern:
+
+````
+GET https://cloud.ccd.pitt.edu/ccd-api/{userId}/priorknowledge
+````
+
+Generated HTTP request code example:
+
+````
+GET /ccd-api/22/priorknowledge HTTP/1.1
+Host: cloud.ccd.pitt.edu
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL2Nsb3VkLmNjZC5waXR0LmVkdS8iLCJuYW1lIjoiemh5MTkiLCJleHAiOjE0NzU4NTA2NzY4MDQsImlhdCI6MTQ3NTg0NzA3NjgwNH0.8azVEoNPfETczXb-vn7dfyDd98eRt7iiLBXehGpPGzY
+Accept: application/json
+````
+
+A `JSON` formatted list of all the input dataset files that are associated with user `22` will be returned.
+
+````javascript
+[
+  {
+    "id": 9,
+    "name": "data_small.prior",
+    "creationTime": 1467132449000,
+    "lastModifiedTime": 1467132449000,
+    "fileSize": 278428,
+    "md5checkSum": "ed5f27a2cf94fe3735a5d9ed9191c382"
+  },
+  {
+    "id": 12,
+    "name": "large-data.prior",
+    "creationTime": 1467134048000,
+    "lastModifiedTime": 1467134048000,
+    "fileSize": 3309465,
+    "md5checkSum": "b1db7511ee293d297e3055d9a7b46c5e"
+  }
+]
+````
+
+#### Get the deatil information of a prior knowledge file based on ID
+
+API Endpoint URI pattern:
+
+````
+GET https://cloud.ccd.pitt.edu/ccd-api/{userId}/priorknowledge/{id}
+````
+
+Generated HTTP request code example:
+
+````
+GET /ccd-api/22/priorknowledge/9 HTTP/1.1
+Host: cloud.ccd.pitt.edu
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL2Nsb3VkLmNjZC5waXR0LmVkdS8iLCJuYW1lIjoiemh5MTkiLCJleHAiOjE0NzU4NTA2NzY4MDQsImlhdCI6MTQ3NTg0NzA3NjgwNH0.8azVEoNPfETczXb-vn7dfyDd98eRt7iiLBXehGpPGzY
+````
+
+And the resulting response looks like this:
+
+````javascript
+{
+  "id": 9,
+  "name": "data_small.prior",
+  "creationTime": 1467132449000,
+  "lastModifiedTime": 1467132449000,
+  "fileSize": 278428,
+  "md5checkSum": "ed5f27a2cf94fe3735a5d9ed9191c382"
+}
+````
+
+#### Delete physical prior knowledge file and all records from database for a given file ID
+
+API Endpoint URI pattern:
+
+````
+DELETE https://cloud.ccd.pitt.edu/ccd-api/{userId}/priorknowledge/{id}
+````
+
+Generated HTTP request code example:
+
+````
+DELETE /ccd-api/22/priorknowledge/9 HTTP/1.1
+Host: cloud.ccd.pitt.edu
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL2Nsb3VkLmNjZC5waXR0LmVkdS8iLCJuYW1lIjoiemh5MTkiLCJleHAiOjE0NzU4NTA2NzY4MDQsImlhdCI6MTQ3NTg0NzA3NjgwNH0.8azVEoNPfETczXb-vn7dfyDd98eRt7iiLBXehGpPGzY
+````
+
+And this will result a HTTP 204 No Content status in response on success, which means the server successfully processed the deletion request but there's no content to response.
 
 ### 2. Causal Discovery
 

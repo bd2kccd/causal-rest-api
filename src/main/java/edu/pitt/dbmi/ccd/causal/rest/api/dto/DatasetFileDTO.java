@@ -30,9 +30,9 @@ import javax.xml.bind.annotation.XmlRootElement;
  *
  * @author Kevin V. Bui (kvb2@pitt.edu)
  */
-@XmlRootElement(name = "dataFile")
+@XmlRootElement(name = "datasetFile")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class DataFileDTO {
+public class DatasetFileDTO {
 
     @XmlElement
     private Long id;
@@ -50,9 +50,12 @@ public class DataFileDTO {
     private long fileSize;
 
     @XmlElement
-    private DataFileSummaryDTO fileSummary;
+    private String md5checkSum;
 
-    public DataFileDTO() {
+    @XmlElement
+    private DatasetFileSummaryDTO fileSummary;
+
+    public DatasetFileDTO() {
     }
 
     public Long getId() {
@@ -95,11 +98,19 @@ public class DataFileDTO {
         this.fileSize = fileSize;
     }
 
-    public DataFileSummaryDTO getFileSummary() {
+    public String getMd5checkSum() {
+        return md5checkSum;
+    }
+
+    public void setMd5checkSum(String md5checkSum) {
+        this.md5checkSum = md5checkSum;
+    }
+
+    public DatasetFileSummaryDTO getFileSummary() {
         return fileSummary;
     }
 
-    public void setFileSummary(DataFileSummaryDTO fileSummary) {
+    public void setFileSummary(DatasetFileSummaryDTO fileSummary) {
         this.fileSummary = fileSummary;
     }
 }
