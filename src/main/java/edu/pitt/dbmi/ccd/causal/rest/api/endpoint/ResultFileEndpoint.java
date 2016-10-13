@@ -21,13 +21,17 @@ package edu.pitt.dbmi.ccd.causal.rest.api.endpoint;
 import edu.pitt.dbmi.ccd.causal.rest.api.Role;
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.ResultComparisonFileDTO;
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.ResultFileDTO;
+import edu.pitt.dbmi.ccd.causal.rest.api.dto.ResultFilesToCompare;
 import edu.pitt.dbmi.ccd.causal.rest.api.service.ResultFileEndpointService;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
+import javax.validation.Valid;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -148,17 +152,18 @@ public class ResultFileEndpoint {
      * request using Accept header) will be used for not found exception
      *
      * @param uid
-     * @param fileNames
+     * @param resultFiles
      * @return The comparison result text file content
      * @throws IOException
      */
-    @GET
-    @Path("/compare/{fileNames}")
+    @POST
+    @Path("/compare")
+    @Consumes(APPLICATION_JSON)
     @Produces({TEXT_PLAIN, APPLICATION_JSON, APPLICATION_XML})
     @RolesAllowed(Role.USER)
-    public Response compareAlgorithmResults(@PathParam("uid") Long uid, @PathParam("fileNames") String fileNames) throws IOException {
+    public Response compareAlgorithmResults(@PathParam("uid") Long uid, @Valid ResultFilesToCompare resultFiles) throws IOException {
         // Get the result comparsion file content and file name
-        ResultComparisonFileDTO comparisonFileDTO = algorithmResultEndpointService.compareAlgorithmResults(uid, fileNames);
+        ResultComparisonFileDTO comparisonFileDTO = algorithmResultEndpointService.compareAlgorithmResults(uid, resultFiles);
 
         return Response.ok(comparisonFileDTO.getFile())
                 .header("Content-Disposition", "attachment; filename=" + comparisonFileDTO.getFileName())

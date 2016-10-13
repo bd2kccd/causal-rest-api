@@ -22,6 +22,7 @@ import edu.pitt.dbmi.ccd.causal.rest.api.dto.ResultComparison;
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.ResultComparisonData;
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.ResultComparisonFileDTO;
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.ResultFileDTO;
+import edu.pitt.dbmi.ccd.causal.rest.api.dto.ResultFilesToCompare;
 import edu.pitt.dbmi.ccd.causal.rest.api.exception.ResourceNotFoundException;
 import edu.pitt.dbmi.ccd.causal.rest.api.prop.CausalRestProperties;
 import edu.pitt.dbmi.ccd.commons.file.info.BasicFileInfo;
@@ -214,10 +215,10 @@ public class ResultFileEndpointService {
      * Handles the comparison of multi result files
      *
      * @param uid
-     * @param fileNames
+     * @param resultFiles
      * @return Comparison result
      */
-    public ResultComparisonFileDTO compareAlgorithmResults(Long uid, String fileNames) {
+    public ResultComparisonFileDTO compareAlgorithmResults(Long uid, ResultFilesToCompare resultFiles) {
         // When we can get here vai AuthFilterSerice, it means the user exists
         // so no need to check if (userAccount == null) and throw UserNotFoundException(uid)
         UserAccount userAccount = userAccountService.findById(uid);
@@ -229,8 +230,8 @@ public class ResultFileEndpointService {
         String algorithmFolder = causalRestProperties.getAlgorithmFolder();
         String comparisonFolder = causalRestProperties.getComparisonFolder();
 
-        // Split the concatenated file names
-        List<String> items = Arrays.asList(fileNames.split("!!"));
+        // Get all the filenames from request bean
+        List<String> items = Arrays.asList(resultFiles.getResultFiles());
 
         List<SimpleGraph> graphs = new LinkedList<>();
         items.forEach(fileName -> {

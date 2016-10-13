@@ -990,15 +990,24 @@ Since we can list all the algorithm result files, based on the results, we can a
 API Endpoint URI pattern:
 
 ````
-GET https://cloud.ccd.pitt.edu/ccd-api/{userId}/results/compare/{result_file_name}!!{another_result_file_name}
+POST https://cloud.ccd.pitt.edu/ccd-api/{userId}/results/compare
 ````
+
+The request body is a JSON that contains an array of result files to be compared.
 
 Generated HTTP request code example:
 
 ````
-GET /ccd-api/22/results/compare/fgs_sim_data_20vars_100cases.csv_1466171729046.txt!!fgs_data_small.txt_1467305104859.txt HTTP/1.1
+POST /ccd-api/22/results/compare HTTP/1.1
 Host: cloud.ccd.pitt.edu
 Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL2Nsb3VkLmNjZC5waXR0LmVkdS8iLCJuYW1lIjoiemh5MTkiLCJleHAiOjE0NzU4NTA2NzY4MDQsImlhdCI6MTQ3NTg0NzA3NjgwNH0.8azVEoNPfETczXb-vn7dfyDd98eRt7iiLBXehGpPGzY
+
+{
+  "resultFiles": [
+    "gs_sim_data_20vars_100cases.csv_1466171729046.txt",
+    "fgs_data_small.txt_1467305104859.txt"
+  ]
+}
 ````
 When you specify multiple file names, use the `!!` as a delimiter. This request will generate a result comparison file with the following content (shortened version):
 
