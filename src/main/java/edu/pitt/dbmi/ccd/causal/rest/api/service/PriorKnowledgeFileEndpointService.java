@@ -9,7 +9,6 @@ import edu.pitt.dbmi.ccd.causal.rest.api.dto.PriorKnowledgeFileDTO;
 import edu.pitt.dbmi.ccd.causal.rest.api.exception.InternalErrorException;
 import edu.pitt.dbmi.ccd.causal.rest.api.exception.NotFoundByIdException;
 import edu.pitt.dbmi.ccd.causal.rest.api.exception.UserNotFoundException;
-import edu.pitt.dbmi.ccd.causal.rest.api.prop.CausalRestProperties;
 import edu.pitt.dbmi.ccd.db.entity.DataFile;
 import edu.pitt.dbmi.ccd.db.entity.DataFileInfo;
 import edu.pitt.dbmi.ccd.db.entity.UserAccount;
@@ -33,18 +32,14 @@ public class PriorKnowledgeFileEndpointService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PriorKnowledgeFileEndpointService.class);
 
-    private final CausalRestProperties causalRestProperties;
-
     private final UserAccountService userAccountService;
 
     private final DataFileService dataFileService;
 
     @Autowired
     public PriorKnowledgeFileEndpointService(
-            CausalRestProperties causalRestProperties,
             UserAccountService userAccountService,
             DataFileService dataFileService) {
-        this.causalRestProperties = causalRestProperties;
         this.userAccountService = userAccountService;
         this.dataFileService = dataFileService;
     }
@@ -111,7 +106,7 @@ public class PriorKnowledgeFileEndpointService {
             Files.deleteIfExists(Paths.get(dataFile.getAbsolutePath(), dataFile.getName()));
             LOGGER.info(String.format("Prior knowledge file '%s' (id=%d) has been deleted.", dataFile.getName(), id));
         } catch (Exception exception) {
-            String errMsg = String.format("Unable to delete Prior knowledge file id=%d.", id);
+            String errMsg = String.format("Unable to delete prior knowledge file id=%d.", id);
             LOGGER.error(errMsg, exception);
             throw new InternalErrorException(errMsg);
         }
