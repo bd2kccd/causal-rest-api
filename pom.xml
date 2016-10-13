@@ -14,7 +14,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>1.3.5.RELEASE</version>
+		<version>1.4.1.RELEASE</version>
 		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
 
@@ -85,6 +85,7 @@
 
 	</dependencies>
 
+        <!-- This makes the jar execuitable, don not use it with other dependencies, like ccd-db -->
 	<build>
 		<plugins>
 			<plugin>
