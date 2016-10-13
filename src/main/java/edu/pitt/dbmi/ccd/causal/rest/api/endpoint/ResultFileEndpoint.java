@@ -76,6 +76,10 @@ public class ResultFileEndpoint {
     /**
      * Download the content of a result file for a given file name
      *
+     * TEXT_PLAIN media type is the desired response type if result file exists.
+     * APPLICATION_JSON(default) or APPLICATION_XML(needs to be specified in
+     * request using Accept header) will be used for not found exception
+     *
      * @param uid
      * @param fileName
      * @return Plain text file content
@@ -114,6 +118,10 @@ public class ResultFileEndpoint {
 
     /**
      * Download the content of a results comparison file for a given file name
+     *
+     * TEXT_PLAIN media type is the desired response type if result file exists.
+     * APPLICATION_JSON(default) or APPLICATION_XML(needs to be specified in
+     * request using Accept header) will be used for not found exception
      *
      * @param uid
      * @param fileName
