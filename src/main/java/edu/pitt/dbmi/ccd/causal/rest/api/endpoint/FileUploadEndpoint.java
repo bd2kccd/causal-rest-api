@@ -22,6 +22,9 @@ import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
+import static javax.ws.rs.core.MediaType.APPLICATION_XML;
 import static javax.ws.rs.core.MediaType.MULTIPART_FORM_DATA;
 import javax.ws.rs.core.Response;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
@@ -66,6 +69,7 @@ public class FileUploadEndpoint {
     @POST
     @Path("/dataset")
     @Consumes(MULTIPART_FORM_DATA)
+    @Produces({APPLICATION_JSON, APPLICATION_XML})
     @RolesAllowed(Role.USER)
     public Response uploadDatasetFile(
             @PathParam("uid") Long uid,
@@ -98,6 +102,7 @@ public class FileUploadEndpoint {
     @POST
     @Path("/priorknowledge")
     @Consumes(MULTIPART_FORM_DATA)
+    @Produces({APPLICATION_JSON, APPLICATION_XML})
     @RolesAllowed(Role.USER)
     public Response uploadPriorKnowledgeFile(
             @PathParam("uid") Long uid,
