@@ -145,17 +145,16 @@ public class JobQueueEndpoint {
      *
      * @param uid
      * @param id
-     * @return 200 OK status code with JobInfoDTO object or 404 NOT_FOUND
+     * @return 200 OK status code with JobInfoDTO object or
+     * ResourceNotFoundException
      * @throws IOException
      */
     @GET
     @Path("/{id}")
+    @Produces({APPLICATION_JSON, APPLICATION_XML})
     @RolesAllowed(Role.USER)
     public Response jobStatus(@PathParam("uid") Long uid, @PathParam("id") Long id) throws IOException {
         JobInfoDTO jobInfoDTO = jobQueueEndpointService.checkJobStatus(uid, id);
-        if (jobInfoDTO == null) {
-            return Response.status(Status.NOT_FOUND).build();
-        }
         GenericEntity<JobInfoDTO> entity = new GenericEntity<JobInfoDTO>(jobInfoDTO) {
         };
         return Response.ok(entity).build();

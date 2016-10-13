@@ -30,6 +30,7 @@ import edu.pitt.dbmi.ccd.causal.rest.api.dto.GfciContinuousParameters;
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.JobInfoDTO;
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.JvmOptions;
 import edu.pitt.dbmi.ccd.causal.rest.api.exception.NotFoundByIdException;
+import edu.pitt.dbmi.ccd.causal.rest.api.exception.ResourceNotFoundException;
 import edu.pitt.dbmi.ccd.causal.rest.api.exception.UserNotFoundException;
 import edu.pitt.dbmi.ccd.causal.rest.api.prop.CausalRestProperties;
 import edu.pitt.dbmi.ccd.db.entity.DataFile;
@@ -632,28 +633,33 @@ public class JobQueueEndpointService {
      * @return jobInfoDTO
      */
     public JobInfoDTO checkJobStatus(Long uid, Long id) {
+        UserAccount userAccount = userAccountService.findById(uid);
+        if (userAccount == null) {
+            throw new UserNotFoundException(uid);
+        }
+
         JobQueueInfo job = jobQueueInfoService.findOne(id);
 
-        JobInfoDTO jobInfoDTO = null;
-
-        if (job != null) {
-            jobInfoDTO = new JobInfoDTO();
-
-            // Not listing data file name nor ID in response at this moment
-            jobInfoDTO.setId(job.getId()); // Job ID
-            jobInfoDTO.setAlgorithmName(job.getAlgorName());
-            jobInfoDTO.setStatus(job.getStatus());
-            jobInfoDTO.setAddedTime(job.getAddedTime());
-
-            String fileName = job.getFileName();
-            String resultJsonFileName = fileName + ".json";
-            fileName = fileName + ".txt";
-            String errorFileName = String.format("error_%s", fileName);
-
-            jobInfoDTO.setResultFileName(fileName);
-            jobInfoDTO.setResultJsonFileName(resultJsonFileName);
-            jobInfoDTO.setErrorResultFileName(errorFileName);
+        if (job == null) {
+            throw new ResourceNotFoundException(String.format("Unable to find job with ID: %d", id));
         }
+
+        JobInfoDTO jobInfoDTO = new JobInfoDTO();
+
+        // Not listing data file name nor ID in response at this moment
+        jobInfoDTO.setId(job.getId()); // Job ID
+        jobInfoDTO.setAlgorithmName(job.getAlgorName());
+        jobInfoDTO.setStatus(job.getStatus());
+        jobInfoDTO.setAddedTime(job.getAddedTime());
+
+        String fileName = job.getFileName();
+        String resultJsonFileName = fileName + ".json";
+        fileName = fileName + ".txt";
+        String errorFileName = String.format("error_%s", fileName);
+
+        jobInfoDTO.setResultFileName(fileName);
+        jobInfoDTO.setResultJsonFileName(resultJsonFileName);
+        jobInfoDTO.setErrorResultFileName(errorFileName);
 
         return jobInfoDTO;
     }
