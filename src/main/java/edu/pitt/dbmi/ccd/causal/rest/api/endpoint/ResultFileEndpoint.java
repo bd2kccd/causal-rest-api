@@ -143,6 +143,10 @@ public class ResultFileEndpoint {
     /**
      * Compare multi result files
      *
+     * TEXT_PLAIN media type is the desired response type if result file exists.
+     * APPLICATION_JSON(default) or APPLICATION_XML(needs to be specified in
+     * request using Accept header) will be used for not found exception
+     *
      * @param uid
      * @param fileNames
      * @return The comparison result text file content
@@ -150,6 +154,7 @@ public class ResultFileEndpoint {
      */
     @GET
     @Path("/compare/{fileNames}")
+    @Produces({TEXT_PLAIN, APPLICATION_JSON, APPLICATION_XML})
     @RolesAllowed(Role.USER)
     public Response compareAlgorithmResults(@PathParam("uid") Long uid, @PathParam("fileNames") String fileNames) throws IOException {
         // Get the result comparsion file content and file name

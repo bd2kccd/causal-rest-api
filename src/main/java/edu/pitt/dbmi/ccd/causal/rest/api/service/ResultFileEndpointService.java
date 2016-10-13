@@ -235,12 +235,15 @@ public class ResultFileEndpointService {
         List<SimpleGraph> graphs = new LinkedList<>();
         items.forEach(fileName -> {
             Path file = Paths.get(workspaceDir, username, resultsFolder, algorithmFolder, fileName);
-            if (Files.exists(file)) {
-                try (BufferedReader reader = Files.newBufferedReader(file, Charset.defaultCharset())) {
-                    graphs.add(SimpleGraphUtil.readInSimpleGraph(reader));
-                } catch (IOException exception) {
-                    LOGGER.error(String.format("Unable to read file '%s'.", fileName), exception);
-                }
+
+            if (!Files.exists(file)) {
+                throw new ResourceNotFoundException(String.format("Algorithm result file %s does not exist.", fileName));
+            }
+
+            try (BufferedReader reader = Files.newBufferedReader(file, Charset.defaultCharset())) {
+                graphs.add(SimpleGraphUtil.readInSimpleGraph(reader));
+            } catch (IOException exception) {
+                LOGGER.error(String.format("Unable to read file '%s'.", fileName), exception);
             }
         });
 
