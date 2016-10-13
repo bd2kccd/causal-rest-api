@@ -48,7 +48,8 @@ public class JwtEndpointService {
         StringTokenizer tokenizer = new StringTokenizer(credentials, ":");
         String username = tokenizer.nextToken();
 
-        // No need to check if the user exists, since the AuthFiter also done that check.
+        // When we can get here vai AuthFilterSerice, it means the user exists
+        // so no need to check if (userAccount == null) and throw UserNotFoundException(uid)
         UserAccount userAccount = userAccountService.findByUsername(username);
 
         // Note this uid is Long object, we'll need to use the numeric primitive long

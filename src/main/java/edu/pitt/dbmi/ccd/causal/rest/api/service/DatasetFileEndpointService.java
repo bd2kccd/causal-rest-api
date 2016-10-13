@@ -23,7 +23,6 @@ import edu.pitt.dbmi.ccd.causal.rest.api.dto.DatasetFileSummarization;
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.DatasetFileSummaryDTO;
 import edu.pitt.dbmi.ccd.causal.rest.api.exception.InternalErrorException;
 import edu.pitt.dbmi.ccd.causal.rest.api.exception.NotFoundByIdException;
-import edu.pitt.dbmi.ccd.causal.rest.api.exception.UserNotFoundException;
 import edu.pitt.dbmi.ccd.commons.file.info.FileInfos;
 import edu.pitt.dbmi.ccd.db.entity.DataFile;
 import edu.pitt.dbmi.ccd.db.entity.DataFileInfo;
@@ -83,10 +82,9 @@ public class DatasetFileEndpointService {
      * @param uid
      */
     public void deleteByIdAndUid(Long id, Long uid) {
+        // When we can get here vai AuthFilterSerice, it means the user exists
+        // so no need to check if (userAccount == null) and throw UserNotFoundException(uid)
         UserAccount userAccount = userAccountService.findById(uid);
-        if (userAccount == null) {
-            throw new UserNotFoundException(uid);
-        }
 
         DataFile dataFile = dataFileService.findByIdAndUserAccount(id, userAccount);
         if (dataFile == null) {
@@ -114,10 +112,9 @@ public class DatasetFileEndpointService {
      * @return
      */
     public DatasetFileDTO findByIdAndUid(Long id, Long uid) {
+        // When we can get here vai AuthFilterSerice, it means the user exists
+        // so no need to check if (userAccount == null) and throw UserNotFoundException(uid)
         UserAccount userAccount = userAccountService.findById(uid);
-        if (userAccount == null) {
-            throw new UserNotFoundException(uid);
-        }
 
         DataFile dataFile = dataFileService.findByIdAndUserAccount(id, userAccount);
         if (dataFile == null) {
@@ -170,10 +167,9 @@ public class DatasetFileEndpointService {
     public List<DatasetFileDTO> listAllDatasetFiles(Long uid) {
         List<DatasetFileDTO> dataFileDTOs = new LinkedList<>();
 
+        // When we can get here vai AuthFilterSerice, it means the user exists
+        // so no need to check if (userAccount == null) and throw UserNotFoundException(uid)
         UserAccount userAccount = userAccountService.findById(uid);
-        if (userAccount == null) {
-            throw new UserNotFoundException(uid);
-        }
 
         List<DataFile> dataFiles = dataFileService.findByUserAccount(userAccount);
         dataFiles.forEach(dataFile -> {
@@ -233,10 +229,9 @@ public class DatasetFileEndpointService {
     public DatasetFileDTO summarizeDatasetFile(Long uid, DatasetFileSummarization datasetFileSummarization) throws IOException {
         Long id = datasetFileSummarization.getId();
 
+        // When we can get here vai AuthFilterSerice, it means the user exists
+        // so no need to check if (userAccount == null) and throw UserNotFoundException(uid)
         UserAccount userAccount = userAccountService.findById(uid);
-        if (userAccount == null) {
-            throw new UserNotFoundException(uid);
-        }
 
         DataFile dataFile = dataFileService.findByIdAndUserAccount(id, userAccount);
         if (dataFile == null) {

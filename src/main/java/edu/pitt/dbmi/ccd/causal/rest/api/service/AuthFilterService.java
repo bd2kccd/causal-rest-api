@@ -140,7 +140,7 @@ public class AuthFilterService {
             Long uid = uidInteger.longValue();
 
             UserAccount userAccount = userAccountService.findById(uid);
-
+            // Since we check the user existence here, no need to check it again in each endpoint service
             if (userAccount == null) {
                 throw BEARER_AUTH_INVALID_JWT;
             }

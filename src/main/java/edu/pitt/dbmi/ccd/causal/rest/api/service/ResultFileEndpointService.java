@@ -23,7 +23,6 @@ import edu.pitt.dbmi.ccd.causal.rest.api.dto.ResultComparisonData;
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.ResultComparisonFileDTO;
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.ResultFileDTO;
 import edu.pitt.dbmi.ccd.causal.rest.api.exception.ResourceNotFoundException;
-import edu.pitt.dbmi.ccd.causal.rest.api.exception.UserNotFoundException;
 import edu.pitt.dbmi.ccd.causal.rest.api.prop.CausalRestProperties;
 import edu.pitt.dbmi.ccd.commons.file.info.BasicFileInfo;
 import edu.pitt.dbmi.ccd.commons.file.info.FileInfos;
@@ -77,10 +76,9 @@ public class ResultFileEndpointService {
      * @throws IOException
      */
     public List<ResultFileDTO> listAlgorithmResults(Long uid) throws IOException {
+        // When we can get here vai AuthFilterSerice, it means the user exists
+        // so no need to check if (userAccount == null) and throw UserNotFoundException(uid)
         UserAccount userAccount = userAccountService.findById(uid);
-        if (userAccount == null) {
-            throw new UserNotFoundException(uid);
-        }
 
         String username = userAccount.getUsername();
 
@@ -121,10 +119,9 @@ public class ResultFileEndpointService {
      * @return The algorithm result file
      */
     public File getAlgorithmResultFile(Long uid, String fileName) {
+        // When we can get here vai AuthFilterSerice, it means the user exists
+        // so no need to check if (userAccount == null) and throw UserNotFoundException(uid)
         UserAccount userAccount = userAccountService.findById(uid);
-        if (userAccount == null) {
-            throw new UserNotFoundException(uid);
-        }
 
         String username = userAccount.getUsername();
 
@@ -150,10 +147,9 @@ public class ResultFileEndpointService {
      * @throws IOException
      */
     public List<ResultFileDTO> listAlgorithmResultComparisons(Long uid) throws IOException {
+        // When we can get here vai AuthFilterSerice, it means the user exists
+        // so no need to check if (userAccount == null) and throw UserNotFoundException(uid)
         UserAccount userAccount = userAccountService.findById(uid);
-        if (userAccount == null) {
-            throw new UserNotFoundException(uid);
-        }
 
         String username = userAccount.getUsername();
 
@@ -194,10 +190,9 @@ public class ResultFileEndpointService {
      * @return The comparison file
      */
     public File getAlgorithmResultsComparisonFile(Long uid, String fileName) {
+        // When we can get here vai AuthFilterSerice, it means the user exists
+        // so no need to check if (userAccount == null) and throw UserNotFoundException(uid)
         UserAccount userAccount = userAccountService.findById(uid);
-        if (userAccount == null) {
-            throw new UserNotFoundException(uid);
-        }
 
         String username = userAccount.getUsername();
 
@@ -223,10 +218,9 @@ public class ResultFileEndpointService {
      * @return Comparison result
      */
     public ResultComparisonFileDTO compareAlgorithmResults(Long uid, String fileNames) {
+        // When we can get here vai AuthFilterSerice, it means the user exists
+        // so no need to check if (userAccount == null) and throw UserNotFoundException(uid)
         UserAccount userAccount = userAccountService.findById(uid);
-        if (userAccount == null) {
-            throw new UserNotFoundException(uid);
-        }
 
         String username = userAccount.getUsername();
 

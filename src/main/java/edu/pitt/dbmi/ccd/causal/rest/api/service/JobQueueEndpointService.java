@@ -31,7 +31,6 @@ import edu.pitt.dbmi.ccd.causal.rest.api.dto.JobInfoDTO;
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.JvmOptions;
 import edu.pitt.dbmi.ccd.causal.rest.api.exception.NotFoundByIdException;
 import edu.pitt.dbmi.ccd.causal.rest.api.exception.ResourceNotFoundException;
-import edu.pitt.dbmi.ccd.causal.rest.api.exception.UserNotFoundException;
 import edu.pitt.dbmi.ccd.causal.rest.api.prop.CausalRestProperties;
 import edu.pitt.dbmi.ccd.db.entity.DataFile;
 import edu.pitt.dbmi.ccd.db.entity.DataFileInfo;
@@ -107,10 +106,9 @@ public class JobQueueEndpointService {
     public JobInfoDTO addGfciContinuousNewJob(Long uid, GfciContinuousNewJob newJob) {
         String algorithm = causalRestProperties.getGfci();
 
+        // When we can get here vai AuthFilterSerice, it means the user exists
+        // so no need to check if (userAccount == null) and throw UserNotFoundException(uid)
         UserAccount userAccount = userAccountService.findById(uid);
-        if (userAccount == null) {
-            throw new UserNotFoundException(uid);
-        }
 
         // algorithmJarPath, dataDir, tmpDir, resultDir
         // will be used in all algorithms
@@ -255,10 +253,9 @@ public class JobQueueEndpointService {
     public JobInfoDTO addFgsDiscreteNewJob(Long uid, FgsDiscreteNewJob newJob) {
         String algorithm = causalRestProperties.getFgsDiscrete();
 
+        // When we can get here vai AuthFilterSerice, it means the user exists
+        // so no need to check if (userAccount == null) and throw UserNotFoundException(uid)
         UserAccount userAccount = userAccountService.findById(uid);
-        if (userAccount == null) {
-            throw new UserNotFoundException(uid);
-        }
 
         // algorithmJarPath, dataDir, tmpDir, resultDir
         // will be used in both "fgs" and "fgs-discrete"
@@ -403,10 +400,9 @@ public class JobQueueEndpointService {
     public JobInfoDTO addFgsContinuousNewJob(Long uid, FgsContinuousNewJob newJob) {
         String algorithm = causalRestProperties.getFgs();
 
+        // When we can get here vai AuthFilterSerice, it means the user exists
+        // so no need to check if (userAccount == null) and throw UserNotFoundException(uid)
         UserAccount userAccount = userAccountService.findById(uid);
-        if (userAccount == null) {
-            throw new UserNotFoundException(uid);
-        }
 
         // algorithmJarPath, dataDir, tmpDir, resultDir
         // will be used in both "fgs" and "fgs-discrete"
@@ -545,10 +541,9 @@ public class JobQueueEndpointService {
      * @return key-value mapping
      */
     private Map<String, String> createSharedMapping(Long uid) {
+        // When we can get here vai AuthFilterSerice, it means the user exists
+        // so no need to check if (userAccount == null) and throw UserNotFoundException(uid)
         UserAccount userAccount = userAccountService.findById(uid);
-        if (userAccount == null) {
-            throw new UserNotFoundException(uid);
-        }
 
         // Get the username
         String username = userAccount.getUsername();
@@ -592,10 +587,9 @@ public class JobQueueEndpointService {
     public List<JobInfoDTO> listAllJobs(Long uid) {
         List<JobInfoDTO> jobInfoDTOs = new LinkedList<>();
 
+        // When we can get here vai AuthFilterSerice, it means the user exists
+        // so no need to check if (userAccount == null) and throw UserNotFoundException(uid)
         UserAccount userAccount = userAccountService.findById(uid);
-        if (userAccount == null) {
-            throw new UserNotFoundException(uid);
-        }
 
         List<JobQueueInfo> jobs = jobQueueInfoService.findByUserAccounts(Collections.singleton(userAccount));
         jobs.forEach(job -> {
@@ -633,15 +627,14 @@ public class JobQueueEndpointService {
      * @return jobInfoDTO
      */
     public JobInfoDTO checkJobStatus(Long uid, Long id) {
+        // When we can get here vai AuthFilterSerice, it means the user exists
+        // so no need to check if (userAccount == null) and throw UserNotFoundException(uid)
         UserAccount userAccount = userAccountService.findById(uid);
-        if (userAccount == null) {
-            throw new UserNotFoundException(uid);
-        }
 
-        JobQueueInfo job = jobQueueInfoService.findOne(id);
+        JobQueueInfo job = jobQueueInfoService.findByIdAndUseraccount(id, userAccount);
 
         if (job == null) {
-            throw new ResourceNotFoundException(String.format("Unable to find job with ID: %d", id));
+            throw new ResourceNotFoundException(String.format("Unable to find job with ID %d for user with ID: %d", id, uid));
         }
 
         JobInfoDTO jobInfoDTO = new JobInfoDTO();
@@ -674,10 +667,9 @@ public class JobQueueEndpointService {
      * @return true on canceled or false if job is already completed
      */
     public boolean cancelJob(Long uid, Long id) {
+        // When we can get here vai AuthFilterSerice, it means the user exists
+        // so no need to check if (userAccount == null) and throw UserNotFoundException(uid)
         UserAccount userAccount = userAccountService.findById(uid);
-        if (userAccount == null) {
-            throw new UserNotFoundException(uid);
-        }
 
         JobQueueInfo job = jobQueueInfoService.findByIdAndUseraccount(id, userAccount);
         // If can't find the job id from database, it's already completed
