@@ -135,7 +135,7 @@ public class ResultFileEndpointService {
         if (file.exists() && !file.isDirectory()) {
             return file;
         } else {
-            throw new ResourceNotFoundException();
+            throw new ResourceNotFoundException(String.format("Algorithm result file %s does not exist.", fileName));
         }
     }
 
@@ -206,7 +206,7 @@ public class ResultFileEndpointService {
         if (file.exists() && !file.isDirectory()) {
             return file;
         } else {
-            throw new ResourceNotFoundException();
+            throw new ResourceNotFoundException(String.format("Algorithm results comparison file %s does not exist.", fileName));
         }
     }
 
