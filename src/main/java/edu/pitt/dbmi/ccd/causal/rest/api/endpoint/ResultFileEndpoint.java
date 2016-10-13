@@ -34,6 +34,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.GenericEntity;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static javax.ws.rs.core.MediaType.APPLICATION_XML;
+import static javax.ws.rs.core.MediaType.TEXT_PLAIN;
 import javax.ws.rs.core.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -82,6 +83,7 @@ public class ResultFileEndpoint {
      */
     @GET
     @Path("/{fileName}")
+    @Produces({TEXT_PLAIN, APPLICATION_JSON, APPLICATION_XML})
     @RolesAllowed(Role.USER)
     public Response downloadAlgorithmResultFile(@PathParam("uid") Long uid, @PathParam("fileName") String fileName) throws IOException {
         File file = algorithmResultEndpointService.getAlgorithmResultFile(uid, fileName);
@@ -120,6 +122,7 @@ public class ResultFileEndpoint {
      */
     @GET
     @Path("/comparisons/{fileName}")
+    @Produces({TEXT_PLAIN, APPLICATION_JSON, APPLICATION_XML})
     @RolesAllowed(Role.USER)
     public Response downloadAlgorithmResultsComparisonFile(@PathParam("uid") Long uid, @PathParam("fileName") String fileName) throws IOException {
         File file = algorithmResultEndpointService.getAlgorithmResultsComparisonFile(uid, fileName);
