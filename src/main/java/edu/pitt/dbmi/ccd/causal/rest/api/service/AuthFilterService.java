@@ -31,7 +31,9 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.Principal;
 import java.security.SignatureException;
+import java.time.Instant;
 import java.util.Base64;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -73,6 +75,7 @@ public class AuthFilterService {
 
     private static final AccessDeniedException BEARER_AUTH_JWT_REQUIRED = new AccessDeniedException("JSON Web Token(JWT) is required.");
     private static final AccessDeniedException BEARER_AUTH_SCHEME_REQUIRED = new AccessDeniedException("Bearer Authentication scheme is required to acees this resource.");
+    private static final AccessDeniedException BEARER_AUTH_EXPIRED_JWT = new AccessDeniedException("Your JSON Web Token(JWT) has expired, please get a new one and try again.");
     private static final AccessDeniedException BEARER_AUTH_INVALID_JWT = new AccessDeniedException("Invalid JSON Web Token(JWT).");
 
     private static final AccessForbiddenException FORBIDDEN_ACCESS = new AccessForbiddenException("You don't have permission to access this resource.");
@@ -133,6 +136,15 @@ public class AuthFilterService {
             // Verify both secret and issuer
             final JWTVerifier jwtVerifier = new JWTVerifier(jwtSecret, null, jwtIssuer);
             final Map<String, Object> claims = jwtVerifier.verify(jwt);
+
+            // Verify the expiration date
+            Long exp = (Long) claims.get("exp");
+            Instant nowInstant = Instant.now();
+            Long now = Date.from(nowInstant).getTime();
+            if (now.compareTo(exp) > 0) {
+                throw BEARER_AUTH_EXPIRED_JWT;
+            }
+
             // We can simply get the user account based on the user id
             // Turned out jwt library returns claims.get("uid") as java.lang.Integer
             //System.out.println(claims.get("uid").getClass().getName());
