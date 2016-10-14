@@ -54,20 +54,20 @@ public class JerseyConfig extends ResourceConfig {
 //        );
 
         // Register all endpoint calsses
-        registerClasses(AlgorithmEndpoint.class);
-        registerClasses(DatasetFileEndpoint.class);
-        registerClasses(FileUploadEndpoint.class);
-        registerClasses(JobQueueEndpoint.class);
-        registerClasses(JwtEndpoint.class);
-        registerClasses(PriorKnowledgeFileEndpoint.class);
-        registerClasses(ResultFileEndpoint.class);
+        register(AlgorithmEndpoint.class);
+        register(DatasetFileEndpoint.class);
+        register(FileUploadEndpoint.class);
+        register(JobQueueEndpoint.class);
+        register(JwtEndpoint.class);
+        register(PriorKnowledgeFileEndpoint.class);
+        register(ResultFileEndpoint.class);
 
         // Register exception mapper
-        registerClasses(WebApplicationExceptionMapper.class);
+        register(WebApplicationExceptionMapper.class);
 
         //Register filters
-        registerClasses(AuthFilter.class);
-        registerClasses(CORSFilter.class);
+        register(AuthFilter.class);
+        register(CORSFilter.class);
 
         register(RolesAllowedDynamicFeature.class);
 
