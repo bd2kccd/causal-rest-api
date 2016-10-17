@@ -18,15 +18,24 @@
  */
 package edu.pitt.dbmi.ccd.causal.rest.api.service;
 
+import com.auth0.jwt.JWTVerifier;
+import com.auth0.jwt.JWTVerifyException;
 import edu.pitt.dbmi.ccd.causal.rest.api.Role;
 import edu.pitt.dbmi.ccd.causal.rest.api.exception.AccessDeniedException;
 import edu.pitt.dbmi.ccd.causal.rest.api.exception.AccessForbiddenException;
 import edu.pitt.dbmi.ccd.db.entity.UserAccount;
 import edu.pitt.dbmi.ccd.db.entity.UserRole;
 import edu.pitt.dbmi.ccd.db.service.UserAccountService;
+import java.io.IOException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.security.Principal;
+import java.security.SignatureException;
+import java.time.Instant;
 import java.util.Base64;
+import java.util.Date;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
 import javax.ws.rs.container.ContainerRequestContext;
@@ -36,6 +45,7 @@ import org.apache.shiro.authc.credential.DefaultPasswordService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 /**
@@ -47,14 +57,28 @@ import org.springframework.stereotype.Service;
 @Service
 public class AuthFilterService {
 
+    @Value("${ccd.jwt.issuer}")
+    private String jwtIssuer;
+
+    @Value("${ccd.jwt.secret}")
+    private String jwtSecret;
+
     private static final Logger LOGGER = LoggerFactory.getLogger(AuthFilterService.class);
 
     private static final String AUTH_HEADER = "Authorization";
     public static final String AUTH_SCHEME_BASIC = "Basic";
+    public static final String AUTH_SCHEME_BEARER = "Bearer";
 
-    private static final AccessDeniedException USER_CREDENTIALS_REQUIRED = new AccessDeniedException("User credentials are required.");
-    private static final AccessDeniedException INVALID_USER_CREDENTIALS = new AccessDeniedException("Invalid username and/or password.");
-    private static final AccessForbiddenException FORBIDDEN_ACCESS = new AccessForbiddenException("You cannot access this resource.");
+    private static final AccessDeniedException BASIC_AUTH_USER_CREDENTIALS_REQUIRED = new AccessDeniedException("User credentials are required.");
+    private static final AccessDeniedException BASIC_AUTH_SCHEME_REQUIRED = new AccessDeniedException("Basic Authentication scheme is required to get the JSON Web Token(JWT).");
+    private static final AccessDeniedException BASIC_AUTH_INVALID_USER_CREDENTIALS = new AccessDeniedException("Invalid user credentials.");
+
+    private static final AccessDeniedException BEARER_AUTH_JWT_REQUIRED = new AccessDeniedException("JSON Web Token(JWT) is required.");
+    private static final AccessDeniedException BEARER_AUTH_SCHEME_REQUIRED = new AccessDeniedException("Bearer Authentication scheme is required to acees this resource.");
+    private static final AccessDeniedException BEARER_AUTH_EXPIRED_JWT = new AccessDeniedException("Your JSON Web Token(JWT) has expired, please get a new one and try again.");
+    private static final AccessDeniedException BEARER_AUTH_INVALID_JWT = new AccessDeniedException("Invalid JSON Web Token(JWT).");
+
+    private static final AccessForbiddenException FORBIDDEN_ACCESS = new AccessForbiddenException("You don't have permission to access this resource.");
 
     private final UserAccountService userAccountService;
     private final DefaultPasswordService defaultPasswordService;
@@ -65,31 +89,98 @@ public class AuthFilterService {
         this.defaultPasswordService = defaultPasswordService;
     }
 
-    public void doBasicAuth(ContainerRequestContext requestContext) {
+    // Direct the actual authentication to baisc auth
+    public void verifyBasicAuth(ContainerRequestContext requestContext) {
         String authCredentials = requestContext.getHeaderString(AUTH_HEADER);
-        if (authCredentials == null || !authCredentials.contains(AUTH_SCHEME_BASIC)) {
-            throw USER_CREDENTIALS_REQUIRED;
+        if (authCredentials == null) {
+            throw BASIC_AUTH_USER_CREDENTIALS_REQUIRED;
+        }
+
+        if (!authCredentials.contains(AUTH_SCHEME_BASIC)) {
+            throw BASIC_AUTH_SCHEME_REQUIRED;
         }
 
         String authCredentialBase64 = authCredentials.replaceFirst(AUTH_SCHEME_BASIC, "").trim();
+        // In the basic auth schema, both username and password are encoded in the request header
+        // So we'll need to get the user account info with username and password
         String credentials = new String(Base64.getDecoder().decode(authCredentialBase64));
         UserAccount userAccount = retrieveUserAccount(credentials);
+
         if (userAccount == null) {
-            throw INVALID_USER_CREDENTIALS;
+            throw BASIC_AUTH_INVALID_USER_CREDENTIALS;
         }
 
-        SecurityContext securityContext = createSecurityContext(userAccount, requestContext, SecurityContext.BASIC_AUTH);
-        if (!(securityContext.isUserInRole("admin") || isAccountMatchesRequest(userAccount, requestContext))) {
-            throw FORBIDDEN_ACCESS;
-        }
+        // No need to check isUserInRole("admin") since everyone can sign in
+        // No need to check isAccountMatchesRequest(userAccount, requestContext) since the jwt URI doesn't contain username
+        SecurityContext securityContext = createSecurityContext(userAccount, requestContext, AUTH_SCHEME_BASIC);
+
         requestContext.setSecurityContext(securityContext);
     }
 
-    private boolean isAccountMatchesRequest(UserAccount userAccount, ContainerRequestContext requestContext) {
-        MultivaluedMap<String, String> pathParams = requestContext.getUriInfo().getPathParameters();
-        String username = pathParams.getFirst("username");
+    // Direct the actual authentication to jwt based bearer schema
+    public void verifyJwt(ContainerRequestContext requestContext) {
+        String authCredentials = requestContext.getHeaderString(AUTH_HEADER);
+        if (authCredentials == null) {
+            throw BEARER_AUTH_JWT_REQUIRED;
+        }
 
-        return userAccount.getUsername().equals(username);
+        // All other endpoints use bearer JWT to verify the API consumer
+        if (!authCredentials.contains(AUTH_SCHEME_BEARER)) {
+            throw BEARER_AUTH_SCHEME_REQUIRED;
+        }
+
+        // Verify JWT
+        try {
+            String jwt = authCredentials.replaceFirst(AUTH_SCHEME_BEARER, "").trim();
+
+            // Verify both secret and issuer
+            final JWTVerifier jwtVerifier = new JWTVerifier(jwtSecret, null, jwtIssuer);
+            final Map<String, Object> claims = jwtVerifier.verify(jwt);
+
+            // Verify the expiration date
+            Long exp = (Long) claims.get("exp");
+            Instant nowInstant = Instant.now();
+            Long now = Date.from(nowInstant).getTime();
+            if (now.compareTo(exp) > 0) {
+                throw BEARER_AUTH_EXPIRED_JWT;
+            }
+
+            // We can simply get the user account based on the user id
+            // Turned out jwt library returns claims.get("uid") as java.lang.Integer
+            //System.out.println(claims.get("uid").getClass().getName());
+            Integer uidInteger = (Integer) claims.get("uid");
+            Long uid = uidInteger.longValue();
+
+            UserAccount userAccount = userAccountService.findById(uid);
+            // Since we check the user existence here, no need to check it again in each endpoint service
+            if (userAccount == null) {
+                throw BEARER_AUTH_INVALID_JWT;
+            }
+
+            // Also make sure the uid found in jwt matches the one in URI
+            SecurityContext securityContext = createSecurityContext(userAccount, requestContext, AUTH_SCHEME_BEARER);
+            if (!(securityContext.isUserInRole("admin") || isAccountMatchesRequest(uid, requestContext))) {
+                throw FORBIDDEN_ACCESS;
+            }
+
+            // Then compare the jwt with the one stored in `public_key` field in user account table
+            // It's very possible that the jwt sent here has already been overwritten
+            String currentJwt = userAccount.getPublicKey();
+            if (!currentJwt.equals(jwt)) {
+                throw BEARER_AUTH_INVALID_JWT;
+            }
+
+            requestContext.setSecurityContext(securityContext);
+        } catch (NoSuchAlgorithmException | InvalidKeyException | IllegalStateException | IOException | SignatureException | JWTVerifyException ex) {
+            LOGGER.error("Failed to verify JWT", ex);
+        }
+    }
+
+    private boolean isAccountMatchesRequest(Long uid, ContainerRequestContext requestContext) {
+        MultivaluedMap<String, String> pathParams = requestContext.getUriInfo().getPathParameters();
+        long reqUid = Long.parseLong(pathParams.getFirst("uid"));
+
+        return uid.equals(reqUid);
     }
 
     private SecurityContext createSecurityContext(UserAccount userAccount, ContainerRequestContext requestContext, String authScheme) {

@@ -25,6 +25,7 @@ import javax.ws.rs.Priorities;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.ext.Provider;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -36,6 +37,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 @Provider
 @Priority(Priorities.AUTHENTICATION)
 public class AuthFilter implements ContainerRequestFilter {
+
+    private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(AuthFilter.class);
 
     private final AuthFilterService authFilterService;
 
@@ -54,7 +57,13 @@ public class AuthFilter implements ContainerRequestFilter {
             return;
         }
 
-        authFilterService.doBasicAuth(requestContext);
+        // We'll only use basic auth for API sign in to get the JWT
+        // and all other following requests will be handled by JWT verification
+        if (method.equals("GET") && path.equals("jwt")) {
+            authFilterService.verifyBasicAuth(requestContext);
+        } else {
+            authFilterService.verifyJwt(requestContext);
+        }
     }
 
 }

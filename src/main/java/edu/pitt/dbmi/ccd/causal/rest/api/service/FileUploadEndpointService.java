@@ -18,13 +18,11 @@
  */
 package edu.pitt.dbmi.ccd.causal.rest.api.service;
 
-import edu.pitt.dbmi.ccd.causal.rest.api.dto.DataFileDTO;
-import edu.pitt.dbmi.ccd.causal.rest.api.dto.DataFileSummarization;
-import edu.pitt.dbmi.ccd.causal.rest.api.dto.DataFileSummaryDTO;
+import edu.pitt.dbmi.ccd.causal.rest.api.dto.DatasetFileDTO;
+import edu.pitt.dbmi.ccd.causal.rest.api.dto.DatasetFileSummaryDTO;
+import edu.pitt.dbmi.ccd.causal.rest.api.dto.PriorKnowledgeFileDTO;
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.ResumableChunkViaGet;
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.ResumableChunkViaPost;
-import edu.pitt.dbmi.ccd.causal.rest.api.exception.InternalErrorException;
-import edu.pitt.dbmi.ccd.causal.rest.api.exception.NotFoundByIdException;
 import edu.pitt.dbmi.ccd.causal.rest.api.exception.UserNotFoundException;
 import edu.pitt.dbmi.ccd.causal.rest.api.prop.CausalRestProperties;
 import edu.pitt.dbmi.ccd.commons.file.MessageDigestHash;
@@ -32,13 +30,9 @@ import edu.pitt.dbmi.ccd.commons.file.info.BasicFileInfo;
 import edu.pitt.dbmi.ccd.commons.file.info.FileInfos;
 import edu.pitt.dbmi.ccd.db.entity.DataFile;
 import edu.pitt.dbmi.ccd.db.entity.DataFileInfo;
-import edu.pitt.dbmi.ccd.db.entity.FileDelimiter;
 import edu.pitt.dbmi.ccd.db.entity.UserAccount;
-import edu.pitt.dbmi.ccd.db.entity.VariableType;
 import edu.pitt.dbmi.ccd.db.service.DataFileService;
-import edu.pitt.dbmi.ccd.db.service.FileDelimiterService;
 import edu.pitt.dbmi.ccd.db.service.UserAccountService;
-import edu.pitt.dbmi.ccd.db.service.VariableTypeService;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -55,8 +49,6 @@ import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Collections;
 import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,14 +57,12 @@ import org.springframework.stereotype.Service;
 
 /**
  *
- * Jun 5, 2016 9:42:03 PM
- *
- * @author Kevin V. Bui (kvb2@pitt.edu)
+ * @author Zhou Yuan (zhy19@pitt.edu)
  */
 @Service
-public class DataFileEndpointService {
+public class FileUploadEndpointService {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(DataFileEndpointService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(FileUploadEndpointService.class);
 
     private final CausalRestProperties causalRestProperties;
 
@@ -80,176 +70,35 @@ public class DataFileEndpointService {
 
     private final DataFileService dataFileService;
 
-    private final VariableTypeService variableTypeService;
-
-    private final FileDelimiterService fileDelimiterService;
-
     @Autowired
-    public DataFileEndpointService(
+    public FileUploadEndpointService(
             CausalRestProperties causalRestProperties,
             UserAccountService userAccountService,
-            DataFileService dataFileService,
-            VariableTypeService variableTypeService,
-            FileDelimiterService fileDelimiterService) {
+            DataFileService dataFileService) {
         this.causalRestProperties = causalRestProperties;
         this.userAccountService = userAccountService;
         this.dataFileService = dataFileService;
-        this.variableTypeService = variableTypeService;
-        this.fileDelimiterService = fileDelimiterService;
     }
 
     /**
-     * Delete a data file for a given file ID
+     * Small dataset file upload, not resumable
      *
-     * @param id
-     * @param username
-     */
-    public void deleteByIdAndUsername(Long id, String username) {
-        UserAccount userAccount = userAccountService.findByUsername(username);
-        if (userAccount == null) {
-            throw new UserNotFoundException(username);
-        }
-
-        DataFile dataFile = dataFileService.findByIdAndUserAccount(id, userAccount);
-        if (dataFile == null) {
-            throw new NotFoundByIdException(id);
-        }
-
-        try {
-            // Delete records from data_file_info table and data_file table
-            dataFileService.deleteDataFile(dataFile);
-            // Delete the physical file from workspace folder
-            Files.deleteIfExists(Paths.get(dataFile.getAbsolutePath(), dataFile.getName()));
-            LOGGER.info(String.format("Data file '%s' (id=%d) has been deleted.", dataFile.getName(), id));
-        } catch (Exception exception) {
-            String errMsg = String.format("Unable to delete data file id=%d.", id);
-            LOGGER.error(errMsg, exception);
-            throw new InternalErrorException(errMsg);
-        }
-    }
-
-    /**
-     * Get a data file info for a given file ID
-     *
-     * @param id
-     * @param username
-     * @return
-     */
-    public DataFileDTO findByIdAndUsername(Long id, String username) {
-        UserAccount userAccount = userAccountService.findByUsername(username);
-        if (userAccount == null) {
-            throw new UserNotFoundException(username);
-        }
-
-        DataFile dataFile = dataFileService.findByIdAndUserAccount(id, userAccount);
-        if (dataFile == null) {
-            LOGGER.warn(String.format("Can not find data file id=%d.", id));
-            throw new NotFoundByIdException(id);
-        }
-
-        DataFileDTO dataFileDTO = new DataFileDTO();
-
-        DataFileSummaryDTO dataFileSummaryDTO = new DataFileSummaryDTO();
-
-        DataFileInfo dataFileInfo = dataFile.getDataFileInfo();
-
-        // Will get java.lang.NullPointerException when calling dataFileInfo.getFileDelimiter().getName()
-        // while dataFileInfo.getFileDelimiter() returns null
-        if (dataFileInfo.getFileDelimiter() != null) {
-            dataFileSummaryDTO.setFileDelimiter(dataFileInfo.getFileDelimiter().getName());
-        } else {
-            dataFileSummaryDTO.setFileDelimiter(null);
-        }
-
-        // Will get java.lang.NullPointerException when calling dataFileInfo.getVariableType().getName()
-        // while dataFileInfo.getVariableType() returns null
-        if (dataFileInfo.getVariableType() != null) {
-            dataFileSummaryDTO.setVariableType(dataFileInfo.getVariableType().getName());
-        } else {
-            dataFileSummaryDTO.setVariableType(null);
-        }
-
-        dataFileSummaryDTO.setMd5checkSum(dataFileInfo.getMd5checkSum());
-        dataFileSummaryDTO.setNumOfColumns(dataFileInfo.getNumOfColumns());
-        dataFileSummaryDTO.setNumOfRows(dataFileInfo.getNumOfRows());
-
-        dataFileDTO.setCreationTime(dataFile.getCreationTime());
-        dataFileDTO.setFileSize(dataFile.getFileSize());
-        dataFileDTO.setId(dataFile.getId());
-        dataFileDTO.setLastModifiedTime(dataFile.getLastModifiedTime());
-        dataFileDTO.setName(dataFile.getName());
-        dataFileDTO.setFileSummary(dataFileSummaryDTO);
-
-        return dataFileDTO;
-    }
-
-    /**
-     * List all the available data files for a given user
-     *
-     * @param username
-     * @return
-     */
-    public List<DataFileDTO> listDataFiles(String username) {
-        List<DataFileDTO> dataFileDTOs = new LinkedList<>();
-
-        UserAccount userAccount = userAccountService.findByUsername(username);
-        if (userAccount == null) {
-            throw new UserNotFoundException(username);
-        }
-
-        List<DataFile> dataFiles = dataFileService.findByUserAccount(userAccount);
-        dataFiles.forEach(dataFile -> {
-            DataFileDTO dataFileDTO = new DataFileDTO();
-
-            DataFileSummaryDTO dataFileSummaryDTO = new DataFileSummaryDTO();
-
-            DataFileInfo dataFileInfo = dataFile.getDataFileInfo();
-
-            // Will get java.lang.NullPointerException when calling dataFileInfo.getFileDelimiter().getName()
-            // while dataFileInfo.getFileDelimiter() returns null
-            if (dataFileInfo.getFileDelimiter() != null) {
-                dataFileSummaryDTO.setFileDelimiter(dataFileInfo.getFileDelimiter().getName());
-            } else {
-                dataFileSummaryDTO.setFileDelimiter(null);
-            }
-
-            // Will get java.lang.NullPointerException when calling dataFileInfo.getVariableType().getName()
-            // while dataFileInfo.getVariableType() returns null
-            if (dataFileInfo.getVariableType() != null) {
-                dataFileSummaryDTO.setVariableType(dataFileInfo.getVariableType().getName());
-            } else {
-                dataFileSummaryDTO.setVariableType(null);
-            }
-
-            // md5checkSum is always created by the time we add new data file
-            dataFileSummaryDTO.setMd5checkSum(dataFileInfo.getMd5checkSum());
-            dataFileSummaryDTO.setNumOfColumns(dataFileInfo.getNumOfColumns());
-            dataFileSummaryDTO.setNumOfRows(dataFileInfo.getNumOfRows());
-
-            dataFileDTO.setId(dataFile.getId());
-            dataFileDTO.setName(dataFile.getName());
-            dataFileDTO.setCreationTime(dataFile.getCreationTime());
-            dataFileDTO.setFileSize(dataFile.getFileSize());
-            dataFileDTO.setLastModifiedTime(dataFile.getLastModifiedTime());
-            dataFileDTO.setFileSummary(dataFileSummaryDTO);
-
-            dataFileDTOs.add(dataFileDTO);
-        });
-
-        return dataFileDTOs;
-    }
-
-    /**
-     * Small file upload, not resumable
-     *
-     * @param username
+     * @param uid
      * @param inputStream
      * @param fileDetail
      * @return Info of just uploaded file
      * @throws FileNotFoundException
      * @throws IOException
      */
-    public DataFileDTO upload(String username, InputStream inputStream, FormDataContentDisposition fileDetail) throws FileNotFoundException, IOException {
+    public DatasetFileDTO uploadDatasetFile(Long uid, InputStream inputStream, FormDataContentDisposition fileDetail) throws FileNotFoundException, IOException {
+        UserAccount userAccount = userAccountService.findById(uid);
+        if (userAccount == null) {
+            throw new UserNotFoundException(uid);
+        }
+
+        // Get the username since it's used as the data file folder name
+        String username = userAccount.getUsername();
+
         String workspaceDir = causalRestProperties.getWorkspaceDir();
         String dataFolder = causalRestProperties.getDataFolder();
         String fileName = fileDetail.getFileName();
@@ -270,9 +119,6 @@ public class DataFileEndpointService {
         // Now if everything worked fine, the new file should have been uploaded
         // Then we'll also need to insert the data file info into three database tables:
         // `data_file_info`, `data_file`, and `user_account_data_file_rel`
-        // First we'll need to know who uploaded this file
-        UserAccount userAccount = userAccountService.findByUsername(username);
-
         // Get file information with FileInfos of ccd-commons
         BasicFileInfo fileInfo = FileInfos.basicPathInfo(uploadedFile);
 
@@ -316,18 +162,17 @@ public class DataFileEndpointService {
         dataFileService.saveDataFile(dataFile);
 
         // Create DTO to be used for HTTP response
-        DataFileDTO dataFileDTO = new DataFileDTO();
+        DatasetFileDTO dataFileDTO = new DatasetFileDTO();
 
         // We should get the data from database since the new record has an ID
         // that can be used for later API calls
         // All other info can be obtained solely based on the file system but no ID
         DataFile newDataFile = dataFileService.findByAbsolutePathAndName(directory, fileName);
 
-        DataFileSummaryDTO dataFileSummaryDTO = new DataFileSummaryDTO();
+        DatasetFileSummaryDTO dataFileSummaryDTO = new DatasetFileSummaryDTO();
 
         dataFileSummaryDTO.setFileDelimiter(null);
         dataFileSummaryDTO.setVariableType(null);
-        dataFileSummaryDTO.setMd5checkSum(md5checkSum);
         dataFileSummaryDTO.setNumOfColumns(null);
         dataFileSummaryDTO.setNumOfRows(null);
 
@@ -336,22 +181,131 @@ public class DataFileEndpointService {
         dataFileDTO.setCreationTime(newDataFile.getCreationTime());
         dataFileDTO.setFileSize(newDataFile.getFileSize());
         dataFileDTO.setLastModifiedTime(newDataFile.getLastModifiedTime());
+        dataFileDTO.setMd5checkSum(md5checkSum);
         dataFileDTO.setFileSummary(dataFileSummaryDTO);
 
-        LOGGER.info(String.format("New data file '%s' (id=%d) has been uploaded successfully.", newDataFile.getName(), newDataFile.getId()));
+        LOGGER.info(String.format("New dataset file '%s' (id=%d) has been uploaded successfully.", newDataFile.getName(), newDataFile.getId()));
 
         return dataFileDTO;
+    }
+
+    /**
+     * Small prior knowledge file upload, not resumable
+     *
+     * @param uid
+     * @param inputStream
+     * @param fileDetail
+     * @return Info of just uploaded file
+     * @throws FileNotFoundException
+     * @throws IOException
+     */
+    public PriorKnowledgeFileDTO uploadPriorKnowledgeFile(Long uid, InputStream inputStream, FormDataContentDisposition fileDetail) throws FileNotFoundException, IOException {
+        UserAccount userAccount = userAccountService.findById(uid);
+        if (userAccount == null) {
+            throw new UserNotFoundException(uid);
+        }
+
+        // Get the username since it's used as the data file folder name
+        String username = userAccount.getUsername();
+
+        String workspaceDir = causalRestProperties.getWorkspaceDir();
+        String dataFolder = causalRestProperties.getDataFolder();
+        String fileName = fileDetail.getFileName();
+
+        Path uploadedFile = Paths.get(workspaceDir, username, dataFolder, fileName);
+
+        // Actual file upload, will make it resumeble by uploading chunk by chunk
+        // Also need to use md5checksum to make sure the file is complete
+        int read = 0;
+        byte[] bytes = new byte[1024];
+
+        OutputStream out = new FileOutputStream(new File(uploadedFile.toString()));
+        while ((read = inputStream.read(bytes)) != -1) {
+            out.write(bytes, 0, read);
+        }
+        out.flush();
+
+        // Now if everything worked fine, the new file should have been uploaded
+        // Then we'll also need to insert the data file info into three database tables:
+        // `data_file_info`, `data_file`, and `user_account_data_file_rel`
+        // Get file information with FileInfos of ccd-commons
+        BasicFileInfo fileInfo = FileInfos.basicPathInfo(uploadedFile);
+
+        // By now these info are solely based on the file system
+        String directory = fileInfo.getAbsolutePath().toString();
+        long size = fileInfo.getSize();
+        long creationTime = fileInfo.getCreationTime();
+        long lastModifiedTime = fileInfo.getLastModifiedTime();
+
+        // Let's check if a file with the same fileName has already been there
+        DataFile dataFile = dataFileService.findByAbsolutePathAndName(directory, fileName);
+
+        if (dataFile == null) {
+            dataFile = new DataFile();
+            dataFile.setUserAccounts(Collections.singleton(userAccount));
+        }
+
+        dataFile.setName(fileName);
+        dataFile.setAbsolutePath(directory);
+        dataFile.setCreationTime(new Date(creationTime));
+        dataFile.setFileSize(size);
+        dataFile.setLastModifiedTime(new Date(lastModifiedTime));
+
+        // Generate md5 checksum based on the file path
+        String md5checkSum = MessageDigestHash.computeMD5Hash(uploadedFile);
+
+        DataFileInfo dataFileInfo = dataFile.getDataFileInfo();
+
+        if (dataFileInfo == null) {
+            dataFileInfo = new DataFileInfo();
+        }
+
+        dataFileInfo.setFileDelimiter(null);
+        dataFileInfo.setVariableType(null);
+        dataFileInfo.setMd5checkSum(md5checkSum);
+        dataFileInfo.setNumOfColumns(null);
+        dataFileInfo.setNumOfRows(null);
+
+        // Now add new records into database
+        dataFile.setDataFileInfo(dataFileInfo);
+        dataFileService.saveDataFile(dataFile);
+
+        // Create DTO to be used for HTTP response
+        PriorKnowledgeFileDTO priorKnowledgeFileDTO = new PriorKnowledgeFileDTO();
+
+        // We should get the data from database since the new record has an ID
+        // that can be used for later API calls
+        // All other info can be obtained solely based on the file system but no ID
+        DataFile newDataFile = dataFileService.findByAbsolutePathAndName(directory, fileName);
+
+        priorKnowledgeFileDTO.setId(newDataFile.getId());
+        priorKnowledgeFileDTO.setName(newDataFile.getName());
+        priorKnowledgeFileDTO.setCreationTime(newDataFile.getCreationTime());
+        priorKnowledgeFileDTO.setFileSize(newDataFile.getFileSize());
+        priorKnowledgeFileDTO.setLastModifiedTime(newDataFile.getLastModifiedTime());
+
+        LOGGER.info(String.format("New prior knowledge file '%s' (id=%d) has been uploaded successfully.", newDataFile.getName(), newDataFile.getId()));
+
+        return priorKnowledgeFileDTO;
     }
 
     /**
      * Chunk upload, check chunk existence
      *
      * @param chunk
-     * @param username
+     * @param uid
      * @return true or false
      * @throws IOException
      */
-    public boolean chunkExists(ResumableChunkViaGet chunk, String username) throws IOException {
+    public boolean chunkExists(ResumableChunkViaGet chunk, Long uid) throws IOException {
+        UserAccount userAccount = userAccountService.findById(uid);
+        if (userAccount == null) {
+            throw new UserNotFoundException(uid);
+        }
+
+        // Get the username since it's used as the data file folder name
+        String username = userAccount.getUsername();
+
         String identifier = chunk.getResumableIdentifier();
         int chunkNumber = chunk.getResumableChunkNumber();
 
@@ -373,11 +327,19 @@ public class DataFileEndpointService {
      * completion of the whole file
      *
      * @param chunk
-     * @param username
+     * @param uid
      * @return md5checksum string
      * @throws IOException
      */
-    public String uploadChunk(ResumableChunkViaPost chunk, String username) throws IOException {
+    public String uploadChunk(ResumableChunkViaPost chunk, Long uid) throws IOException {
+        UserAccount userAccount = userAccountService.findById(uid);
+        if (userAccount == null) {
+            throw new UserNotFoundException(uid);
+        }
+
+        // Get the username since it's used as the data file folder name
+        String username = userAccount.getUsername();
+
         String fileName = chunk.getResumableFilename();
         String md5checkSum = null;
 
@@ -553,88 +515,4 @@ public class DataFileEndpointService {
             }
         });
     }
-
-    /**
-     * Summarize data file by adding fileDelimiter, variableType, numOfRows,
-     * numOfColumns, and missingValue
-     *
-     * @param username
-     * @param dataFileSummarization
-     * @return The info of just summarized file
-     * @throws IOException
-     */
-    public DataFileDTO summarizeDataFile(String username, DataFileSummarization dataFileSummarization) throws IOException {
-        Long id = dataFileSummarization.getId();
-
-        UserAccount userAccount = userAccountService.findByUsername(username);
-        if (userAccount == null) {
-            throw new UserNotFoundException(username);
-        }
-
-        DataFile dataFile = dataFileService.findByIdAndUserAccount(id, userAccount);
-        if (dataFile == null) {
-            throw new NotFoundByIdException(id);
-        }
-
-        DataFileInfo dataFileInfo = dataFile.getDataFileInfo();
-
-        // Since we only get the string values from request
-        // Here we'll need to convert the string values to FileDelimiter and VariableType objects
-        FileDelimiter fileDelimiter = fileDelimiterService.getFileDelimiterRepository().findByName(dataFileSummarization.getFileDelimiter());
-        VariableType variableType = variableTypeService.findByName(dataFileSummarization.getVariableType());
-
-        // Set file delimiter and variable type
-        dataFileInfo.setFileDelimiter(fileDelimiter);
-        dataFileInfo.setVariableType(variableType);
-
-        // Set the numbers of columns and rows based on the physical file
-        char delimiter = FileInfos.delimiterNameToChar(dataFileSummarization.getFileDelimiter());
-        Path file = Paths.get(dataFile.getAbsolutePath(), dataFile.getName());
-        dataFileInfo.setNumOfRows(FileInfos.countLine(file.toFile()));
-        dataFileInfo.setNumOfColumns(FileInfos.countColumn(file.toFile(), delimiter));
-
-        // Ignore missing value here since it'll be removed from db in the new design
-        // Update the dataFileInfo property
-        dataFile.setDataFileInfo(dataFileInfo);
-
-        // Update record in database table `data_file_info`
-        dataFileService.saveDataFile(dataFile);
-
-        // Create DTO to be used for HTTP response
-        DataFileDTO dataFileDTO = new DataFileDTO();
-
-        DataFileSummaryDTO dataFileSummaryDTO = new DataFileSummaryDTO();
-
-        // Will get java.lang.NullPointerException when calling dataFileInfo.getFileDelimiter().getName()
-        // while dataFileInfo.getFileDelimiter() returns null
-        if (dataFileInfo.getFileDelimiter() != null) {
-            dataFileSummaryDTO.setFileDelimiter(dataFileInfo.getFileDelimiter().getName());
-        } else {
-            dataFileSummaryDTO.setFileDelimiter(null);
-        }
-
-        // Will get java.lang.NullPointerException when calling dataFileInfo.getVariableType().getName()
-        // while dataFileInfo.getVariableType() returns null
-        if (dataFileInfo.getVariableType() != null) {
-            dataFileSummaryDTO.setVariableType(dataFileInfo.getVariableType().getName());
-        } else {
-            dataFileSummaryDTO.setVariableType(null);
-        }
-
-        dataFileSummaryDTO.setMd5checkSum(dataFileInfo.getMd5checkSum());
-        dataFileSummaryDTO.setNumOfColumns(dataFileInfo.getNumOfColumns());
-        dataFileSummaryDTO.setNumOfRows(dataFileInfo.getNumOfRows());
-
-        dataFileDTO.setCreationTime(dataFile.getCreationTime());
-        dataFileDTO.setFileSize(dataFile.getFileSize());
-        dataFileDTO.setId(dataFile.getId());
-        dataFileDTO.setLastModifiedTime(dataFile.getLastModifiedTime());
-        dataFileDTO.setName(dataFile.getName());
-        dataFileDTO.setFileSummary(dataFileSummaryDTO);
-
-        LOGGER.info(String.format("Data file '%s' (id=%d) has been summarized successfully.", dataFile.getName(), dataFile.getId()));
-
-        return dataFileDTO;
-    }
-
 }

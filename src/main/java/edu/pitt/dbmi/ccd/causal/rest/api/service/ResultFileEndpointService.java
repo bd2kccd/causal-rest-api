@@ -22,6 +22,7 @@ import edu.pitt.dbmi.ccd.causal.rest.api.dto.ResultComparison;
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.ResultComparisonData;
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.ResultComparisonFileDTO;
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.ResultFileDTO;
+import edu.pitt.dbmi.ccd.causal.rest.api.dto.ResultFilesToCompare;
 import edu.pitt.dbmi.ccd.causal.rest.api.exception.ResourceNotFoundException;
 import edu.pitt.dbmi.ccd.causal.rest.api.prop.CausalRestProperties;
 import edu.pitt.dbmi.ccd.commons.file.info.BasicFileInfo;
@@ -29,6 +30,8 @@ import edu.pitt.dbmi.ccd.commons.file.info.FileInfos;
 import edu.pitt.dbmi.ccd.commons.graph.SimpleGraph;
 import edu.pitt.dbmi.ccd.commons.graph.SimpleGraphComparison;
 import edu.pitt.dbmi.ccd.commons.graph.SimpleGraphUtil;
+import edu.pitt.dbmi.ccd.db.entity.UserAccount;
+import edu.pitt.dbmi.ccd.db.service.UserAccountService;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -58,19 +61,28 @@ public class ResultFileEndpointService {
 
     private final CausalRestProperties causalRestProperties;
 
+    private final UserAccountService userAccountService;
+
     @Autowired
-    public ResultFileEndpointService(CausalRestProperties causalRestProperties) {
+    public ResultFileEndpointService(CausalRestProperties causalRestProperties, UserAccountService userAccountService) {
         this.causalRestProperties = causalRestProperties;
+        this.userAccountService = userAccountService;
     }
 
     /**
      * List all the algorithm result files for a given user
      *
-     * @param username
+     * @param uid
      * @return A list of result files
      * @throws IOException
      */
-    public List<ResultFileDTO> listAlgorithmResults(String username) throws IOException {
+    public List<ResultFileDTO> listAlgorithmResults(Long uid) throws IOException {
+        // When we can get here vai AuthFilterSerice, it means the user exists
+        // so no need to check if (userAccount == null) and throw UserNotFoundException(uid)
+        UserAccount userAccount = userAccountService.findById(uid);
+
+        String username = userAccount.getUsername();
+
         String workspaceDir = causalRestProperties.getWorkspaceDir();
         String resultsFolder = causalRestProperties.getResultsFolder();
         String algorithmFolder = causalRestProperties.getAlgorithmFolder();
@@ -103,11 +115,17 @@ public class ResultFileEndpointService {
     /**
      * Get the result file content based on user and the file name
      *
-     * @param username
+     * @param uid
      * @param fileName
      * @return The algorithm result file
      */
-    public File getAlgorithmResultFile(String username, String fileName) {
+    public File getAlgorithmResultFile(Long uid, String fileName) {
+        // When we can get here vai AuthFilterSerice, it means the user exists
+        // so no need to check if (userAccount == null) and throw UserNotFoundException(uid)
+        UserAccount userAccount = userAccountService.findById(uid);
+
+        String username = userAccount.getUsername();
+
         String workspaceDir = causalRestProperties.getWorkspaceDir();
         String resultsFolder = causalRestProperties.getResultsFolder();
         String algorithmFolder = causalRestProperties.getAlgorithmFolder();
@@ -118,18 +136,24 @@ public class ResultFileEndpointService {
         if (file.exists() && !file.isDirectory()) {
             return file;
         } else {
-            throw new ResourceNotFoundException();
+            throw new ResourceNotFoundException(String.format("Algorithm result file %s does not exist.", fileName));
         }
     }
 
     /**
      * List all the algorithm results comparison files for a given user
      *
-     * @param username
+     * @param uid
      * @return A list of result comparison files
      * @throws IOException
      */
-    public List<ResultFileDTO> listAlgorithmResultComparisons(String username) throws IOException {
+    public List<ResultFileDTO> listAlgorithmResultComparisons(Long uid) throws IOException {
+        // When we can get here vai AuthFilterSerice, it means the user exists
+        // so no need to check if (userAccount == null) and throw UserNotFoundException(uid)
+        UserAccount userAccount = userAccountService.findById(uid);
+
+        String username = userAccount.getUsername();
+
         String workspaceDir = causalRestProperties.getWorkspaceDir();
         String resultsFolder = causalRestProperties.getResultsFolder();
         String comparisonFolder = causalRestProperties.getComparisonFolder();
@@ -162,11 +186,17 @@ public class ResultFileEndpointService {
     /**
      * Get the result comparison file content based on user and the file name
      *
-     * @param username
+     * @param uid
      * @param fileName
      * @return The comparison file
      */
-    public File getAlgorithmResultsComparisonFile(String username, String fileName) {
+    public File getAlgorithmResultsComparisonFile(Long uid, String fileName) {
+        // When we can get here vai AuthFilterSerice, it means the user exists
+        // so no need to check if (userAccount == null) and throw UserNotFoundException(uid)
+        UserAccount userAccount = userAccountService.findById(uid);
+
+        String username = userAccount.getUsername();
+
         String workspaceDir = causalRestProperties.getWorkspaceDir();
         String resultsFolder = causalRestProperties.getResultsFolder();
         String comparisonFolder = causalRestProperties.getComparisonFolder();
@@ -177,35 +207,44 @@ public class ResultFileEndpointService {
         if (file.exists() && !file.isDirectory()) {
             return file;
         } else {
-            throw new ResourceNotFoundException();
+            throw new ResourceNotFoundException(String.format("Algorithm results comparison file %s does not exist.", fileName));
         }
     }
 
     /**
      * Handles the comparison of multi result files
      *
-     * @param username
-     * @param fileNames
+     * @param uid
+     * @param resultFiles
      * @return Comparison result
      */
-    public ResultComparisonFileDTO compareAlgorithmResults(String username, String fileNames) {
+    public ResultComparisonFileDTO compareAlgorithmResults(Long uid, ResultFilesToCompare resultFiles) {
+        // When we can get here vai AuthFilterSerice, it means the user exists
+        // so no need to check if (userAccount == null) and throw UserNotFoundException(uid)
+        UserAccount userAccount = userAccountService.findById(uid);
+
+        String username = userAccount.getUsername();
+
         String workspaceDir = causalRestProperties.getWorkspaceDir();
         String resultsFolder = causalRestProperties.getResultsFolder();
         String algorithmFolder = causalRestProperties.getAlgorithmFolder();
         String comparisonFolder = causalRestProperties.getComparisonFolder();
 
-        // Split the concatenated file names
-        List<String> items = Arrays.asList(fileNames.split("!!"));
+        // Get all the filenames from request bean
+        List<String> items = Arrays.asList(resultFiles.getResultFiles());
 
         List<SimpleGraph> graphs = new LinkedList<>();
         items.forEach(fileName -> {
             Path file = Paths.get(workspaceDir, username, resultsFolder, algorithmFolder, fileName);
-            if (Files.exists(file)) {
-                try (BufferedReader reader = Files.newBufferedReader(file, Charset.defaultCharset())) {
-                    graphs.add(SimpleGraphUtil.readInSimpleGraph(reader));
-                } catch (IOException exception) {
-                    LOGGER.error(String.format("Unable to read file '%s'.", fileName), exception);
-                }
+
+            if (!Files.exists(file)) {
+                throw new ResourceNotFoundException(String.format("Algorithm result file %s does not exist.", fileName));
+            }
+
+            try (BufferedReader reader = Files.newBufferedReader(file, Charset.defaultCharset())) {
+                graphs.add(SimpleGraphUtil.readInSimpleGraph(reader));
+            } catch (IOException exception) {
+                LOGGER.error(String.format("Unable to read file '%s'.", fileName), exception);
             }
         });
 

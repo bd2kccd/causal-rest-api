@@ -19,21 +19,26 @@
 package edu.pitt.dbmi.ccd.causal.rest.api.endpoint;
 
 import edu.pitt.dbmi.ccd.causal.rest.api.Role;
-import edu.pitt.dbmi.ccd.causal.rest.api.dto.ResultFileDTO;
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.ResultComparisonFileDTO;
+import edu.pitt.dbmi.ccd.causal.rest.api.dto.ResultFileDTO;
+import edu.pitt.dbmi.ccd.causal.rest.api.dto.ResultFilesToCompare;
 import edu.pitt.dbmi.ccd.causal.rest.api.service.ResultFileEndpointService;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
+import javax.validation.Valid;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.GenericEntity;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static javax.ws.rs.core.MediaType.APPLICATION_XML;
+import static javax.ws.rs.core.MediaType.TEXT_PLAIN;
 import javax.ws.rs.core.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -44,7 +49,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @PermitAll
-@Path("/{username}/results")
+@Path("/{uid}/results")
 public class ResultFileEndpoint {
 
     private final ResultFileEndpointService algorithmResultEndpointService;
@@ -57,15 +62,15 @@ public class ResultFileEndpoint {
     /**
      * List all the algorithm result files
      *
-     * @param username
+     * @param uid
      * @return 200 with a list of existing result files
      * @throws IOException
      */
     @GET
     @Produces({APPLICATION_JSON, APPLICATION_XML})
     @RolesAllowed(Role.USER)
-    public Response listAlgorithmResultFiles(@PathParam("username") String username) throws IOException {
-        List<ResultFileDTO> algorithmResultDTOs = algorithmResultEndpointService.listAlgorithmResults(username);
+    public Response listAlgorithmResultFiles(@PathParam("uid") Long uid) throws IOException {
+        List<ResultFileDTO> algorithmResultDTOs = algorithmResultEndpointService.listAlgorithmResults(uid);
         GenericEntity<List<ResultFileDTO>> entity = new GenericEntity<List<ResultFileDTO>>(algorithmResultDTOs) {
         };
 
@@ -75,16 +80,21 @@ public class ResultFileEndpoint {
     /**
      * Download the content of a result file for a given file name
      *
-     * @param username
+     * TEXT_PLAIN media type is the desired response type if result file exists.
+     * APPLICATION_JSON(default) or APPLICATION_XML(needs to be specified in
+     * request using Accept header) will be used for not found exception
+     *
+     * @param uid
      * @param fileName
      * @return Plain text file content
      * @throws IOException
      */
     @GET
     @Path("/{fileName}")
+    @Produces({TEXT_PLAIN, APPLICATION_JSON, APPLICATION_XML})
     @RolesAllowed(Role.USER)
-    public Response downloadAlgorithmResultFile(@PathParam("username") String username, @PathParam("fileName") String fileName) throws IOException {
-        File file = algorithmResultEndpointService.getAlgorithmResultFile(username, fileName);
+    public Response downloadAlgorithmResultFile(@PathParam("uid") Long uid, @PathParam("fileName") String fileName) throws IOException {
+        File file = algorithmResultEndpointService.getAlgorithmResultFile(uid, fileName);
 
         return Response.ok(file)
                 .header("Content-Disposition", "attachment; filename=" + fileName)
@@ -94,7 +104,7 @@ public class ResultFileEndpoint {
     /**
      * List all the comparison files
      *
-     * @param username
+     * @param uid
      * @return
      * @throws IOException
      */
@@ -102,8 +112,8 @@ public class ResultFileEndpoint {
     @Path("/comparisons")
     @Produces({APPLICATION_JSON, APPLICATION_XML})
     @RolesAllowed(Role.USER)
-    public Response listAlgorithmResultComparisonFiles(@PathParam("username") String username) throws IOException {
-        List<ResultFileDTO> algorithmResultDTOs = algorithmResultEndpointService.listAlgorithmResultComparisons(username);
+    public Response listAlgorithmResultComparisonFiles(@PathParam("uid") Long uid) throws IOException {
+        List<ResultFileDTO> algorithmResultDTOs = algorithmResultEndpointService.listAlgorithmResultComparisons(uid);
         GenericEntity<List<ResultFileDTO>> entity = new GenericEntity<List<ResultFileDTO>>(algorithmResultDTOs) {
         };
 
@@ -113,16 +123,21 @@ public class ResultFileEndpoint {
     /**
      * Download the content of a results comparison file for a given file name
      *
-     * @param username
+     * TEXT_PLAIN media type is the desired response type if result file exists.
+     * APPLICATION_JSON(default) or APPLICATION_XML(needs to be specified in
+     * request using Accept header) will be used for not found exception
+     *
+     * @param uid
      * @param fileName
      * @return Plain text file content
      * @throws IOException
      */
     @GET
     @Path("/comparisons/{fileName}")
+    @Produces({TEXT_PLAIN, APPLICATION_JSON, APPLICATION_XML})
     @RolesAllowed(Role.USER)
-    public Response downloadAlgorithmResultsComparisonFile(@PathParam("username") String username, @PathParam("fileName") String fileName) throws IOException {
-        File file = algorithmResultEndpointService.getAlgorithmResultsComparisonFile(username, fileName);
+    public Response downloadAlgorithmResultsComparisonFile(@PathParam("uid") Long uid, @PathParam("fileName") String fileName) throws IOException {
+        File file = algorithmResultEndpointService.getAlgorithmResultsComparisonFile(uid, fileName);
 
         return Response.ok(file)
                 .header("Content-Disposition", "attachment; filename=" + fileName)
@@ -132,17 +147,23 @@ public class ResultFileEndpoint {
     /**
      * Compare multi result files
      *
-     * @param username
-     * @param fileNames
+     * TEXT_PLAIN media type is the desired response type if result file exists.
+     * APPLICATION_JSON(default) or APPLICATION_XML(needs to be specified in
+     * request using Accept header) will be used for not found exception
+     *
+     * @param uid
+     * @param resultFiles
      * @return The comparison result text file content
      * @throws IOException
      */
-    @GET
-    @Path("/compare/{fileNames}")
+    @POST
+    @Path("/compare")
+    @Consumes(APPLICATION_JSON)
+    @Produces({TEXT_PLAIN, APPLICATION_JSON, APPLICATION_XML})
     @RolesAllowed(Role.USER)
-    public Response compareAlgorithmResults(@PathParam("username") String username, @PathParam("fileNames") String fileNames) throws IOException {
+    public Response compareAlgorithmResults(@PathParam("uid") Long uid, @Valid ResultFilesToCompare resultFiles) throws IOException {
         // Get the result comparsion file content and file name
-        ResultComparisonFileDTO comparisonFileDTO = algorithmResultEndpointService.compareAlgorithmResults(username, fileNames);
+        ResultComparisonFileDTO comparisonFileDTO = algorithmResultEndpointService.compareAlgorithmResults(uid, resultFiles);
 
         return Response.ok(comparisonFileDTO.getFile())
                 .header("Content-Disposition", "attachment; filename=" + comparisonFileDTO.getFileName())

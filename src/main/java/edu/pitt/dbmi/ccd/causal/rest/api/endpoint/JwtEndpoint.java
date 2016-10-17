@@ -18,17 +18,13 @@
  */
 package edu.pitt.dbmi.ccd.causal.rest.api.endpoint;
 
-import edu.pitt.dbmi.ccd.causal.rest.api.Role;
-import edu.pitt.dbmi.ccd.causal.rest.api.dto.AlgorithmDTO;
-import edu.pitt.dbmi.ccd.causal.rest.api.service.AlgorithmEndpointService;
-import java.io.IOException;
-import java.util.List;
+import edu.pitt.dbmi.ccd.causal.rest.api.dto.JwtDTO;
+import edu.pitt.dbmi.ccd.causal.rest.api.service.JwtEndpointService;
 import javax.annotation.security.PermitAll;
-import javax.annotation.security.RolesAllowed;
 import javax.ws.rs.GET;
+import javax.ws.rs.HeaderParam;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
-import javax.ws.rs.core.GenericEntity;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static javax.ws.rs.core.MediaType.APPLICATION_XML;
 import javax.ws.rs.core.Response;
@@ -37,35 +33,24 @@ import org.springframework.stereotype.Component;
 
 /**
  *
- * @author Zhou Yuan (zhy19@pitt.edu) We need this uid in the URI since JWT
- * compares the uid
+ * @author Zhou Yuan (zhy19@pitt.edu)
  */
 @Component
 @PermitAll
-@Path("/{uid}/algorithms")
-public class AlgorithmEndpoint {
+@Path("/jwt")
+public class JwtEndpoint {
 
-    private final AlgorithmEndpointService algorithmEndpointService;
+    private final JwtEndpointService jwtEndpointService;
 
     @Autowired
-    public AlgorithmEndpoint(AlgorithmEndpointService algorithmEndpointService) {
-        this.algorithmEndpointService = algorithmEndpointService;
+    public JwtEndpoint(JwtEndpointService jwtEndpointService) {
+        this.jwtEndpointService = jwtEndpointService;
     }
 
-    /**
-     * List all the available algorithms
-     *
-     * @return 200 with a list of available algorithms
-     * @throws IOException
-     */
     @GET
     @Produces({APPLICATION_JSON, APPLICATION_XML})
-    @RolesAllowed(Role.USER)
-    public Response listAlgorithmResultFiles() throws IOException {
-        List<AlgorithmDTO> algorithmDTOs = algorithmEndpointService.listAlgorithms();
-        GenericEntity<List<AlgorithmDTO>> entity = new GenericEntity<List<AlgorithmDTO>>(algorithmDTOs) {
-        };
-
-        return Response.ok(entity).build();
+    public Response getJwt(@HeaderParam("Authorization") String authString) {
+        JwtDTO jwtDTO = jwtEndpointService.generateJwt(authString);
+        return Response.ok(jwtDTO).build();
     }
 }

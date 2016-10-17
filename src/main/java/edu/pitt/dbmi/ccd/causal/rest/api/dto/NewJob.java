@@ -30,7 +30,11 @@ public abstract class NewJob {
 
     @NotNull
     @Range(min = 1, max = Long.MAX_VALUE)
-    protected Long dataFileId;
+    protected Long datasetFileId;
+
+    @NotNull
+    @Range(min = 1, max = Long.MAX_VALUE)
+    protected Long priorKnowledgeFileId;
 
     // We must ues @Valid annoation here again to enable the bean validation in JvmOptions,
     // because the @Valid annoation used in endpopint only works on this NewJob bean,
@@ -41,12 +45,20 @@ public abstract class NewJob {
     public NewJob() {
     }
 
-    public Long getDataFileId() {
-        return dataFileId;
+    public Long getDatasetFileId() {
+        return datasetFileId;
     }
 
-    public void setDataFileId(Long dataFileId) {
-        this.dataFileId = dataFileId;
+    public void setDatasetFileId(Long datasetFileId) {
+        this.datasetFileId = datasetFileId;
+    }
+
+    public Long getPriorKnowledgeFileId() {
+        return priorKnowledgeFileId;
+    }
+
+    public void setPriorKnowledgeFileId(Long priorKnowledgeFileId) {
+        this.priorKnowledgeFileId = priorKnowledgeFileId;
     }
 
     public JvmOptions getJvmOptions() {

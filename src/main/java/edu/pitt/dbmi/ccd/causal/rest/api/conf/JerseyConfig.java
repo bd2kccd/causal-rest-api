@@ -18,6 +18,16 @@
  */
 package edu.pitt.dbmi.ccd.causal.rest.api.conf;
 
+import edu.pitt.dbmi.ccd.causal.rest.api.endpoint.AlgorithmEndpoint;
+import edu.pitt.dbmi.ccd.causal.rest.api.endpoint.DatasetFileEndpoint;
+import edu.pitt.dbmi.ccd.causal.rest.api.endpoint.FileUploadEndpoint;
+import edu.pitt.dbmi.ccd.causal.rest.api.endpoint.JobQueueEndpoint;
+import edu.pitt.dbmi.ccd.causal.rest.api.endpoint.JwtEndpoint;
+import edu.pitt.dbmi.ccd.causal.rest.api.endpoint.PriorKnowledgeFileEndpoint;
+import edu.pitt.dbmi.ccd.causal.rest.api.endpoint.ResultFileEndpoint;
+import edu.pitt.dbmi.ccd.causal.rest.api.exception.mapper.WebApplicationExceptionMapper;
+import edu.pitt.dbmi.ccd.causal.rest.api.filter.AuthFilter;
+import edu.pitt.dbmi.ccd.causal.rest.api.filter.CORSFilter;
 import org.glassfish.jersey.media.multipart.MultiPartFeature;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.server.ServerProperties;
@@ -36,11 +46,28 @@ public class JerseyConfig extends ResourceConfig {
     public JerseyConfig() {
         // Register resources and providers using package-scanning
         // Adds array of package names which will be used to scan for components.
-        packages(
-                "edu.pitt.dbmi.ccd.causal.rest.api.endpoint",
-                "edu.pitt.dbmi.ccd.causal.rest.api.exception.mapper",
-                "edu.pitt.dbmi.ccd.causal.rest.api.filter"
-        );
+        // This doesn't work with Spring Boot 1.4.1
+//        packages(
+//                "edu.pitt.dbmi.ccd.causal.rest.api.endpoint",
+//                "edu.pitt.dbmi.ccd.causal.rest.api.exception.mapper",
+//                "edu.pitt.dbmi.ccd.causal.rest.api.filter"
+//        );
+
+        // Register all endpoint calsses
+        register(AlgorithmEndpoint.class);
+        register(DatasetFileEndpoint.class);
+        register(FileUploadEndpoint.class);
+        register(JobQueueEndpoint.class);
+        register(JwtEndpoint.class);
+        register(PriorKnowledgeFileEndpoint.class);
+        register(ResultFileEndpoint.class);
+
+        // Register exception mapper
+        register(WebApplicationExceptionMapper.class);
+
+        //Register filters
+        register(AuthFilter.class);
+        register(CORSFilter.class);
 
         register(RolesAllowedDynamicFeature.class);
 

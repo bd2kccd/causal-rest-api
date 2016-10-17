@@ -24,10 +24,8 @@ import edu.pitt.dbmi.ccd.causal.rest.api.dto.FgsDiscreteNewJob;
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.GfciContinuousNewJob;
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.JobInfoDTO;
 import edu.pitt.dbmi.ccd.causal.rest.api.service.JobQueueEndpointService;
-
 import java.io.IOException;
 import java.util.List;
-
 import javax.annotation.security.RolesAllowed;
 import javax.validation.Valid;
 import javax.ws.rs.Consumes;
@@ -38,20 +36,17 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.GenericEntity;
-
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static javax.ws.rs.core.MediaType.APPLICATION_XML;
-
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
-
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  *
  * @author Zhou Yuan (zhy19@pitt.edu)
  */
-@Path("/{username}/jobs")
+@Path("/{uid}/jobs")
 public class JobQueueEndpoint {
 
     private final JobQueueEndpointService jobQueueEndpointService;
@@ -64,7 +59,7 @@ public class JobQueueEndpoint {
     /**
      * Adding a new job and run GFCI continuous
      *
-     * @param username
+     * @param uid
      * @param newJob
      * @return 201 Created status code with new job ID
      * @throws IOException
@@ -74,9 +69,10 @@ public class JobQueueEndpoint {
     @Consumes(APPLICATION_JSON)
     @Produces({APPLICATION_JSON, APPLICATION_XML})
     @RolesAllowed(Role.USER)
-    public Response addGfciContinuousNewJob(@PathParam("username") String username, @Valid GfciContinuousNewJob newJob) throws IOException {
-	JobInfoDTO jobInfo = jobQueueEndpointService.addGfciContinuousNewJob(username, newJob);
-	GenericEntity<JobInfoDTO> jobRequestEntity = new GenericEntity<JobInfoDTO>(jobInfo){};
+    public Response addGfciContinuousNewJob(@PathParam("uid") Long uid, @Valid GfciContinuousNewJob newJob) throws IOException {
+        JobInfoDTO jobInfo = jobQueueEndpointService.addGfciContinuousNewJob(uid, newJob);
+        GenericEntity<JobInfoDTO> jobRequestEntity = new GenericEntity<JobInfoDTO>(jobInfo) {
+        };
         // Return 201 Created status code and the job id in body
         return Response.status(Status.CREATED).entity(jobRequestEntity).build();
     }
@@ -84,7 +80,7 @@ public class JobQueueEndpoint {
     /**
      * Adding a new job and run FGS continuous
      *
-     * @param username
+     * @param uid
      * @param newJob
      * @return 201 Created status code with new job ID
      * @throws IOException
@@ -94,9 +90,10 @@ public class JobQueueEndpoint {
     @Consumes(APPLICATION_JSON)
     @Produces({APPLICATION_JSON, APPLICATION_XML})
     @RolesAllowed(Role.USER)
-    public Response addFgsContinuousNewJob(@PathParam("username") String username, @Valid FgsContinuousNewJob newJob) throws IOException {
-	JobInfoDTO jobInfo = jobQueueEndpointService.addFgsContinuousNewJob(username, newJob);
-	GenericEntity<JobInfoDTO> jobRequestEntity = new GenericEntity<JobInfoDTO>(jobInfo){};
+    public Response addFgsContinuousNewJob(@PathParam("uid") Long uid, @Valid FgsContinuousNewJob newJob) throws IOException {
+        JobInfoDTO jobInfo = jobQueueEndpointService.addFgsContinuousNewJob(uid, newJob);
+        GenericEntity<JobInfoDTO> jobRequestEntity = new GenericEntity<JobInfoDTO>(jobInfo) {
+        };
         // Return 201 Created status code and the job id in body
         return Response.status(Status.CREATED).entity(jobRequestEntity).build();
     }
@@ -104,7 +101,7 @@ public class JobQueueEndpoint {
     /**
      * Adding a new job and run FGS discrete
      *
-     * @param username
+     * @param uid
      * @param newJob
      * @return 201 Created status code with new job ID
      * @throws IOException
@@ -114,9 +111,10 @@ public class JobQueueEndpoint {
     @Consumes(APPLICATION_JSON)
     @Produces({APPLICATION_JSON, APPLICATION_XML})
     @RolesAllowed(Role.USER)
-    public Response addFgsDiscreteNewJob(@PathParam("username") String username, @Valid FgsDiscreteNewJob newJob) throws IOException {
-	JobInfoDTO jobInfo = jobQueueEndpointService.addFgsDiscreteNewJob(username, newJob);
-	GenericEntity<JobInfoDTO> jobRequestEntity = new GenericEntity<JobInfoDTO>(jobInfo){};
+    public Response addFgsDiscreteNewJob(@PathParam("uid") Long uid, @Valid FgsDiscreteNewJob newJob) throws IOException {
+        JobInfoDTO jobInfo = jobQueueEndpointService.addFgsDiscreteNewJob(uid, newJob);
+        GenericEntity<JobInfoDTO> jobRequestEntity = new GenericEntity<JobInfoDTO>(jobInfo) {
+        };
         // Return 201 Created status code and the job id in body
         return Response.status(Status.CREATED).entity(jobRequestEntity).build();
     }
@@ -124,15 +122,15 @@ public class JobQueueEndpoint {
     /**
      * List all Queued or Running jobs associated with the user
      *
-     * @param username
+     * @param uid
      * @return
      * @throws IOException
      */
     @GET
     @Produces({APPLICATION_JSON, APPLICATION_XML})
     @RolesAllowed(Role.USER)
-    public Response listAllJobs(@PathParam("username") String username) throws IOException {
-        List<JobInfoDTO> jobInfoDTOs = jobQueueEndpointService.listAllJobs(username);
+    public Response listAllJobs(@PathParam("uid") Long uid) throws IOException {
+        List<JobInfoDTO> jobInfoDTOs = jobQueueEndpointService.listAllJobs(uid);
         GenericEntity<List<JobInfoDTO>> entity = new GenericEntity<List<JobInfoDTO>>(jobInfoDTOs) {
         };
 
@@ -145,27 +143,27 @@ public class JobQueueEndpoint {
      * Note: job ID is not associated with user account at this moment that's
      * why we don't have an endpoint that lists all the running jobs
      *
-     * @param username
+     * @param uid
      * @param id
-     * @return 200 OK status code with JobInfoDTO object or 404 NOT_FOUND
+     * @return 200 OK status code with JobInfoDTO object or
+     * ResourceNotFoundException
      * @throws IOException
      */
     @GET
     @Path("/{id}")
+    @Produces({APPLICATION_JSON, APPLICATION_XML})
     @RolesAllowed(Role.USER)
-    public Response jobStatus(@PathParam("username") String username, @PathParam("id") Long id) throws IOException {
-        JobInfoDTO jobInfoDTO = jobQueueEndpointService.checkJobStatus(username, id);
-        if(jobInfoDTO == null){
-            return Response.status(Status.NOT_FOUND).build();
-        }
-        GenericEntity<JobInfoDTO> entity = new GenericEntity<JobInfoDTO>(jobInfoDTO){}; 
+    public Response jobStatus(@PathParam("uid") Long uid, @PathParam("id") Long id) throws IOException {
+        JobInfoDTO jobInfoDTO = jobQueueEndpointService.checkJobStatus(uid, id);
+        GenericEntity<JobInfoDTO> entity = new GenericEntity<JobInfoDTO>(jobInfoDTO) {
+        };
         return Response.ok(entity).build();
     }
 
     /**
      * Cancel a job (job status can be Queued or Running)
      *
-     * @param username
+     * @param uid
      * @param id
      * @return
      * @throws IOException
@@ -173,8 +171,8 @@ public class JobQueueEndpoint {
     @DELETE
     @Path("/{id}")
     @RolesAllowed(Role.USER)
-    public Response cancelJob(@PathParam("username") String username, @PathParam("id") Long id) throws IOException {
-        boolean canceled = jobQueueEndpointService.cancelJob(username, id);
+    public Response cancelJob(@PathParam("uid") Long uid, @PathParam("id") Long id) throws IOException {
+        boolean canceled = jobQueueEndpointService.cancelJob(uid, id);
 
         if (canceled) {
             return Response.ok("Job " + id + " has been canceled").build();

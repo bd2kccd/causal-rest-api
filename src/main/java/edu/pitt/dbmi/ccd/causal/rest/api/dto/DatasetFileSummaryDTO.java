@@ -18,42 +18,33 @@
  */
 package edu.pitt.dbmi.ccd.causal.rest.api.dto;
 
-import javax.validation.constraints.NotNull;
-import org.hibernate.validator.constraints.NotBlank;
-import org.hibernate.validator.constraints.Range;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 
 /**
- * This bean is used to get form data when user wants to summarize a data file
+ * This DTO is used inside DataFileDTO
  *
  * @author Zhou Yuan (zhy19@pitt.edu)
  */
-public class DataFileSummarization {
+@XmlRootElement(name = "fileSummary")
+@XmlAccessorType(XmlAccessType.FIELD)
+public class DatasetFileSummaryDTO {
 
-    @NotNull
-    @Range(min = 1, max = Long.MAX_VALUE)
-    private Long id;
-
-    /*
-     * We'll convert the string value to VariableType object
-     */
-    @NotBlank(message = "Please specify the variable type.")
+    @XmlElement(nillable = true)
     private String variableType;
 
-    /*
-     * We'll convert the string value to FileDelimiter object
-     */
-    @NotBlank(message = "Please specify the file delimiter.")
+    @XmlElement(nillable = true)
     private String fileDelimiter;
 
-    public DataFileSummarization() {
-    }
+    @XmlElement(nillable = true)
+    private Integer numOfRows;
 
-    public Long getId() {
-        return id;
-    }
+    @XmlElement(nillable = true)
+    private Integer numOfColumns;
 
-    public void setId(Long id) {
-        this.id = id;
+    public DatasetFileSummaryDTO() {
     }
 
     public String getVariableType() {
@@ -70,5 +61,21 @@ public class DataFileSummarization {
 
     public void setFileDelimiter(String fileDelimiter) {
         this.fileDelimiter = fileDelimiter;
+    }
+
+    public Integer getNumOfRows() {
+        return numOfRows;
+    }
+
+    public void setNumOfRows(Integer numOfRows) {
+        this.numOfRows = numOfRows;
+    }
+
+    public Integer getNumOfColumns() {
+        return numOfColumns;
+    }
+
+    public void setNumOfColumns(Integer numOfColumns) {
+        this.numOfColumns = numOfColumns;
     }
 }

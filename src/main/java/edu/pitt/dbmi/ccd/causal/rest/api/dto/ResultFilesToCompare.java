@@ -16,23 +16,32 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301  USA
  */
-package edu.pitt.dbmi.ccd.causal.rest.api.exception;
+package edu.pitt.dbmi.ccd.causal.rest.api.dto;
 
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Response.Status;
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+import org.hibernate.validator.constraints.NotEmpty;
 
 /**
  *
- * Jun 5, 2016 10:11:40 PM
- *
- * @author Kevin V. Bui (kvb2@pitt.edu)
+ * @author Zhou Yuan (zhy19@pitt.edu)
  */
-public class UserNotFoundException extends WebApplicationException {
+public class ResultFilesToCompare {
 
-    private static final long serialVersionUID = 1509866160324624758L;
+    @Valid
+    @NotNull
+    @NotEmpty
+    protected String[] resultFiles;
 
-    public UserNotFoundException(Long uid) {
-        super(String.format("User ID '%s' not found.", uid), Status.NOT_FOUND);
+    public ResultFilesToCompare() {
+    }
+
+    public String[] getResultFiles() {
+        return resultFiles;
+    }
+
+    public void setResultFiles(String[] resultFiles) {
+        this.resultFiles = resultFiles;
     }
 
 }
