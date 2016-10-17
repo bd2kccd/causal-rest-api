@@ -690,7 +690,7 @@ Currently we support "FGS continuous", "FGS discrete" and "GFCI continuous". The
 | Input JSON Fields | Description |
 | --- | --- |
 | `datasetFileId` | The dataset file ID, integer |
-| `priorKnowledgeFileId` | The prior knowledge file ID, integer |
+| `priorKnowledgeFileId` | The optional prior knowledge file ID, integer |
 | `dataValidation` | Algorithm specific input data validation flags, JSON object |
 | `algorithmParameters` | Algorithm specific parameters, JSON object |
 | `jvmOptions` | Advanced Options For Java Virtual Machine (JVM), JSON object. Currently only support `maxHeapSize` (Gigabyte, max value is 100) |

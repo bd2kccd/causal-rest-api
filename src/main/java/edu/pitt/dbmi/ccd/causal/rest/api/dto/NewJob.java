@@ -32,7 +32,6 @@ public abstract class NewJob {
     @Range(min = 1, max = Long.MAX_VALUE)
     protected Long datasetFileId;
 
-    @NotNull
     @Range(min = 1, max = Long.MAX_VALUE)
     protected Long priorKnowledgeFileId;
 
