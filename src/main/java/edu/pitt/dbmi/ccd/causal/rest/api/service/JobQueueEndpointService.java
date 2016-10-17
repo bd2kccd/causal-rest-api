@@ -145,16 +145,19 @@ public class JobQueueEndpointService {
         commands.add("--data");
         commands.add(datasetPath.toAbsolutePath().toString());
 
-        // Get prior knowledge file name by file id
-        Long priorKnowledgeFileId = newJob.getPriorKnowledgeFileId();
-        DataFile priorKnowledgeFile = dataFileService.findByIdAndUserAccount(priorKnowledgeFileId, userAccount);
-        if (priorKnowledgeFile == null) {
-            throw new NotFoundByIdException(priorKnowledgeFileId);
-        }
-        Path priorKnowledgePath = Paths.get(map.get("dataDir"), priorKnowledgeFile.getName());
+        // Add prior knowloedge file (optional)
+        if (newJob.getPriorKnowledgeFileId() != null) {
+            // Get prior knowledge file name by file id
+            Long priorKnowledgeFileId = newJob.getPriorKnowledgeFileId();
+            DataFile priorKnowledgeFile = dataFileService.findByIdAndUserAccount(priorKnowledgeFileId, userAccount);
+            if (priorKnowledgeFile == null) {
+                throw new NotFoundByIdException(priorKnowledgeFileId);
+            }
+            Path priorKnowledgePath = Paths.get(map.get("dataDir"), priorKnowledgeFile.getName());
 
-        commands.add("--knowledge");
-        commands.add(priorKnowledgePath.toAbsolutePath().toString());
+            commands.add("--knowledge");
+            commands.add(priorKnowledgePath.toAbsolutePath().toString());
+        }
 
         // Algorithm parameters
         GfciContinuousParameters algorithmParameters = newJob.getAlgorithmParameters();
@@ -292,16 +295,19 @@ public class JobQueueEndpointService {
         commands.add("--data");
         commands.add(datasetPath.toAbsolutePath().toString());
 
-        // Get prior knowledge file name by file id
-        Long priorKnowledgeFileId = newJob.getPriorKnowledgeFileId();
-        DataFile priorKnowledgeFile = dataFileService.findByIdAndUserAccount(priorKnowledgeFileId, userAccount);
-        if (priorKnowledgeFile == null) {
-            throw new NotFoundByIdException(priorKnowledgeFileId);
-        }
-        Path priorKnowledgePath = Paths.get(map.get("dataDir"), priorKnowledgeFile.getName());
+        // Add prior knowloedge file (optional)
+        if (newJob.getPriorKnowledgeFileId() != null) {
+            // Get prior knowledge file name by file id
+            Long priorKnowledgeFileId = newJob.getPriorKnowledgeFileId();
+            DataFile priorKnowledgeFile = dataFileService.findByIdAndUserAccount(priorKnowledgeFileId, userAccount);
+            if (priorKnowledgeFile == null) {
+                throw new NotFoundByIdException(priorKnowledgeFileId);
+            }
+            Path priorKnowledgePath = Paths.get(map.get("dataDir"), priorKnowledgeFile.getName());
 
-        commands.add("--knowledge");
-        commands.add(priorKnowledgePath.toAbsolutePath().toString());
+            commands.add("--knowledge");
+            commands.add(priorKnowledgePath.toAbsolutePath().toString());
+        }
 
         // Algorithm parameters
         FgsDiscreteParameters algorithmParameters = newJob.getAlgorithmParameters();
@@ -439,16 +445,19 @@ public class JobQueueEndpointService {
         commands.add("--data");
         commands.add(datasetPath.toAbsolutePath().toString());
 
-        // Get prior knowledge file name by file id
-        Long priorKnowledgeFileId = newJob.getPriorKnowledgeFileId();
-        DataFile priorKnowledgeFile = dataFileService.findByIdAndUserAccount(priorKnowledgeFileId, userAccount);
-        if (priorKnowledgeFile == null) {
-            throw new NotFoundByIdException(priorKnowledgeFileId);
-        }
-        Path priorKnowledgePath = Paths.get(map.get("dataDir"), priorKnowledgeFile.getName());
+        // Add prior knowloedge file (optional)
+        if (newJob.getPriorKnowledgeFileId() != null) {
+            // Get prior knowledge file name by file id
+            Long priorKnowledgeFileId = newJob.getPriorKnowledgeFileId();
+            DataFile priorKnowledgeFile = dataFileService.findByIdAndUserAccount(priorKnowledgeFileId, userAccount);
+            if (priorKnowledgeFile == null) {
+                throw new NotFoundByIdException(priorKnowledgeFileId);
+            }
+            Path priorKnowledgePath = Paths.get(map.get("dataDir"), priorKnowledgeFile.getName());
 
-        commands.add("--knowledge");
-        commands.add(priorKnowledgePath.toAbsolutePath().toString());
+            commands.add("--knowledge");
+            commands.add(priorKnowledgePath.toAbsolutePath().toString());
+        }
 
         // Algorithm parameters
         FgsContinuousParameters algorithmParameters = newJob.getAlgorithmParameters();
