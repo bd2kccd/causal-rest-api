@@ -74,7 +74,7 @@ public class AuthFilterService {
     private static final AccessDeniedException BASIC_AUTH_INVALID_USER_CREDENTIALS = new AccessDeniedException("Invalid user credentials.");
 
     private static final AccessDeniedException BEARER_AUTH_JWT_REQUIRED = new AccessDeniedException("JSON Web Token(JWT) is required.");
-    private static final AccessDeniedException BEARER_AUTH_SCHEME_REQUIRED = new AccessDeniedException("Bearer Authentication scheme is required to acees this resource.");
+    private static final AccessDeniedException BEARER_AUTH_SCHEME_REQUIRED = new AccessDeniedException("Bearer Authentication scheme is required to access this resource.");
     private static final AccessDeniedException BEARER_AUTH_EXPIRED_JWT = new AccessDeniedException("Your JSON Web Token(JWT) has expired, please get a new one and try again.");
     private static final AccessDeniedException BEARER_AUTH_INVALID_JWT = new AccessDeniedException("Invalid JSON Web Token(JWT).");
 
