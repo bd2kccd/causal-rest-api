@@ -729,8 +729,8 @@ Algorithm parameters:
 
 | Parameters        | Description           | Default Value  |
 | ------------- | ------------- | ----- |
-| `structurePrior`      | Penalty discount      |  |
-| `samplePrior` | Sample prior      |  |
+| `structurePrior`      | Structure prior      | 1.0 |
+| `samplePrior` | Sample prior      | 1.0 |
 | `faithfulnessAssumed`      | Yes if (one edge) faithfulness should be assumed      |   true |
 | `maxDegree`      | The maximum degree of the output graph      |   100 |
 | `verbose` | Print additional information      |    true |
