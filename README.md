@@ -710,12 +710,9 @@ Algorithm parameters:
 
 | Parameters        | Description           | Default Value  |
 | ------------- | ------------- | ----- |
-| `depth`      | Search depth. Integer value |  |
-| `faithfulnessAssumed`      | Yes if (one edge) faithfulness should be assumed      |   false |
-| `maxDegree`      | The maximum degree of the output graph      |   5 |
+| `faithfulnessAssumed`      | Yes if (one edge) faithfulness should be assumed      |   true |
+| `maxDegree`      | The maximum degree of the output graph      |   100 |
 | `penaltyDiscount`      | Penalty discount      |   4.0 |
-| `ignoreLinearDependence` | Ignore linear dependence      |    true |
-| `heuristicSpeedup` | Heuristic speedup. All conditional independence relations that hold in the distribution are entailed by the Causal Markov Assumption      |    true |
 | `verbose` | Print additional information      |    true |
 
 **FGS discrete** 
@@ -732,12 +729,10 @@ Algorithm parameters:
 
 | Parameters        | Description           | Default Value  |
 | ------------- | ------------- | ----- |
-| `depth`      | Search depth. Integer value |  |
-| `faithfulnessAssumed`      | Yes if (one edge) faithfulness should be assumed      |   false |
-| `maxDegree`      | The maximum degree of the output graph      |   5 |
 | `structurePrior`      | Penalty discount      |  |
 | `samplePrior` | Sample prior      |  |
-| `heuristicSpeedup` | Heuristic speedup. All conditional independence relations that hold in the distribution are entailed by the Causal Markov Assumption      |    true |
+| `faithfulnessAssumed`      | Yes if (one edge) faithfulness should be assumed      |   true |
+| `maxDegree`      | The maximum degree of the output graph      |   100 |
 | `verbose` | Print additional information      |    true |
 
 **GFCI continuous** 
@@ -746,6 +741,7 @@ Data validation:
 
 | Parameters        | Description           | Default Value  |
 | ------------- | ------------- | ----- |
+| `nonZeroVariance`      | Non-zero Variance. Ensure that each variable has non-zero variance | true |
 | `uniqueVarName`      | Unique Variable Name. Ensure that there are no duplicated variable names      |  true |
 
 Algorithm parameters:
@@ -753,9 +749,9 @@ Algorithm parameters:
 | Parameters        | Description           | Default Value  |
 | ------------- | ------------- | ----- |
 | `alpha`      | Search depth. Integer value |  1.0 | 
-| `faithfulnessAssumed`      | Yes if (one edge) faithfulness should be assumed      |   false |
-| `maxInDegree`      | Maximum indegree of graph      |   100 |
 | `penaltyDiscount`      | Penalty discount      |   4.0 |
+| `maxInDegree`      | Maximum indegree of graph      |   100 |
+| `faithfulnessAssumed`      | Yes if (one edge) faithfulness should be assumed      |   false |
 | `verbose` | Print additional information      |    true |
 
 #### Add a new job to run the desired algorithm on a given data file
