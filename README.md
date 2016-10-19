@@ -780,8 +780,8 @@ Content-Type: application/json
       "uniqueVarName": false
     },
     "algorithmParameters": {
-      "depth": 3,
-      "penaltyDiscount": 5.0
+      "penaltyDiscount": 5.0,
+      "maxDegree": 101
     },
     "jvmOptions": {
       "maxHeapSize": 100
@@ -827,9 +827,9 @@ Content-Type: application/json
       "limitNumOfCategory": false
     },
     "algorithmParameters": {
-      "depth": 3,
       "structurePrior": 1.0,
-      "samplePrior": 1.0
+      "samplePrior": 1.0,
+      "maxDegree": 102
     },
     "jvmOptions": {
       "maxHeapSize": 100
