@@ -55,15 +55,15 @@ public class JwtEndpointService {
     }
 
     public JwtDTO generateJwt(String authString) {
-        // Parse the username from the authString
+        // Parse the email from the authString
         String authCredentialBase64 = authString.replaceFirst(AUTH_SCHEME_BASIC, "").trim();
         String credentials = new String(Base64.getDecoder().decode(authCredentialBase64));
         StringTokenizer tokenizer = new StringTokenizer(credentials, ":");
-        String username = tokenizer.nextToken();
+        String email = tokenizer.nextToken();
 
         // When we can get here vai AuthFilterSerice, it means the user exists
         // so no need to check if (userAccount == null) and throw UserNotFoundException(uid)
-        UserAccount userAccount = userAccountService.findByUsername(username);
+        UserAccount userAccount = userAccountService.findByEmail(email);
 
         // Note this uid is Long object, we'll need to use the numeric primitive long
         // to store it into JWT claims

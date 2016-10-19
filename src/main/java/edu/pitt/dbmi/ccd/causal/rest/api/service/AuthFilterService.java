@@ -202,12 +202,18 @@ public class AuthFilterService {
         return new CustomSecurityContext(username, roles, authScheme, secure);
     }
 
+    /**
+     * Find the user account by email and password provided in Basic Auth header
+     *
+     * @param credentials
+     * @return
+     */
     private UserAccount retrieveUserAccount(String credentials) {
         StringTokenizer tokenizer = new StringTokenizer(credentials, ":");
-        String username = tokenizer.nextToken();
+        String email = tokenizer.nextToken();
         String password = tokenizer.nextToken();
 
-        UserAccount userAccount = userAccountService.findByUsername(username);
+        UserAccount userAccount = userAccountService.findByEmail(email);
         if (userAccount != null) {
             String hashedPassword = userAccount.getPassword();
             if (!defaultPasswordService.passwordsMatch(password, hashedPassword)) {
