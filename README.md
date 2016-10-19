@@ -103,7 +103,7 @@ This API requires user to be authenticated. Before using this API, the user will
 
 ### Getting JSON Web Token(JWT)
 
-After registration in Causal Web App, the username and password can be used to authenticate against the Causal REST API to get the access token (we use JWT) via **HTTP Basic Auth**. 
+After registration in Causal Web App, the email and password can be used to authenticate against the Causal REST API to get the access token (we use JWT) via **HTTP Basic Auth**. 
 
 API Endpoint URI pattern:
 
@@ -111,12 +111,12 @@ API Endpoint URI pattern:
 GET https://cloud.ccd.pitt.edu/ccd-api/jwt
 ````
 
-In basic auth, the user provides the username and password, which the HTTP client concatenates (username + ":" + password), and base64 encodes it. This encoded string is then sent using a `Authorization` header with the "Basic" schema. For instance user `demouser` whose password is `123`.
+In basic auth, the user provides the username and password, which the HTTP client concatenates (username + ":" + password), and base64 encodes it. This encoded string is then sent using a `Authorization` header with the "Basic" schema. For instance user email `demo@pitt.edu` whose password is `123`.
 
 ````
 POST /ccd-api/jwt HTTP/1.1
 Host: cloud.ccd.pitt.edu
-Authorization: Basic ZGVtb3VzZXI6MTIz
+Authorization: Basic ZGVtb0BwaXR0LmVkdToxMjM=
 ````
 
 Once the request is processed successfully, the user ID together with a JWT will be returned in the response for further API queries.
