@@ -74,7 +74,7 @@ public class AuthFilterService {
     private static final AccessDeniedException BASIC_AUTH_INVALID_USER_CREDENTIALS = new AccessDeniedException("Invalid user credentials.");
 
     private static final AccessDeniedException BEARER_AUTH_JWT_REQUIRED = new AccessDeniedException("JSON Web Token(JWT) is required.");
-    private static final AccessDeniedException BEARER_AUTH_SCHEME_REQUIRED = new AccessDeniedException("Bearer Authentication scheme is required to acees this resource.");
+    private static final AccessDeniedException BEARER_AUTH_SCHEME_REQUIRED = new AccessDeniedException("Bearer Authentication scheme is required to access this resource.");
     private static final AccessDeniedException BEARER_AUTH_EXPIRED_JWT = new AccessDeniedException("Your JSON Web Token(JWT) has expired, please get a new one and try again.");
     private static final AccessDeniedException BEARER_AUTH_INVALID_JWT = new AccessDeniedException("Invalid JSON Web Token(JWT).");
 
@@ -91,16 +91,21 @@ public class AuthFilterService {
 
     // Direct the actual authentication to baisc auth
     public void verifyBasicAuth(ContainerRequestContext requestContext) {
+        // Based on testing, getHeaderString() matches the header string in a case-insensitive way
+        // So no need to worry about the cases of the "Authorization" header
         String authCredentials = requestContext.getHeaderString(AUTH_HEADER);
         if (authCredentials == null) {
             throw BASIC_AUTH_USER_CREDENTIALS_REQUIRED;
         }
 
-        if (!authCredentials.contains(AUTH_SCHEME_BASIC)) {
+        // Use lower case to check since HTTP headers are case-insentive
+        if (!authCredentials.toLowerCase().startsWith(AUTH_SCHEME_BASIC.toLowerCase())) {
             throw BASIC_AUTH_SCHEME_REQUIRED;
         }
 
-        String authCredentialBase64 = authCredentials.replaceFirst(AUTH_SCHEME_BASIC, "").trim();
+        // "\\s+" will cause any number of consecutive spaces to split the string into tokens
+        // Here we split the auth string by space(s) and the second part is the base64 encoded
+        String authCredentialBase64 = authCredentials.split("\\s+")[1];
         // In the basic auth schema, both username and password are encoded in the request header
         // So we'll need to get the user account info with username and password
         String credentials = new String(Base64.getDecoder().decode(authCredentialBase64));
@@ -119,19 +124,24 @@ public class AuthFilterService {
 
     // Direct the actual authentication to jwt based bearer schema
     public void verifyJwt(ContainerRequestContext requestContext) {
+        // Based on testing, getHeaderString() matches the header string in a case-insensitive way
+        // So no need to worry about the cases of the "Authorization" header
         String authCredentials = requestContext.getHeaderString(AUTH_HEADER);
         if (authCredentials == null) {
             throw BEARER_AUTH_JWT_REQUIRED;
         }
 
         // All other endpoints use bearer JWT to verify the API consumer
-        if (!authCredentials.contains(AUTH_SCHEME_BEARER)) {
+        // Use lower case to check since HTTP headers are case-insentive
+        if (!authCredentials.toLowerCase().startsWith(AUTH_SCHEME_BEARER.toLowerCase())) {
             throw BEARER_AUTH_SCHEME_REQUIRED;
         }
 
         // Verify JWT
         try {
-            String jwt = authCredentials.replaceFirst(AUTH_SCHEME_BEARER, "").trim();
+            // "\\s+" will cause any number of consecutive spaces to split the string into tokens
+            // Here we split the auth string by space(s) and the second part is the base64 encoded JWT
+            String jwt = authCredentials.split("\\s+")[1];
 
             // Verify both secret and issuer
             final JWTVerifier jwtVerifier = new JWTVerifier(jwtSecret, null, jwtIssuer);

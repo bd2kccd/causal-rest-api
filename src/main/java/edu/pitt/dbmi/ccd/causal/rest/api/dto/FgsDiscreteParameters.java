@@ -18,14 +18,18 @@
  */
 package edu.pitt.dbmi.ccd.causal.rest.api.dto;
 
+import org.springframework.beans.factory.annotation.Value;
+
 /**
  *
  * @author Zhou Yuan (zhy19@pitt.edu)
  */
 public class FgsDiscreteParameters extends FgsParameters {
 
+    @Value("1.0")
     private double structurePrior;
 
+    @Value("1.0")
     private double samplePrior;
 
     public FgsDiscreteParameters() {
