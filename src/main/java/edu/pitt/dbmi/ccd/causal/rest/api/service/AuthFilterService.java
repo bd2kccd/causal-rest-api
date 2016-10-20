@@ -91,7 +91,8 @@ public class AuthFilterService {
 
     // Direct the actual authentication to baisc auth
     public void verifyBasicAuth(ContainerRequestContext requestContext) {
-        // How does this handle cases of the header?
+        // Based on testing, getHeaderString() matches the header string in a case-insensitive way
+        // So no need to worry about the cases of the "Authorization" header
         String authCredentials = requestContext.getHeaderString(AUTH_HEADER);
         if (authCredentials == null) {
             throw BASIC_AUTH_USER_CREDENTIALS_REQUIRED;
@@ -123,6 +124,8 @@ public class AuthFilterService {
 
     // Direct the actual authentication to jwt based bearer schema
     public void verifyJwt(ContainerRequestContext requestContext) {
+        // Based on testing, getHeaderString() matches the header string in a case-insensitive way
+        // So no need to worry about the cases of the "Authorization" header
         String authCredentials = requestContext.getHeaderString(AUTH_HEADER);
         if (authCredentials == null) {
             throw BEARER_AUTH_JWT_REQUIRED;
