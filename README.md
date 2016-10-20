@@ -154,7 +154,7 @@ At this point, you can upload two types of data files: tabular dataset file(eith
 API Endpoint URI pattern:
 
 ````
-POST https://cloud.ccd.pitt.edu/ccd-api/{userId}/upload/dataset
+POST https://cloud.ccd.pitt.edu/ccd-api/{userId}/dataset/upload
 ````
 
 This is a multipart file upload via an HTML form, and the client is required to use `name="file"` to name their file upload field in their form.
@@ -162,7 +162,7 @@ This is a multipart file upload via an HTML form, and the client is required to 
 Generated HTTP request code example:
 
 ````
-POST /ccd-api/22/upload/dataset HTTP/1.1
+POST /ccd-api/22/dataset/upload HTTP/1.1
 Host: cloud.ccd.pitt.edu
 Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL2Nsb3VkLmNjZC5waXR0LmVkdS8iLCJuYW1lIjoiemh5MTkiLCJleHAiOjE0NzU4NTA2NzY4MDQsImlhdCI6MTQ3NTg0NzA3NjgwNH0.8azVEoNPfETczXb-vn7dfyDd98eRt7iiLBXehGpPGzY
 Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
@@ -183,7 +183,7 @@ If the Authorization header is not provided, the response will look like this:
   "status": 401,
   "error": "Unauthorized",
   "message": "User credentials are required.",
-  "path": "/22/upload/dataset"
+  "path": "/22/dataset/upload"
 }
 ````
 
@@ -209,7 +209,7 @@ This POST request will upload the dataset file to the target server location and
 The prior knowledge file upload uses a similar API endpoint:
 
 ````
-POST https://cloud.ccd.pitt.edu/ccd-api/{userId}/upload/priorknowledge
+POST https://cloud.ccd.pitt.edu/ccd-api/{userId}/priorknowledge/upload
 ````
 
 Due to there's no need to summarize a prior knowledge file, the response of a successful prior knowledge file upload will look like:
@@ -234,9 +234,9 @@ and resumable uploads via the HTML5 File API. You can also create your own clien
 API Endpoint URI pattern:
 
 ````
-GET https://cloud.ccd.pitt.edu/ccd-api/{userId}/upload/chunk
+GET https://cloud.ccd.pitt.edu/ccd-api/{userId}/chunkupload
 
-POST https://cloud.ccd.pitt.edu/ccd-api/{userId}/upload/chunk
+POST https://cloud.ccd.pitt.edu/ccd-api/{userId}/chunkupload
 ````
 
 In this example, the data file is splited into 3 chunks. The upload of each chunk consists of a GET request and a POST request. To handle the state of upload chunks, a number of extra parameters are sent along with all requests:
@@ -254,7 +254,7 @@ In this example, the data file is splited into 3 chunks. The upload of each chun
 Generated HTTP request code example:
 
 ````
-GET /ccd-api/22/upload/chunk?resumableChunkNumber=2&resumableChunkSize=1048576&resumableCurrentChunkSize=1048576&resumableTotalSize=3309465&resumableType=text%2Fplain&resumableIdentifier=3309465-large-datatxt&resumableFilename=large-data.txt&resumableRelativePath=large-data.txt&resumableTotalChunks=3 HTTP/1.1
+GET /ccd-api/22/chunkupload?resumableChunkNumber=2&resumableChunkSize=1048576&resumableCurrentChunkSize=1048576&resumableTotalSize=3309465&resumableType=text%2Fplain&resumableIdentifier=3309465-large-datatxt&resumableFilename=large-data.txt&resumableRelativePath=large-data.txt&resumableTotalChunks=3 HTTP/1.1
 Host: cloud.ccd.pitt.edu
 Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL2Nsb3VkLmNjZC5waXR0LmVkdS8iLCJuYW1lIjoiemh5MTkiLCJleHAiOjE0NzU4NTA2NzY4MDQsImlhdCI6MTQ3NTg0NzA3NjgwNH0.8azVEoNPfETczXb-vn7dfyDd98eRt7iiLBXehGpPGzY
 ````
@@ -264,7 +264,7 @@ This GET request checks if the data chunk is already on the server side. If the 
 Generated HTTP request code example:
 
 ````
-POST /ccd-api/22/upload/chunk HTTP/1.1
+POST /ccd-api/22/chunkupload HTTP/1.1
 Host: cloud.ccd.pitt.edu
 Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL2Nsb3VkLmNjZC5waXR0LmVkdS8iLCJuYW1lIjoiemh5MTkiLCJleHAiOjE0NzU4NTA2NzY4MDQsImlhdCI6MTQ3NTg0NzA3NjgwNH0.8azVEoNPfETczXb-vn7dfyDd98eRt7iiLBXehGpPGzY
 Content-Type: multipart/form-data; boundary=----WebKitFormBoundaryMFjgApg56XGyeTnZ
