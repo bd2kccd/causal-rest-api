@@ -56,7 +56,9 @@ public class JwtEndpointService {
 
     public JwtDTO generateJwt(String authString) {
         // Parse the email from the authString
-        String authCredentialBase64 = authString.replaceFirst(AUTH_SCHEME_BASIC, "").trim();
+        // "\\s+" will cause any number of consecutive spaces to split the string into tokens
+        // Here we split the auth string by space(s) and the second part is the base64 encoded
+        String authCredentialBase64 = authString.split("\\s+")[1];
         String credentials = new String(Base64.getDecoder().decode(authCredentialBase64));
         StringTokenizer tokenizer = new StringTokenizer(credentials, ":");
         String email = tokenizer.nextToken();
@@ -99,7 +101,7 @@ public class JwtEndpointService {
         userAccount.setPublicKey(jwt);
         userAccountService.save(userAccount);
 
-        LOGGER.info("Added JWT for user id %d", uid);
+        LOGGER.info(String.format("Added JWT for user id %d", uid));
 
         // Return the jwt to API consumer
         JwtDTO jwtDTO = new JwtDTO();
