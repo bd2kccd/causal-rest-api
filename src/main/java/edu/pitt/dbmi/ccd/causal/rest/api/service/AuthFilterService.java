@@ -91,12 +91,14 @@ public class AuthFilterService {
 
     // Direct the actual authentication to baisc auth
     public void verifyBasicAuth(ContainerRequestContext requestContext) {
+        // How does this handle cases of the header?
         String authCredentials = requestContext.getHeaderString(AUTH_HEADER);
         if (authCredentials == null) {
             throw BASIC_AUTH_USER_CREDENTIALS_REQUIRED;
         }
 
-        if (!authCredentials.contains(AUTH_SCHEME_BASIC)) {
+        // Use lower case to check since HTTP headers are case-insentive
+        if (!authCredentials.toLowerCase().startsWith(AUTH_SCHEME_BASIC.toLowerCase())) {
             throw BASIC_AUTH_SCHEME_REQUIRED;
         }
 
@@ -125,7 +127,8 @@ public class AuthFilterService {
         }
 
         // All other endpoints use bearer JWT to verify the API consumer
-        if (!authCredentials.contains(AUTH_SCHEME_BEARER)) {
+        // Use lower case to check since HTTP headers are case-insentive
+        if (!authCredentials.toLowerCase().startsWith(AUTH_SCHEME_BEARER.toLowerCase())) {
             throw BEARER_AUTH_SCHEME_REQUIRED;
         }
 
