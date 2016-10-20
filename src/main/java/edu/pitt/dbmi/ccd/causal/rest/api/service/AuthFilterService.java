@@ -102,7 +102,9 @@ public class AuthFilterService {
             throw BASIC_AUTH_SCHEME_REQUIRED;
         }
 
-        String authCredentialBase64 = authCredentials.replaceFirst(AUTH_SCHEME_BASIC, "").trim();
+        // "\\s+" will cause any number of consecutive spaces to split the string into tokens
+        // Here we split the auth string by space(s) and the second part is the base64 encoded
+        String authCredentialBase64 = authCredentials.split("\\s+")[1];
         // In the basic auth schema, both username and password are encoded in the request header
         // So we'll need to get the user account info with username and password
         String credentials = new String(Base64.getDecoder().decode(authCredentialBase64));
@@ -134,7 +136,9 @@ public class AuthFilterService {
 
         // Verify JWT
         try {
-            String jwt = authCredentials.replaceFirst(AUTH_SCHEME_BEARER, "").trim();
+            // "\\s+" will cause any number of consecutive spaces to split the string into tokens
+            // Here we split the auth string by space(s) and the second part is the base64 encoded JWT
+            String jwt = authCredentials.split("\\s+")[1];
 
             // Verify both secret and issuer
             final JWTVerifier jwtVerifier = new JWTVerifier(jwtSecret, null, jwtIssuer);
