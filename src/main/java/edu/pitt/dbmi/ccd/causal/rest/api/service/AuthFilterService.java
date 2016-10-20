@@ -99,7 +99,8 @@ public class AuthFilterService {
         }
 
         // Use lower case to check since HTTP headers are case-insentive
-        if (!authCredentials.toLowerCase().startsWith(AUTH_SCHEME_BASIC.toLowerCase())) {
+        // Add a space to make sure "Basic" is separated from the base64 string by a space
+        if (!authCredentials.toLowerCase().startsWith(AUTH_SCHEME_BASIC.toLowerCase() + " ")) {
             throw BASIC_AUTH_SCHEME_REQUIRED;
         }
 
@@ -133,7 +134,8 @@ public class AuthFilterService {
 
         // All other endpoints use bearer JWT to verify the API consumer
         // Use lower case to check since HTTP headers are case-insentive
-        if (!authCredentials.toLowerCase().startsWith(AUTH_SCHEME_BEARER.toLowerCase())) {
+        // Add a space to makre sure "Bearer" is sepatated from the base64 string by a space
+        if (!authCredentials.toLowerCase().startsWith(AUTH_SCHEME_BEARER.toLowerCase() + " ")) {
             throw BEARER_AUTH_SCHEME_REQUIRED;
         }
 
