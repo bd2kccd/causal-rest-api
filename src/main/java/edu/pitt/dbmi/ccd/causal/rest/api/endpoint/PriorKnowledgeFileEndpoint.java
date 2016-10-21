@@ -42,7 +42,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @PermitAll
-@Path("/{uid}/priorknowledge")
+@Path("/{uid}")
 public class PriorKnowledgeFileEndpoint {
 
     private final PriorKnowledgeFileEndpointService priorKnowledgeFileEndpointService;
@@ -59,6 +59,7 @@ public class PriorKnowledgeFileEndpoint {
      * @return 200 with file list
      */
     @GET
+    @Path("/priorknowledge")
     @Produces({APPLICATION_JSON, APPLICATION_XML})
     @RolesAllowed(Role.USER)
     public Response listDataFiles(@PathParam("uid") Long uid) {
@@ -77,7 +78,7 @@ public class PriorKnowledgeFileEndpoint {
      * @return 204 No content
      */
     @DELETE
-    @Path("/{id}")
+    @Path("/priorknowledge/{id}")
     @RolesAllowed(Role.USER)
     public Response deleteById(@PathParam("uid") Long uid, @PathParam("id") Long id) {
         priorKnowledgeFileEndpointService.deleteByIdAndUid(id, uid);
@@ -93,7 +94,7 @@ public class PriorKnowledgeFileEndpoint {
      * @return 200 with data file info
      */
     @GET
-    @Path("/{id}")
+    @Path("/priorknowledge/{id}")
     @Produces({APPLICATION_JSON, APPLICATION_XML})
     @RolesAllowed(Role.USER)
     public Response findById(@PathParam("username") Long uid, @PathParam("id") Long id) {

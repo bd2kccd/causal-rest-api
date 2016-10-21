@@ -42,7 +42,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @PermitAll
-@Path("/{uid}/algorithms")
+@Path("/{uid}")
 public class AlgorithmEndpoint {
 
     private final AlgorithmEndpointService algorithmEndpointService;
@@ -59,6 +59,7 @@ public class AlgorithmEndpoint {
      * @throws IOException
      */
     @GET
+    @Path("/algorithms")
     @Produces({APPLICATION_JSON, APPLICATION_XML})
     @RolesAllowed(Role.USER)
     public Response listAlgorithmResultFiles() throws IOException {

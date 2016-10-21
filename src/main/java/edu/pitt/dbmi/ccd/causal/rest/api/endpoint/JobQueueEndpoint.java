@@ -26,6 +26,7 @@ import edu.pitt.dbmi.ccd.causal.rest.api.dto.JobInfoDTO;
 import edu.pitt.dbmi.ccd.causal.rest.api.service.JobQueueEndpointService;
 import java.io.IOException;
 import java.util.List;
+import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
 import javax.validation.Valid;
 import javax.ws.rs.Consumes;
@@ -41,12 +42,15 @@ import static javax.ws.rs.core.MediaType.APPLICATION_XML;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  *
  * @author Zhou Yuan (zhy19@pitt.edu)
  */
-@Path("/{uid}/jobs")
+@Component
+@PermitAll
+@Path("/{uid}")
 public class JobQueueEndpoint {
 
     private final JobQueueEndpointService jobQueueEndpointService;
@@ -65,7 +69,7 @@ public class JobQueueEndpoint {
      * @throws IOException
      */
     @POST
-    @Path("/gfcic")
+    @Path("/jobs/gfcic")
     @Consumes(APPLICATION_JSON)
     @Produces({APPLICATION_JSON, APPLICATION_XML})
     @RolesAllowed(Role.USER)
@@ -86,7 +90,7 @@ public class JobQueueEndpoint {
      * @throws IOException
      */
     @POST
-    @Path("/fgsc")
+    @Path("/jobs/fgsc")
     @Consumes(APPLICATION_JSON)
     @Produces({APPLICATION_JSON, APPLICATION_XML})
     @RolesAllowed(Role.USER)
@@ -107,7 +111,7 @@ public class JobQueueEndpoint {
      * @throws IOException
      */
     @POST
-    @Path("/fgsd")
+    @Path("/jobs/fgsd")
     @Consumes(APPLICATION_JSON)
     @Produces({APPLICATION_JSON, APPLICATION_XML})
     @RolesAllowed(Role.USER)
@@ -127,6 +131,7 @@ public class JobQueueEndpoint {
      * @throws IOException
      */
     @GET
+    @Path("/jobs")
     @Produces({APPLICATION_JSON, APPLICATION_XML})
     @RolesAllowed(Role.USER)
     public Response listAllJobs(@PathParam("uid") Long uid) throws IOException {
@@ -150,7 +155,7 @@ public class JobQueueEndpoint {
      * @throws IOException
      */
     @GET
-    @Path("/{id}")
+    @Path("/jobs/{id}")
     @Produces({APPLICATION_JSON, APPLICATION_XML})
     @RolesAllowed(Role.USER)
     public Response jobStatus(@PathParam("uid") Long uid, @PathParam("id") Long id) throws IOException {
@@ -169,7 +174,7 @@ public class JobQueueEndpoint {
      * @throws IOException
      */
     @DELETE
-    @Path("/{id}")
+    @Path("/jobs/{id}")
     @RolesAllowed(Role.USER)
     public Response cancelJob(@PathParam("uid") Long uid, @PathParam("id") Long id) throws IOException {
         boolean canceled = jobQueueEndpointService.cancelJob(uid, id);

@@ -49,7 +49,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @PermitAll
-@Path("/{uid}/results")
+@Path("/{uid}")
 public class ResultFileEndpoint {
 
     private final ResultFileEndpointService algorithmResultEndpointService;
@@ -67,6 +67,7 @@ public class ResultFileEndpoint {
      * @throws IOException
      */
     @GET
+    @Path("/results")
     @Produces({APPLICATION_JSON, APPLICATION_XML})
     @RolesAllowed(Role.USER)
     public Response listAlgorithmResultFiles(@PathParam("uid") Long uid) throws IOException {
@@ -90,7 +91,7 @@ public class ResultFileEndpoint {
      * @throws IOException
      */
     @GET
-    @Path("/{fileName}")
+    @Path("/results/{fileName}")
     @Produces({TEXT_PLAIN, APPLICATION_JSON, APPLICATION_XML})
     @RolesAllowed(Role.USER)
     public Response downloadAlgorithmResultFile(@PathParam("uid") Long uid, @PathParam("fileName") String fileName) throws IOException {
@@ -109,7 +110,7 @@ public class ResultFileEndpoint {
      * @throws IOException
      */
     @GET
-    @Path("/comparisons")
+    @Path("/results/comparisons")
     @Produces({APPLICATION_JSON, APPLICATION_XML})
     @RolesAllowed(Role.USER)
     public Response listAlgorithmResultComparisonFiles(@PathParam("uid") Long uid) throws IOException {
@@ -133,7 +134,7 @@ public class ResultFileEndpoint {
      * @throws IOException
      */
     @GET
-    @Path("/comparisons/{fileName}")
+    @Path("/results/comparisons/{fileName}")
     @Produces({TEXT_PLAIN, APPLICATION_JSON, APPLICATION_XML})
     @RolesAllowed(Role.USER)
     public Response downloadAlgorithmResultsComparisonFile(@PathParam("uid") Long uid, @PathParam("fileName") String fileName) throws IOException {
@@ -157,7 +158,7 @@ public class ResultFileEndpoint {
      * @throws IOException
      */
     @POST
-    @Path("/compare")
+    @Path("/results/compare")
     @Consumes(APPLICATION_JSON)
     @Produces({TEXT_PLAIN, APPLICATION_JSON, APPLICATION_XML})
     @RolesAllowed(Role.USER)

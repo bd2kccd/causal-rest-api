@@ -49,7 +49,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @PermitAll
-@Path("/{uid}/dataset")
+@Path("/{uid}")
 public class DatasetFileEndpoint {
 
     private final DatasetFileEndpointService datasetFileEndpointService;
@@ -67,7 +67,7 @@ public class DatasetFileEndpoint {
      * @return 204 No content
      */
     @DELETE
-    @Path("/{id}")
+    @Path("/dataset/{id}")
     @RolesAllowed(Role.USER)
     public Response deleteById(@PathParam("uid") Long uid, @PathParam("id") Long id) {
         datasetFileEndpointService.deleteByIdAndUid(id, uid);
@@ -83,7 +83,7 @@ public class DatasetFileEndpoint {
      * @return 200 with data file info
      */
     @GET
-    @Path("/{id}")
+    @Path("/dataset/{id}")
     @Produces({APPLICATION_JSON, APPLICATION_XML})
     @RolesAllowed(Role.USER)
     public Response findById(@PathParam("uid") Long uid, @PathParam("id") Long id) {
@@ -99,6 +99,7 @@ public class DatasetFileEndpoint {
      * @return 200 with file list
      */
     @GET
+    @Path("/dataset")
     @Produces({APPLICATION_JSON, APPLICATION_XML})
     @RolesAllowed(Role.USER)
     public Response listDataFiles(@PathParam("uid") Long uid) {
@@ -118,7 +119,7 @@ public class DatasetFileEndpoint {
      * @throws IOException
      */
     @POST
-    @Path("/summarize")
+    @Path("/dataset/summarize")
     @Consumes(APPLICATION_JSON)
     @Produces({APPLICATION_JSON, APPLICATION_XML})
     @RolesAllowed(Role.USER)
