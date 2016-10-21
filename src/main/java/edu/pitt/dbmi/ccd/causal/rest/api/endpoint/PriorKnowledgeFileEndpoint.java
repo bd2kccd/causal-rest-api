@@ -97,7 +97,7 @@ public class PriorKnowledgeFileEndpoint {
     @Path("/priorknowledge/{id}")
     @Produces({APPLICATION_JSON, APPLICATION_XML})
     @RolesAllowed(Role.USER)
-    public Response findById(@PathParam("username") Long uid, @PathParam("id") Long id) {
+    public Response findById(@PathParam("uid") Long uid, @PathParam("id") Long id) {
         PriorKnowledgeFileDTO priorKnowledgeFileDTO = priorKnowledgeFileEndpointService.findByIdAndUid(id, uid);
 
         return Response.ok(priorKnowledgeFileDTO).build();
