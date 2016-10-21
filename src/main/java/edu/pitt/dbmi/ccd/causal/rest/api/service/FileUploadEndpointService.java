@@ -133,11 +133,14 @@ public class FileUploadEndpointService {
 
         if (dataFile == null) {
             dataFile = new DataFile();
+            // No need to update these fileds in the same fileName found
+            // Only set these for new file
+            dataFile.setName(fileName);
+            dataFile.setAbsolutePath(directory);
             dataFile.setUserAccounts(Collections.singleton(userAccount));
         }
 
-        dataFile.setName(fileName);
-        dataFile.setAbsolutePath(directory);
+        // We need to specify/update these fileds no matter if the same fileName found
         dataFile.setCreationTime(new Date(creationTime));
         dataFile.setFileSize(size);
         dataFile.setLastModifiedTime(new Date(lastModifiedTime));
@@ -149,13 +152,16 @@ public class FileUploadEndpointService {
 
         if (dataFileInfo == null) {
             dataFileInfo = new DataFileInfo();
+            dataFileInfo.setMd5checkSum(md5checkSum);
+        } else if (!md5checkSum.equals(dataFileInfo.getMd5checkSum())) {
+            // Need to update the md5checksum
+            dataFileInfo.setMd5checkSum(md5checkSum);
+            // And reset the following fields
+            dataFileInfo.setFileDelimiter(null);
+            dataFileInfo.setVariableType(null);
+            dataFileInfo.setNumOfColumns(null);
+            dataFileInfo.setNumOfRows(null);
         }
-
-        dataFileInfo.setFileDelimiter(null);
-        dataFileInfo.setVariableType(null);
-        dataFileInfo.setMd5checkSum(md5checkSum);
-        dataFileInfo.setNumOfColumns(null);
-        dataFileInfo.setNumOfRows(null);
 
         // Now add new records into database
         dataFile.setDataFileInfo(dataFileInfo);
@@ -242,11 +248,14 @@ public class FileUploadEndpointService {
 
         if (dataFile == null) {
             dataFile = new DataFile();
+            // No need to update these fileds in the same fileName found
+            // Only set these for new file
+            dataFile.setName(fileName);
+            dataFile.setAbsolutePath(directory);
             dataFile.setUserAccounts(Collections.singleton(userAccount));
         }
 
-        dataFile.setName(fileName);
-        dataFile.setAbsolutePath(directory);
+        // We need to update these fileds no matter if the same fileName found
         dataFile.setCreationTime(new Date(creationTime));
         dataFile.setFileSize(size);
         dataFile.setLastModifiedTime(new Date(lastModifiedTime));
@@ -258,11 +267,15 @@ public class FileUploadEndpointService {
 
         if (dataFileInfo == null) {
             dataFileInfo = new DataFileInfo();
+            dataFileInfo.setMd5checkSum(md5checkSum);
+        } else if (!md5checkSum.equals(dataFileInfo.getMd5checkSum())) {
+            // Need to update the md5checksum
+            dataFileInfo.setMd5checkSum(md5checkSum);
         }
 
+        // Prior knowledge file doesn't need these fileds to be specified
         dataFileInfo.setFileDelimiter(null);
         dataFileInfo.setVariableType(null);
-        dataFileInfo.setMd5checkSum(md5checkSum);
         dataFileInfo.setNumOfColumns(null);
         dataFileInfo.setNumOfRows(null);
 
@@ -283,6 +296,7 @@ public class FileUploadEndpointService {
         priorKnowledgeFileDTO.setCreationTime(newDataFile.getCreationTime());
         priorKnowledgeFileDTO.setFileSize(newDataFile.getFileSize());
         priorKnowledgeFileDTO.setLastModifiedTime(newDataFile.getLastModifiedTime());
+        priorKnowledgeFileDTO.setMd5checkSum(md5checkSum);
 
         LOGGER.info(String.format("New prior knowledge file '%s' (id=%d) has been uploaded successfully.", newDataFile.getName(), newDataFile.getId()));
 

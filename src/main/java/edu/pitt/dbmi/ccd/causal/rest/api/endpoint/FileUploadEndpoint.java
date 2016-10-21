@@ -51,7 +51,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @PermitAll
-@Path("/{uid}/upload")
+@Path("/{uid}")
 public class FileUploadEndpoint {
 
     private final FileUploadEndpointService fileUploadEndpointService;
@@ -80,7 +80,7 @@ public class FileUploadEndpoint {
      * @throws IOException
      */
     @POST
-    @Path("/dataset")
+    @Path("/dataset/upload")
     @Consumes(MULTIPART_FORM_DATA)
     @Produces({APPLICATION_JSON, APPLICATION_XML})
     @RolesAllowed(Role.USER)
@@ -113,7 +113,7 @@ public class FileUploadEndpoint {
      * @throws IOException
      */
     @POST
-    @Path("/priorknowledge")
+    @Path("/priorknowledge/upload")
     @Consumes(MULTIPART_FORM_DATA)
     @Produces({APPLICATION_JSON, APPLICATION_XML})
     @RolesAllowed(Role.USER)
@@ -139,7 +139,7 @@ public class FileUploadEndpoint {
      * @throws IOException
      */
     @GET
-    @Path("/chunk")
+    @Path("/chunkupload")
     @RolesAllowed(Role.USER)
     public Response checkChunkExistence(@PathParam("uid") Long uid, @Valid @BeanParam ResumableChunkViaGet chunkViaGet) throws IOException {
         if (fileUploadEndpointService.chunkExists(chunkViaGet, uid)) {
@@ -171,7 +171,7 @@ public class FileUploadEndpoint {
      * @throws IOException
      */
     @POST
-    @Path("/chunk")
+    @Path("/chunkupload")
     @Consumes(MULTIPART_FORM_DATA)
     @RolesAllowed(Role.USER)
     public Response processChunkUpload(@PathParam("uid") Long uid, @Valid @BeanParam ResumableChunkViaPost chunkViaPost) throws IOException {
