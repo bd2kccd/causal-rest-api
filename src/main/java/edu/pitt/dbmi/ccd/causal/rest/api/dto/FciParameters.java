@@ -11,8 +11,8 @@ import org.springframework.beans.factory.annotation.Value;
  */
 public class FciParameters {
 
-    @Value("100")
-    protected int maxInDegree;
+    @Value("-1")
+    protected int maxDegree;
 
     @Value("true")
     protected boolean faithfulnessAssumed;
@@ -20,12 +20,12 @@ public class FciParameters {
     @Value("true")
     protected boolean verbose;
 
-    public int getMaxInDegree() {
-        return maxInDegree;
+    public int getMaxDegree() {
+        return maxDegree;
     }
 
-    public void setMaxInDegree(int maxInDegree) {
-        this.maxInDegree = maxInDegree;
+    public void setMaxDegree(int maxDegree) {
+        this.maxDegree = maxDegree;
     }
 
     public boolean isFaithfulnessAssumed() {

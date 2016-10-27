@@ -171,8 +171,8 @@ public class JobQueueEndpointService {
         commands.add("--penalty-discount");
         commands.add(Double.toString(algorithmParameters.getPenaltyDiscount()));
 
-        commands.add("--max-indegree");
-        commands.add(Integer.toString(algorithmParameters.getMaxInDegree()));
+        commands.add("--max-degree");
+        commands.add(Integer.toString(algorithmParameters.getMaxDegree()));
 
         if (algorithmParameters.isVerbose()) {
             commands.add("--verbose");
@@ -186,7 +186,7 @@ public class JobQueueEndpointService {
         GfciContinuousDataValidation dataValidation = newJob.getDataValidation();
 
         if (!dataValidation.isNonZeroVariance()) {
-            commands.add("--skip-non-zero-variance");
+            commands.add("--skip-nonzero-variance");
         }
 
         if (!dataValidation.isUniqueVarName()) {
@@ -483,7 +483,7 @@ public class JobQueueEndpointService {
         FgsContinuousDataValidation dataValidation = newJob.getDataValidation();
 
         if (!dataValidation.isNonZeroVariance()) {
-            commands.add("--skip-non-zero-variance");
+            commands.add("--skip-nonzero-variance");
         }
 
         if (!dataValidation.isUniqueVarName()) {
