@@ -18,27 +18,24 @@
  */
 package edu.pitt.dbmi.ccd.causal.rest.api.dto;
 
-import org.springframework.beans.factory.annotation.Value;
-
 /**
  *
  * @author Zhou Yuan (zhy19@pitt.edu)
  */
 public abstract class BasicDataValidation {
 
-    // Unique Variable Name - ensure that there are no duplicated variable names
-    @Value("true")
-    protected boolean uniqueVarName;
+    // Skip check for unique variable names
+    protected boolean skipUniqueVarName;
 
     public BasicDataValidation() {
     }
 
-    public boolean isUniqueVarName() {
-        return uniqueVarName;
+    public boolean isSkipUniqueVarName() {
+        return skipUniqueVarName;
     }
 
-    public void setUniqueVarName(boolean uniqueVarName) {
-        this.uniqueVarName = uniqueVarName;
+    public void setSkipUniqueVarName(boolean skipUniqueVarName) {
+        this.skipUniqueVarName = skipUniqueVarName;
     }
 
 }

@@ -189,7 +189,7 @@ public class JobQueueEndpointService {
             commands.add("--skip-nonzero-variance");
         }
 
-        if (!dataValidation.isUniqueVarName()) {
+        if (!dataValidation.isSkipUniqueVarName()) {
             commands.add("--skip-unique-var-name");
         }
 
@@ -339,7 +339,7 @@ public class JobQueueEndpointService {
             commands.add("--skip-category-limit");
         }
 
-        if (!dataValidation.isUniqueVarName()) {
+        if (!dataValidation.isSkipUniqueVarName()) {
             commands.add("--skip-unique-var-name");
         }
 
@@ -486,7 +486,7 @@ public class JobQueueEndpointService {
             commands.add("--skip-nonzero-variance");
         }
 
-        if (!dataValidation.isUniqueVarName()) {
+        if (!dataValidation.isSkipUniqueVarName()) {
             commands.add("--skip-unique-var-name");
         }
 
