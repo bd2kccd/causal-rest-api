@@ -1,5 +1,7 @@
 package edu.pitt.dbmi.ccd.causal.rest.api.dto;
 
+import javax.validation.constraints.Min;
+
 /**
  *
  * Oct 3, 2016 6:18:45 PM
@@ -9,6 +11,8 @@ package edu.pitt.dbmi.ccd.causal.rest.api.dto;
  */
 public class FciParameters {
 
+    // Search max degree must be at least -1
+    @Min(-1)
     protected int maxDegree;
 
     protected boolean faithfulnessAssumed;
