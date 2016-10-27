@@ -711,7 +711,7 @@ Algorithm parameters:
 | Parameters        | Description           | Default Value  |
 | ------------- | ------------- | ----- |
 | `faithfulnessAssumed`      | Yes if (one edge) faithfulness should be assumed      |   true |
-| `maxDegree`      | The maximum degree of the output graph      |   100 |
+| `maxDegree`      | The maximum degree of the output graph      |   -1 |
 | `penaltyDiscount`      | Penalty discount      |   4.0 |
 | `verbose` | Print additional information      |    true |
 
@@ -732,7 +732,7 @@ Algorithm parameters:
 | `structurePrior`      | Structure prior      | 1.0 |
 | `samplePrior` | Sample prior      | 1.0 |
 | `faithfulnessAssumed`      | Yes if (one edge) faithfulness should be assumed      |   true |
-| `maxDegree`      | The maximum degree of the output graph      |   100 |
+| `maxDegree`      | The maximum degree of the output graph      |  -1 |
 | `verbose` | Print additional information      |    true |
 
 **GFCI continuous** 
@@ -750,7 +750,7 @@ Algorithm parameters:
 | ------------- | ------------- | ----- |
 | `alpha`      | Search depth. Integer value |  1.0 | 
 | `penaltyDiscount`      | Penalty discount      |   4.0 |
-| `maxInDegree`      | Maximum indegree of graph      |   100 |
+| `maxDegree`      |  The maximum degree of the output graph |  -1 |
 | `faithfulnessAssumed`      | Yes if (one edge) faithfulness should be assumed      |   false |
 | `verbose` | Print additional information      |    true |
 
@@ -781,7 +781,7 @@ Content-Type: application/json
     },
     "algorithmParameters": {
       "penaltyDiscount": 5.0,
-      "maxDegree": 101
+      "maxDegree": 100
     },
     "jvmOptions": {
       "maxHeapSize": 100
