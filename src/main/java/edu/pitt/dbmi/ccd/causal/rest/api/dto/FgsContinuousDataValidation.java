@@ -18,26 +18,23 @@
  */
 package edu.pitt.dbmi.ccd.causal.rest.api.dto;
 
-import org.springframework.beans.factory.annotation.Value;
-
 /**
  *
  * @author Zhou Yuan (zhy19@pitt.edu)
  */
 public class FgsContinuousDataValidation extends BasicDataValidation {
 
-    // Non-zero Variance - ensure that each variable has non-zero variance
-    @Value("true")
-    protected boolean nonZeroVariance;
+    // Skip check for zero variance variables
+    protected boolean isSkipNonzeroVariance;
 
     public FgsContinuousDataValidation() {
     }
 
-    public boolean isNonZeroVariance() {
-        return nonZeroVariance;
+    public boolean isSkipNonZeroVariance() {
+        return isSkipNonzeroVariance;
     }
 
-    public void setNonZeroVariance(boolean nonZeroVariance) {
-        this.nonZeroVariance = nonZeroVariance;
+    public void setSkipNonZeroVariance(boolean isSkipNonzeroVariance) {
+        this.isSkipNonzeroVariance = isSkipNonzeroVariance;
     }
 }
