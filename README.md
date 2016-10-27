@@ -751,7 +751,7 @@ Algorithm parameters:
 | `alpha`      | Search depth. Integer value |  1.0 | 
 | `penaltyDiscount`      | Penalty discount      |   4.0 |
 | `maxDegree`      |  The maximum degree of the output graph |  -1 |
-| `faithfulnessAssumed`      | Yes if (one edge) faithfulness should be assumed      |   false |
+| `faithfulnessAssumed`      | Yes if (one edge) faithfulness should be assumed      |  true |
 | `verbose` | Print additional information      |    true |
 
 #### Add a new job to run the desired algorithm on a given data file
