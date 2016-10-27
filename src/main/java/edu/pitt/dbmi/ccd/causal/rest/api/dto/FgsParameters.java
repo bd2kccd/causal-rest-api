@@ -18,12 +18,16 @@
  */
 package edu.pitt.dbmi.ccd.causal.rest.api.dto;
 
+import javax.validation.constraints.Min;
+
 /**
  *
  * @author Zhou Yuan (zhy19@pitt.edu)
  */
 public abstract class FgsParameters {
 
+    // Search max degree must be at least -1
+    @Min(-1)
     protected int maxDegree;
 
     protected boolean faithfulnessAssumed;
