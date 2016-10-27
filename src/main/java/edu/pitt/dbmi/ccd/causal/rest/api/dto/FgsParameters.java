@@ -18,8 +18,6 @@
  */
 package edu.pitt.dbmi.ccd.causal.rest.api.dto;
 
-import org.springframework.beans.factory.annotation.Value;
-
 /**
  *
  * @author Zhou Yuan (zhy19@pitt.edu)
@@ -28,10 +26,8 @@ public abstract class FgsParameters {
 
     protected int maxDegree;
 
-    @Value("true")
     protected boolean faithfulnessAssumed;
 
-    @Value("true")
     protected boolean verbose;
 
     public FgsParameters() {

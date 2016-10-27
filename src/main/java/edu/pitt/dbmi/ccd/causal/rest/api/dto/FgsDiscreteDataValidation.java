@@ -18,8 +18,6 @@
  */
 package edu.pitt.dbmi.ccd.causal.rest.api.dto;
 
-import org.springframework.beans.factory.annotation.Value;
-
 /**
  *
  * @author Zhou Yuan (zhy19@pitt.edu)
@@ -27,7 +25,6 @@ import org.springframework.beans.factory.annotation.Value;
 public class FgsDiscreteDataValidation extends BasicDataValidation {
 
     // Limit Number of Categories - ensure the number of categories of a variable does not exceed 10.
-    @Value("true")
     private boolean limitNumOfCategory;
 
     public FgsDiscreteDataValidation() {

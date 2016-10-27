@@ -1,7 +1,5 @@
 package edu.pitt.dbmi.ccd.causal.rest.api.dto;
 
-import org.springframework.beans.factory.annotation.Value;
-
 /**
  *
  * Oct 3, 2016 6:18:45 PM
@@ -11,13 +9,10 @@ import org.springframework.beans.factory.annotation.Value;
  */
 public class FciParameters {
 
-    @Value("-1")
     protected int maxDegree;
 
-    @Value("true")
     protected boolean faithfulnessAssumed;
 
-    @Value("true")
     protected boolean verbose;
 
     public int getMaxDegree() {

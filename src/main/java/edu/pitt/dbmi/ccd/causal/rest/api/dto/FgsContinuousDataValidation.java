@@ -25,16 +25,17 @@ package edu.pitt.dbmi.ccd.causal.rest.api.dto;
 public class FgsContinuousDataValidation extends BasicDataValidation {
 
     // Skip check for zero variance variables
-    protected boolean isSkipNonzeroVariance;
+    protected boolean skipNonzeroVariance;
 
     public FgsContinuousDataValidation() {
     }
 
-    public boolean isSkipNonZeroVariance() {
-        return isSkipNonzeroVariance;
+    public boolean isSkipNonzeroVariance() {
+        return skipNonzeroVariance;
     }
 
-    public void setSkipNonZeroVariance(boolean isSkipNonzeroVariance) {
-        this.isSkipNonzeroVariance = isSkipNonzeroVariance;
+    public void setSkipNonzeroVariance(boolean skipNonzeroVariance) {
+        this.skipNonzeroVariance = skipNonzeroVariance;
     }
+
 }

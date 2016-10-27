@@ -185,7 +185,7 @@ public class JobQueueEndpointService {
         // Data validation
         GfciContinuousDataValidation dataValidation = newJob.getDataValidation();
 
-        if (!dataValidation.isNonZeroVariance()) {
+        if (!dataValidation.isSkipNonzeroVariance()) {
             commands.add("--skip-nonzero-variance");
         }
 
@@ -482,7 +482,7 @@ public class JobQueueEndpointService {
         // Data validation
         FgsContinuousDataValidation dataValidation = newJob.getDataValidation();
 
-        if (!dataValidation.isSkipNonZeroVariance()) {
+        if (!dataValidation.isSkipNonzeroVariance()) {
             commands.add("--skip-nonzero-variance");
         }
 
