@@ -24,18 +24,18 @@ package edu.pitt.dbmi.ccd.causal.rest.api.dto;
  */
 public class FgsDiscreteDataValidation extends BasicDataValidation {
 
-    // Limit Number of Categories - ensure the number of categories of a variable does not exceed 10.
-    private boolean limitNumOfCategory;
+    //  Skip 'limit number of categories' check
+    private boolean skipCategoryLimit;
 
     public FgsDiscreteDataValidation() {
     }
 
-    public boolean isLimitNumOfCategory() {
-        return limitNumOfCategory;
+    public boolean isSkipCategoryLimit() {
+        return skipCategoryLimit;
     }
 
-    public void setLimitNumOfCategory(boolean limitNumOfCategory) {
-        this.limitNumOfCategory = limitNumOfCategory;
+    public void setSkipCategoryLimit(boolean skipCategoryLimit) {
+        this.skipCategoryLimit = skipCategoryLimit;
     }
 
 }

@@ -335,7 +335,7 @@ public class JobQueueEndpointService {
         // Data validation
         FgsDiscreteDataValidation dataValidation = newJob.getDataValidation();
 
-        if (!dataValidation.isLimitNumOfCategory()) {
+        if (!dataValidation.isSkipCategoryLimit()) {
             commands.add("--skip-category-limit");
         }
 
