@@ -703,8 +703,8 @@ Data validation:
 
 | Parameters        | Description           | Default Value  |
 | ------------- | ------------- | ----- |
-| `nonZeroVariance`      | Non-zero Variance. Ensure that each variable has non-zero variance | true |
-| `uniqueVarName`      | Unique Variable Name. Ensure that there are no duplicated variable names      |  true |
+| `skipNonzeroVariance`      | Skip check for zero variance variables | false |
+| `skipUniqueVarName`      | Skip check for unique variable names      |  false |
 
 Algorithm parameters:
 
@@ -721,8 +721,8 @@ Data validation:
 
 | Parameters        | Description           | Default Value  |
 | ------------- | ------------- | ----- |
-| `uniqueVarName`      | Unique Variable Name. Ensure that there are no duplicated variable names      |  true |
-| `limitNumOfCategory`      | Limit Number of Categories - ensure the number of categories of a variable does not exceed 10 | true |
+| `skipUniqueVarName`      | Skip check for unique variable names       |  false |
+| `skipCategoryLimit`      | Skip 'limit number of categories' check | false |
 
 
 Algorithm parameters:
@@ -741,8 +741,8 @@ Data validation:
 
 | Parameters        | Description           | Default Value  |
 | ------------- | ------------- | ----- |
-| `nonZeroVariance`      | Non-zero Variance. Ensure that each variable has non-zero variance | true |
-| `uniqueVarName`      | Unique Variable Name. Ensure that there are no duplicated variable names      |  true |
+| `skipNonzeroVariance`      | Skip check for zero variance variables | false |
+| `skipUniqueVarName`      | Skip check for unique variable names       |  false |
 
 Algorithm parameters:
 
@@ -776,8 +776,8 @@ Content-Type: application/json
     "datasetFileId": 8,
     "priorKnowledgeFileId": 9,
     "dataValidation": {
-      "nonZeroVariance": false,
-      "uniqueVarName": false
+      "skipNonzeroVariance": true,
+      "skipUniqueVarName": true
     },
     "algorithmParameters": {
       "penaltyDiscount": 5.0,
@@ -823,8 +823,8 @@ Content-Type: application/json
     "datasetFileId": 10,
     "priorKnowledgeFileId": 12,
     "dataValidation": {
-      "uniqueVarName": false,
-      "limitNumOfCategory": false
+      "skipUniqueVarName": true,
+      "skipCategoryLimit": true
     },
     "algorithmParameters": {
       "structurePrior": 1.0,
