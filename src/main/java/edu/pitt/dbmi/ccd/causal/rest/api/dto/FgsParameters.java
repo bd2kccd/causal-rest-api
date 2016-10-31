@@ -18,7 +18,7 @@
  */
 package edu.pitt.dbmi.ccd.causal.rest.api.dto;
 
-import org.springframework.beans.factory.annotation.Value;
+import javax.validation.constraints.Min;
 
 /**
  *
@@ -26,12 +26,12 @@ import org.springframework.beans.factory.annotation.Value;
  */
 public abstract class FgsParameters {
 
+    // Search max degree must be at least -1
+    @Min(-1)
     protected int maxDegree;
 
-    @Value("true")
     protected boolean faithfulnessAssumed;
 
-    @Value("true")
     protected boolean verbose;
 
     public FgsParameters() {

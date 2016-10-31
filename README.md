@@ -703,15 +703,15 @@ Data validation:
 
 | Parameters        | Description           | Default Value  |
 | ------------- | ------------- | ----- |
-| `nonZeroVariance`      | Non-zero Variance. Ensure that each variable has non-zero variance | true |
-| `uniqueVarName`      | Unique Variable Name. Ensure that there are no duplicated variable names      |  true |
+| `skipNonzeroVariance`      | Skip check for zero variance variables | false |
+| `skipUniqueVarName`      | Skip check for unique variable names      |  false |
 
 Algorithm parameters:
 
 | Parameters        | Description           | Default Value  |
 | ------------- | ------------- | ----- |
 | `faithfulnessAssumed`      | Yes if (one edge) faithfulness should be assumed      |   true |
-| `maxDegree`      | The maximum degree of the output graph      |   100 |
+| `maxDegree`      | The maximum degree of the output graph, at least -1      |   -1 |
 | `penaltyDiscount`      | Penalty discount      |   4.0 |
 | `verbose` | Print additional information      |    true |
 
@@ -721,8 +721,8 @@ Data validation:
 
 | Parameters        | Description           | Default Value  |
 | ------------- | ------------- | ----- |
-| `uniqueVarName`      | Unique Variable Name. Ensure that there are no duplicated variable names      |  true |
-| `limitNumOfCategory`      | Limit Number of Categories - ensure the number of categories of a variable does not exceed 10 | true |
+| `skipUniqueVarName`      | Skip check for unique variable names       |  false |
+| `skipCategoryLimit`      | Skip 'limit number of categories' check | false |
 
 
 Algorithm parameters:
@@ -732,7 +732,7 @@ Algorithm parameters:
 | `structurePrior`      | Structure prior      | 1.0 |
 | `samplePrior` | Sample prior      | 1.0 |
 | `faithfulnessAssumed`      | Yes if (one edge) faithfulness should be assumed      |   true |
-| `maxDegree`      | The maximum degree of the output graph      |   100 |
+| `maxDegree`      | The maximum degree of the output graph, at least -1      |  -1 |
 | `verbose` | Print additional information      |    true |
 
 **GFCI continuous** 
@@ -741,8 +741,8 @@ Data validation:
 
 | Parameters        | Description           | Default Value  |
 | ------------- | ------------- | ----- |
-| `nonZeroVariance`      | Non-zero Variance. Ensure that each variable has non-zero variance | true |
-| `uniqueVarName`      | Unique Variable Name. Ensure that there are no duplicated variable names      |  true |
+| `skipNonzeroVariance`      | Skip check for zero variance variables | false |
+| `skipUniqueVarName`      | Skip check for unique variable names       |  false |
 
 Algorithm parameters:
 
@@ -750,8 +750,8 @@ Algorithm parameters:
 | ------------- | ------------- | ----- |
 | `alpha`      | Search depth. Integer value |  1.0 | 
 | `penaltyDiscount`      | Penalty discount      |   4.0 |
-| `maxInDegree`      | Maximum indegree of graph      |   100 |
-| `faithfulnessAssumed`      | Yes if (one edge) faithfulness should be assumed      |   false |
+| `maxDegree`      |  The maximum degree of the output graph, at least -1 |  -1 |
+| `faithfulnessAssumed`      | Yes if (one edge) faithfulness should be assumed      |  true |
 | `verbose` | Print additional information      |    true |
 
 #### Add a new job to run the desired algorithm on a given data file
@@ -776,12 +776,12 @@ Content-Type: application/json
     "datasetFileId": 8,
     "priorKnowledgeFileId": 9,
     "dataValidation": {
-      "nonZeroVariance": false,
-      "uniqueVarName": false
+      "skipNonzeroVariance": true,
+      "skipUniqueVarName": true
     },
     "algorithmParameters": {
       "penaltyDiscount": 5.0,
-      "maxDegree": 101
+      "maxDegree": 100
     },
     "jvmOptions": {
       "maxHeapSize": 100
@@ -823,8 +823,8 @@ Content-Type: application/json
     "datasetFileId": 10,
     "priorKnowledgeFileId": 12,
     "dataValidation": {
-      "uniqueVarName": false,
-      "limitNumOfCategory": false
+      "skipUniqueVarName": true,
+      "skipCategoryLimit": true
     },
     "algorithmParameters": {
       "structurePrior": 1.0,

@@ -171,8 +171,8 @@ public class JobQueueEndpointService {
         commands.add("--penalty-discount");
         commands.add(Double.toString(algorithmParameters.getPenaltyDiscount()));
 
-        commands.add("--max-indegree");
-        commands.add(Integer.toString(algorithmParameters.getMaxInDegree()));
+        commands.add("--max-degree");
+        commands.add(Integer.toString(algorithmParameters.getMaxDegree()));
 
         if (algorithmParameters.isVerbose()) {
             commands.add("--verbose");
@@ -185,11 +185,11 @@ public class JobQueueEndpointService {
         // Data validation
         GfciContinuousDataValidation dataValidation = newJob.getDataValidation();
 
-        if (!dataValidation.isNonZeroVariance()) {
-            commands.add("--skip-non-zero-variance");
+        if (!dataValidation.isSkipNonzeroVariance()) {
+            commands.add("--skip-nonzero-variance");
         }
 
-        if (!dataValidation.isUniqueVarName()) {
+        if (!dataValidation.isSkipUniqueVarName()) {
             commands.add("--skip-unique-var-name");
         }
 
@@ -335,11 +335,11 @@ public class JobQueueEndpointService {
         // Data validation
         FgsDiscreteDataValidation dataValidation = newJob.getDataValidation();
 
-        if (!dataValidation.isLimitNumOfCategory()) {
+        if (!dataValidation.isSkipCategoryLimit()) {
             commands.add("--skip-category-limit");
         }
 
-        if (!dataValidation.isUniqueVarName()) {
+        if (!dataValidation.isSkipUniqueVarName()) {
             commands.add("--skip-unique-var-name");
         }
 
@@ -482,11 +482,11 @@ public class JobQueueEndpointService {
         // Data validation
         FgsContinuousDataValidation dataValidation = newJob.getDataValidation();
 
-        if (!dataValidation.isNonZeroVariance()) {
-            commands.add("--skip-non-zero-variance");
+        if (!dataValidation.isSkipNonzeroVariance()) {
+            commands.add("--skip-nonzero-variance");
         }
 
-        if (!dataValidation.isUniqueVarName()) {
+        if (!dataValidation.isSkipUniqueVarName()) {
             commands.add("--skip-unique-var-name");
         }
 

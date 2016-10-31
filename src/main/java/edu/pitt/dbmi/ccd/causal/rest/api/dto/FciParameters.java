@@ -1,6 +1,6 @@
 package edu.pitt.dbmi.ccd.causal.rest.api.dto;
 
-import org.springframework.beans.factory.annotation.Value;
+import javax.validation.constraints.Min;
 
 /**
  *
@@ -11,21 +11,20 @@ import org.springframework.beans.factory.annotation.Value;
  */
 public class FciParameters {
 
-    @Value("100")
-    protected int maxInDegree;
+    // Search max degree must be at least -1
+    @Min(-1)
+    protected int maxDegree;
 
-    @Value("true")
     protected boolean faithfulnessAssumed;
 
-    @Value("true")
     protected boolean verbose;
 
-    public int getMaxInDegree() {
-        return maxInDegree;
+    public int getMaxDegree() {
+        return maxDegree;
     }
 
-    public void setMaxInDegree(int maxInDegree) {
-        this.maxInDegree = maxInDegree;
+    public void setMaxDegree(int maxDegree) {
+        this.maxDegree = maxDegree;
     }
 
     public boolean isFaithfulnessAssumed() {
