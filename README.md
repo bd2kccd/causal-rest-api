@@ -5,7 +5,7 @@ This RESTful API is designed for causal web. And it implements the [JAX-RS](http
 **Table of Contents**
 
 - [Installation](#installation)
-  - [Prerequisites](#)
+  - [Prerequisites](#prerequisites)
   - [Dependencies](#dependencies)
   - [Configuration](#configuration)
   - [Start the API Server](#start-the-api-server)
