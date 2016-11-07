@@ -47,7 +47,9 @@ You must have the following installed to build/install Causal REST API:
 
 ### Dependencies
 
-If you want to run this API server and expose the API to your users, you'll first need to have the [Causal Web Application](https://github.com/bd2kccd/causal-web) installed and running. Your API users will use this web app to create their user accounts before they can consume the API.
+If you want to run this API server and expose the API to your users, you'll first need to have the [Causal Web Application](https://github.com/bd2kccd/causal-web) installed and running. Your API users will use this web app to create their user accounts before they can consume the API. 
+
+**Note: currently new users can also be created using Auth0 login option, but the API doesn't work for these users.**
 
 In order to build the API server, you'll need the released version of [ccd-commons-0.3.1](https://github.com/bd2kccd/ccd-commons/releases/tag/v0.3.1) by going to the repo and checkout this specific release version:
 
