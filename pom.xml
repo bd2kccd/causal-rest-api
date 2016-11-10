@@ -50,7 +50,6 @@
             <artifactId>ccd-db</artifactId>
             <version>0.6.2</version>
         </dependency>
-
         <dependency>
             <groupId>edu.pitt.dbmi</groupId>
             <artifactId>ccd-commons</artifactId>
@@ -73,19 +72,16 @@
             <groupId>org.glassfish.jersey.media</groupId>
             <artifactId>jersey-media-multipart</artifactId>
             <version>2.23.1</version>
-            <!--            <type>jar</type>-->
         </dependency>
-                
+
         <!-- Auth0 JTW - https://github.com/auth0/java-jwt -->
         <dependency>
             <groupId>com.auth0</groupId>
             <artifactId>java-jwt</artifactId>
             <version>2.2.0</version>
         </dependency>
-
     </dependencies>
 
-    <!-- This makes the jar execuitable, don not use it with other dependencies, like ccd-db -->
     <build>
         <plugins>
             <plugin>

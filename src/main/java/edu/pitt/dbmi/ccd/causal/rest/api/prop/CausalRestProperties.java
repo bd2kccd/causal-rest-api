@@ -32,38 +32,38 @@ import org.springframework.stereotype.Component;
 @PropertySource("classpath:causal.properties")
 public class CausalRestProperties {
 
-    @Value("${ccd.dir.workspace}")
-    private String workspaceDir;
-
-    @Value("${ccd.folder.lib}")
-    private String libFolder;
-
     @Value("${ccd.jar.algorithm}")
     private String algorithmJar;
 
-    @Value("${ccd.folder.data}")
-    private String dataFolder;
-
-    @Value("${ccd.folder.tmp}")
-    private String tmpFolder;
-
-    @Value("${ccd.folder.results}")
-    private String resultsFolder;
-
-    @Value("${ccd.folder.results.algorithm}")
-    private String algorithmFolder;
-
-    @Value("${ccd.folder.results.comparison}")
-    private String comparisonFolder;
-
-    @Value("${ccd.algorithm.fgs}")
+    @Value("${ccd.algorithm.fgs:fgs}")
     private String fgs;
 
-    @Value("${ccd.algorithm.fgs.discrete}")
+    @Value("${ccd.algorithm.fgs.discrete:fgsc}")
     private String fgsDiscrete;
 
-    @Value("${ccd.algorithm.gfci}")
+    @Value("${ccd.algorithm.gfci:gfci}")
     private String gfci;
+
+    @Value("${ccd.server.workspace:}")
+    private String workspaceDir;
+
+    @Value("${ccd.folder.data:data}")
+    private String dataFolder;
+
+    @Value("${ccd.folder.lib:lib}")
+    private String libFolder;
+
+    @Value("${ccd.folder.tmp:tmp}")
+    private String tmpFolder;
+
+    @Value("${ccd.folder.results:results}")
+    private String resultsFolder;
+
+    @Value("${ccd.folder.results.algorithm:algorithm}")
+    private String algorithmFolder;
+
+    @Value("${ccd.folder.results.comparison:comparison}")
+    private String comparisonFolder;
 
     @Value("${ccd.jwt.issuer}")
     private String jwtIssuer;
@@ -77,22 +77,6 @@ public class CausalRestProperties {
     public CausalRestProperties() {
     }
 
-    public String getWorkspaceDir() {
-        return workspaceDir;
-    }
-
-    public void setWorkspaceDir(String workspaceDir) {
-        this.workspaceDir = workspaceDir;
-    }
-
-    public String getLibFolder() {
-        return libFolder;
-    }
-
-    public void setLibFolder(String libFolder) {
-        this.libFolder = libFolder;
-    }
-
     public String getAlgorithmJar() {
         return algorithmJar;
     }
@@ -101,12 +85,52 @@ public class CausalRestProperties {
         this.algorithmJar = algorithmJar;
     }
 
+    public String getFgs() {
+        return fgs;
+    }
+
+    public void setFgs(String fgs) {
+        this.fgs = fgs;
+    }
+
+    public String getFgsDiscrete() {
+        return fgsDiscrete;
+    }
+
+    public void setFgsDiscrete(String fgsDiscrete) {
+        this.fgsDiscrete = fgsDiscrete;
+    }
+
+    public String getGfci() {
+        return gfci;
+    }
+
+    public void setGfci(String gfci) {
+        this.gfci = gfci;
+    }
+
+    public String getWorkspaceDir() {
+        return workspaceDir;
+    }
+
+    public void setWorkspaceDir(String workspaceDir) {
+        this.workspaceDir = workspaceDir;
+    }
+
     public String getDataFolder() {
         return dataFolder;
     }
 
     public void setDataFolder(String dataFolder) {
         this.dataFolder = dataFolder;
+    }
+
+    public String getLibFolder() {
+        return libFolder;
+    }
+
+    public void setLibFolder(String libFolder) {
+        this.libFolder = libFolder;
     }
 
     public String getTmpFolder() {
@@ -139,30 +163,6 @@ public class CausalRestProperties {
 
     public void setComparisonFolder(String comparisonFolder) {
         this.comparisonFolder = comparisonFolder;
-    }
-
-    public String getFgs() {
-        return fgs;
-    }
-
-    public void setFgs(String fgs) {
-        this.fgs = fgs;
-    }
-
-    public String getFgsDiscrete() {
-        return fgsDiscrete;
-    }
-
-    public void setFgsDiscrete(String fgsDiscrete) {
-        this.fgsDiscrete = fgsDiscrete;
-    }
-
-    public String getGfci() {
-        return gfci;
-    }
-
-    public void setGfci(String gfci) {
-        this.gfci = gfci;
     }
 
     public String getJwtIssuer() {
