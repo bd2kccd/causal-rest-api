@@ -19,7 +19,6 @@
 package edu.pitt.dbmi.ccd.causal.rest.api.dto;
 
 import java.util.Date;
-
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -42,19 +41,18 @@ public class JobInfoDTO {
 
     @XmlElement
     private int status;
-    
+
     @XmlElement
     private Date addedTime;
 
     @XmlElement
     private String resultFileName;
-    
+
     @XmlElement
     private String resultJsonFileName;
 
     @XmlElement
     private String errorResultFileName;
-    
 
     public JobInfoDTO() {
     }

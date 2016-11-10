@@ -30,27 +30,28 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name = "AlgorithmResult")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class ResultFileDTO {
+
     @XmlElement
     private String name;
 
     /*
     * We use long type since BasicFileInfo.getCreationTime() returns long
-    */
+     */
     @XmlElement
     private long creationTime;
 
     /*
     * We use long type since BasicFileInfo.getLastModifiedTime() returns long
-    */
+     */
     @XmlElement
     private long lastModifiedTime;
 
     @XmlElement
     private long fileSize;
-    
+
     public ResultFileDTO() {
     }
-    
+
     public String getName() {
         return name;
     }
