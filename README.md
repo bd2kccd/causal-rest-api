@@ -15,11 +15,11 @@ This RESTful API is designed for causal web. And it implements the [JAX-RS](http
     - [Upload small data file](#upload-small-data-file)
     - [Resumable data file upload](#resumable-data-file-upload)
     - [List all dataset files of a user](#list-all-dataset-files-of-a-user)
-    - [Get the deatil information of a dataset file based on ID](#get-the-deatil-information-of-a-dataset-file-based-on-id)
+    - [Get the detail information of a dataset file based on ID](#get-the-detail-information-of-a-dataset-file-based-on-id)
     - [Delete physical dataset file and all records from database for a given file ID](#delete-physical-dataset-file-and-all-records-from-database-for-a-given-file-id)
     - [Summarize dataset file](#summarize-dataset-file)
     - [List all prior knowledge files of a given user](#list-all-prior-knowledge-files-of-a-given-user)
-    - [Get the deatil information of a prior knowledge file based on ID](#get-the-deatil-information-of-a-prior-knowledge-file-based-on-id)
+    - [Get the detail information of a prior knowledge file based on ID](#get-the-detail-information-of-a-prior-knowledge-file-based-on-id)
     - [Delete physical prior knowledge file and all records from database for a given file ID](#delete-physical-prior-knowledge-file-and-all-records-from-database-for-a-given-file-id)
   - [2. Causal Discovery](#2-causal-discovery)
     - [List all the available causal discovery algorithms](#list-all-the-available-causal-discovery-algorithms)
@@ -453,7 +453,7 @@ And the response will look like this:
 
 Form the above output, we can also tell that data file with ID 10 doesn't have all the `fileSummary` field values set, we'll cover this in the dataset summarization section.
 
-#### Get the deatil information of a dataset file based on ID
+#### Get the detail information of a dataset file based on ID
 
 API Endpoint URI pattern:
 
@@ -599,7 +599,7 @@ A `JSON` formatted list of all the input dataset files that are associated with 
 ]
 ````
 
-#### Get the deatil information of a prior knowledge file based on ID
+#### Get the detail information of a prior knowledge file based on ID
 
 API Endpoint URI pattern:
 
