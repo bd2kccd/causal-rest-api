@@ -90,7 +90,7 @@ public class JobQueueEndpoint {
      * @throws IOException
      */
     @POST
-    @Path("/jobs/fgesc")
+    @Path("/jobs/FGESc")
     @Consumes(APPLICATION_JSON)
     @Produces({APPLICATION_JSON, APPLICATION_XML})
     @RolesAllowed(Role.USER)
@@ -111,7 +111,7 @@ public class JobQueueEndpoint {
      * @throws IOException
      */
     @POST
-    @Path("/jobs/fgesd")
+    @Path("/jobs/FGESd")
     @Consumes(APPLICATION_JSON)
     @Produces({APPLICATION_JSON, APPLICATION_XML})
     @RolesAllowed(Role.USER)
