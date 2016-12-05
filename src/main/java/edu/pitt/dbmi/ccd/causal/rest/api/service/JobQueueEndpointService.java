@@ -253,7 +253,7 @@ public class JobQueueEndpointService {
      * @param newJob
      * @return Job ID
      */
-    public JobInfoDTO addFgsDiscreteNewJob(Long uid, FgesDiscreteNewJob newJob) {
+    public JobInfoDTO addFgesDiscreteNewJob(Long uid, FgesDiscreteNewJob newJob) {
         String algorithm = causalRestProperties.getFgesDiscrete();
 
         // When we can get here vai AuthFilterSerice, it means the user exists
@@ -403,7 +403,7 @@ public class JobQueueEndpointService {
      * @param newJob
      * @return JobInfoDTO
      */
-    public JobInfoDTO addFgsContinuousNewJob(Long uid, FgesContinuousNewJob newJob) {
+    public JobInfoDTO addFgesContinuousNewJob(Long uid, FgesContinuousNewJob newJob) {
         String algorithm = causalRestProperties.getFges();
 
         // When we can get here vai AuthFilterSerice, it means the user exists

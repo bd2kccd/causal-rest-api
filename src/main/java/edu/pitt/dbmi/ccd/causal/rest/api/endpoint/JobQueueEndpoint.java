@@ -95,7 +95,7 @@ public class JobQueueEndpoint {
     @Produces({APPLICATION_JSON, APPLICATION_XML})
     @RolesAllowed(Role.USER)
     public Response addFgsContinuousNewJob(@PathParam("uid") Long uid, @Valid FgesContinuousNewJob newJob) throws IOException {
-        JobInfoDTO jobInfo = jobQueueEndpointService.addFgsContinuousNewJob(uid, newJob);
+        JobInfoDTO jobInfo = jobQueueEndpointService.addFgesContinuousNewJob(uid, newJob);
         GenericEntity<JobInfoDTO> jobRequestEntity = new GenericEntity<JobInfoDTO>(jobInfo) {
         };
         // Return 201 Created status code and the job id in body
@@ -116,7 +116,7 @@ public class JobQueueEndpoint {
     @Produces({APPLICATION_JSON, APPLICATION_XML})
     @RolesAllowed(Role.USER)
     public Response addFgsDiscreteNewJob(@PathParam("uid") Long uid, @Valid FgesDiscreteNewJob newJob) throws IOException {
-        JobInfoDTO jobInfo = jobQueueEndpointService.addFgsDiscreteNewJob(uid, newJob);
+        JobInfoDTO jobInfo = jobQueueEndpointService.addFgesDiscreteNewJob(uid, newJob);
         GenericEntity<JobInfoDTO> jobRequestEntity = new GenericEntity<JobInfoDTO>(jobInfo) {
         };
         // Return 201 Created status code and the job id in body
