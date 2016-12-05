@@ -60,16 +60,14 @@ git checkout tags/v0.3.1
 mvn clean install
 ````
 
-You'll also need to download [ccd-db-0.6.2](https://github.com/bd2kccd/ccd-db) branch:
+You'll also need to download released [ccd-db-0.6.2](https://github.com/bd2kccd/ccd-db/releases/tag/v0.6.2):
 
 ````
 git clone https://github.com/bd2kccd/ccd-db.git
 cd ccd-db
-git checkout v0.6.2
+git checkout tags/v0.6.2
 mvn clean install
 ````
-
-**Note: we'll use the the 0.6.2 tagged release once it's released, only use the branch for now.**
 
 Then you can go get and install `causal-rest-api`:
 
@@ -84,6 +82,7 @@ mvn clean package
 There are 4 configuration files to configure located at `causal-rest-api/src/main/resources`:
 - **application-hsqldb.properties**: HSQLDB database configurations (for testing only).
 - **application-mysql.properties**: MySQL database configurations
+- **application-slurm.properties**: Slurm setting for HPC
 - **application.properties**: Spring Boot application settings
 - **causal.properties**: Data file directory path and folder settings
 
