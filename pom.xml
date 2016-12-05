@@ -5,7 +5,7 @@
 
     <groupId>edu.pitt.dbmi.ccd</groupId>
     <artifactId>causal-rest-api</artifactId>
-    <version>0.0.6</version>
+    <version>0.0.7</version>
     <packaging>jar</packaging>
 
     <name>causal-rest-api</name>
