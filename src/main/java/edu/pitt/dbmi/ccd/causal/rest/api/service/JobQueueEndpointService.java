@@ -378,7 +378,7 @@ public class JobQueueEndpointService {
 
         Long newJobId = jobQueueInfo.getId();
 
-        LOGGER.info(String.format("New FGS Discrete job submitted. Job ID: %d", newJobId));
+        LOGGER.info(String.format("New FGES Discrete job submitted. Job ID: %d", newJobId));
 
         String resultJsonFileName = fileName + ".json";
         fileName = fileName + ".txt";
@@ -525,7 +525,7 @@ public class JobQueueEndpointService {
 
         Long newJobId = jobQueueInfo.getId();
 
-        LOGGER.info(String.format("New FGS Continuous job submitted. Job ID: %d", newJobId));
+        LOGGER.info(String.format("New FGES Continuous job submitted. Job ID: %d", newJobId));
 
         String resultJsonFileName = fileName + ".json";
         fileName = fileName + ".txt";
