@@ -1,4 +1,4 @@
-# Causal REST API V1
+# Causal REST API v0.0.7
 
 This RESTful API is designed for causal web. And it implements the [JAX-RS](https://en.wikipedia.org/wiki/Java_API_for_RESTful_Web_Services) specifications using Jersey.
 

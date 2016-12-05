@@ -97,7 +97,7 @@ public class JobQueueEndpointService {
     }
 
     /**
-     * Add a new job to the job queue and run the GFCI Continuous algorithm
+     * Add a new job to the job queue and run the GFCI continuous algorithm
      *
      * @param uid
      * @param newJob
@@ -228,7 +228,7 @@ public class JobQueueEndpointService {
 
         Long newJobId = jobQueueInfo.getId();
 
-        LOGGER.info(String.format("New GFCI Continuous job submitted. Job ID: %d", newJobId));
+        LOGGER.info(String.format("New GFCI continuous job submitted. Job ID: %d", newJobId));
 
         String resultJsonFileName = fileName + ".json";
         fileName = fileName + ".txt";
@@ -247,7 +247,7 @@ public class JobQueueEndpointService {
     }
 
     /**
-     * Add a new job to the job queue and run the FGES Discrete algorithm
+     * Add a new job to the job queue and run the FGES discrete algorithm
      *
      * @param uid
      * @param newJob
@@ -378,7 +378,7 @@ public class JobQueueEndpointService {
 
         Long newJobId = jobQueueInfo.getId();
 
-        LOGGER.info(String.format("New FGES Discrete job submitted. Job ID: %d", newJobId));
+        LOGGER.info(String.format("New FGES discrete job submitted. Job ID: %d", newJobId));
 
         String resultJsonFileName = fileName + ".json";
         fileName = fileName + ".txt";
