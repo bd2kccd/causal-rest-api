@@ -665,19 +665,19 @@ GET /ccd-api/22/algorithms HTTP/1.1
 Host: cloud.ccd.pitt.edu
 Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL2Nsb3VkLmNjZC5waXR0LmVkdS8iLCJuYW1lIjoiemh5MTkiLCJleHAiOjE0NzU4NTA2NzY4MDQsImlhdCI6MTQ3NTg0NzA3NjgwNH0.8azVEoNPfETczXb-vn7dfyDd98eRt7iiLBXehGpPGzY
 ````
-Currently we support "FGS continuous" and "FGS discrete".
+Currently we support "FGES continuous" and "FGES discrete".
 
 ````javascript
 [
   {
     "id": 1,
-    "name": "fgsc",
-    "description": "FGS continuous"
+    "name": "FGESc",
+    "description": "FGES continuous"
   },
   {
     "id": 2,
-    "name": "fgsd",
-    "description": "FGS discrete"
+    "name": "FGESd",
+    "description": "FGES discrete"
   },
   {
     "id": 3,
@@ -687,7 +687,7 @@ Currently we support "FGS continuous" and "FGS discrete".
 ]
 ````
 
-Currently we support "FGS continuous", "FGS discrete" and "GFCI continuous". They also share a common JSON structure as of their input, for example:
+Currently we support "FGES continuous", "FGES discrete" and "GFCI continuous". They also share a common JSON structure as of their input, for example:
 
 | Input JSON Fields | Description |
 | --- | --- |
@@ -699,7 +699,7 @@ Currently we support "FGS continuous", "FGS discrete" and "GFCI continuous". The
 
 Below are the data validation flags and parameters that you can use for each algorithm.
 
-**FGS continuous** 
+**FGES continuous** 
 
 Data validation:
 
@@ -717,7 +717,7 @@ Algorithm parameters:
 | `penaltyDiscount`      | Penalty discount      |   4.0 |
 | `verbose` | Print additional information      |    true |
 
-**FGS discrete** 
+**FGES discrete** 
 
 Data validation:
 
@@ -763,13 +763,13 @@ This is a POST request and the algorithm details and data file id will need to b
 API Endpoint URI pattern:
 
 ````
-POST https://cloud.ccd.pitt.edu/ccd-api/{userId}/jobs/fgsc
+POST https://cloud.ccd.pitt.edu/ccd-api/{userId}/jobs/FGESc
 ````
 
 Generated HTTP request code example:
 
 ````
-POST /ccd-api/22/jobs/fgsc HTTP/1.1
+POST /ccd-api/22/jobs/FGESc HTTP/1.1
 Host: cloud.ccd.pitt.edu
 Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL2Nsb3VkLmNjZC5waXR0LmVkdS8iLCJuYW1lIjoiemh5MTkiLCJleHAiOjE0NzU4NTA2NzY4MDQsImlhdCI6MTQ3NTg0NzA3NjgwNH0.8azVEoNPfETczXb-vn7dfyDd98eRt7iiLBXehGpPGzY
 Content-Type: application/json
@@ -791,32 +791,32 @@ Content-Type: application/json
 }
 ````
 
-In this example, we are running the "FGS continuous" algorithm on the file with ID 8. And this call will return the job info with a 201 Created response status code.
+In this example, we are running the "FGES continuous" algorithm on the file with ID 8. And this call will return the job info with a 201 Created response status code.
 
 ````
 {
   "id": 5,
-  "algorithmName": "fgsc",
+  "algorithmName": "FGESc",
   "addedTime": 1472742564355,
-  "resultFileName": "fgs_data_small.txt_1472742564353.txt",
-  "errorResultFileName": "error_fgs_data_small.txt_1472742564353.txt"
+  "resultFileName": "FGESc_data_small.txt_1472742564353.txt",
+  "errorResultFileName": "error_FGESc_data_small.txt_1472742564353.txt"
 }
 ````
 
-From this response we can tell that the job ID is 5, and the result file name will be `fgs_data_small.txt_1472742564353.txt` if everything goes well. If something is wrong an error result file with name `error_fgs_data_small.txt_1472742564353.txt` will be created.
+From this response we can tell that the job ID is 5, and the result file name will be `FGESc_data_small.txt_1472742564353.txt` if everything goes well. If something is wrong an error result file with name `error_FGEsc_data_small.txt_1472742564353.txt` will be created.
 
-When you need to run "FGS discrete", just send the request to a different endpont URI:
+When you need to run "FGES discrete", just send the request to a different endpont URI:
 
 API Endpoint URI pattern:
 
 ````
-POST https://cloud.ccd.pitt.edu/ccd-api/{userId}/jobs/fgsd
+POST https://cloud.ccd.pitt.edu/ccd-api/{userId}/jobs/FGESd
 ````
 
 Generated HTTP request code example:
 
 ````
-POST /ccd-api/22/jobs/fgsd HTTP/1.1
+POST /ccd-api/22/jobs/FGESd HTTP/1.1
 Host: cloud.ccd.pitt.edu
 Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL2Nsb3VkLmNjZC5waXR0LmVkdS8iLCJuYW1lIjoiemh5MTkiLCJleHAiOjE0NzU4NTA2NzY4MDQsImlhdCI6MTQ3NTg0NzA3NjgwNH0.8azVEoNPfETczXb-vn7dfyDd98eRt7iiLBXehGpPGzY
 Content-Type: application/json
@@ -863,12 +863,12 @@ Then you'll see the information of all jobs that are currently running:
 [
   {
     "id": 32,
-    "algorithmName": "fgsc",
+    "algorithmName": "FGESc",
     "addedTime": 1468436085000
   },
   {
     "id": 33,
-    "algorithmName": "fgsd",
+    "algorithmName": "FGESd",
     "addedTime": 1468436087000
   }
 ]
@@ -937,13 +937,13 @@ The response to this request will look like this:
 ````javascript
 [
   {
-    "name": "fgs_sim_data_20vars_100cases.csv_1466171729046.txt",
+    "name": "FGESc_sim_data_20vars_100cases.csv_1466171729046.txt",
     "creationTime": 1466171732000,
     "lastModifiedTime": 1466171732000,
     "fileSize": 1660
   },
   {
-    "name": "fgs_data_small.txt_1466172140585.txt",
+    "name": "FGESc_data_small.txt_1466172140585.txt",
     "creationTime": 1466172145000,
     "lastModifiedTime": 1466172145000,
     "fileSize": 39559
@@ -962,7 +962,7 @@ GET https://cloud.ccd.pitt.edu/ccd-api/{userId}/results/{result_file_name}
 Generated HTTP request code example:
 
 ````
-GET /ccd-api/22/results/fgs_data_small.txt_1466172140585.txt HTTP/1.1
+GET /ccd-api/22/results/FGESc_data_small.txt_1466172140585.txt HTTP/1.1
 Host: cloud.ccd.pitt.edu
 Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL2Nsb3VkLmNjZC5waXR0LmVkdS8iLCJuYW1lIjoiemh5MTkiLCJleHAiOjE0NzU4NTA2NzY4MDQsImlhdCI6MTQ3NTg0NzA3NjgwNH0.8azVEoNPfETczXb-vn7dfyDd98eRt7iiLBXehGpPGzY
 ````
@@ -976,7 +976,7 @@ The response to this request will look like this:
   "status": 404,
   "error": "Not Found",
   "message": "Resource not found.",
-  "path": "/22/results/fgs_data_small.txt_146172140585.txt"
+  "path": "/22/results/FGESc_data_small.txt_146172140585.txt"
 }
 ````
 
@@ -1002,15 +1002,15 @@ Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL
 
 {
   "resultFiles": [
-    "gs_sim_data_20vars_100cases.csv_1466171729046.txt",
-    "fgs_data_small.txt_1467305104859.txt"
+    "FGESc_sim_data_20vars_100cases.csv_1466171729046.txt",
+    "FGESc_data_small.txt_1467305104859.txt"
   ]
 }
 ````
 When you specify multiple file names, use the `!!` as a delimiter. This request will generate a result comparison file with the following content (shortened version):
 
 ````
-fgs_sim_data_20vars_100cases.csv_1466171729046.txt	fgs_data_small.txt_1467305104859.txt
+FGESc_sim_data_20vars_100cases.csv_1466171729046.txt	FGESc_data_small.txt_1467305104859.txt
 Edges	In All	Same End Point
 NR4A2,FOS	0	0
 X5,X17	0	0
@@ -1088,7 +1088,7 @@ Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL
 Then it returns the content of that comparison file (shorted version):
 
 ````
-fgs_sim_data_20vars_100cases.csv_1466171729046.txt	fgs_data_small.txt_1467305104859.txt
+FGESc_sim_data_20vars_100cases.csv_1466171729046.txt	FGESc_data_small.txt_1467305104859.txt
 Edges	In All	Same End Point
 NR4A2,FOS	0	0
 X5,X17	0	0
