@@ -22,31 +22,29 @@ package edu.pitt.dbmi.ccd.causal.rest.api.dto;
  *
  * @author Zhou Yuan (zhy19@pitt.edu)
  */
-public class FgsDiscreteNewJob extends NewJob {
+public class FgesDiscreteParameters extends FgesParameters {
 
-    // Algorithm parameters
-    private FgsDiscreteParameters algorithmParameters;
+    private double structurePrior;
 
-    // Data validation flag
-    private FgsDiscreteDataValidation dataValidation;
+    private double samplePrior;
 
-    public FgsDiscreteNewJob() {
+    public FgesDiscreteParameters() {
     }
 
-    public FgsDiscreteParameters getAlgorithmParameters() {
-        return algorithmParameters;
+    public double getStructurePrior() {
+        return structurePrior;
     }
 
-    public void setAlgorithmParameters(FgsDiscreteParameters algorithmParameters) {
-        this.algorithmParameters = algorithmParameters;
+    public void setStructurePrior(double structurePrior) {
+        this.structurePrior = structurePrior;
     }
 
-    public FgsDiscreteDataValidation getDataValidation() {
-        return dataValidation;
+    public double getSamplePrior() {
+        return samplePrior;
     }
 
-    public void setDataValidation(FgsDiscreteDataValidation dataValidation) {
-        this.dataValidation = dataValidation;
+    public void setSamplePrior(double samplePrior) {
+        this.samplePrior = samplePrior;
     }
 
 }

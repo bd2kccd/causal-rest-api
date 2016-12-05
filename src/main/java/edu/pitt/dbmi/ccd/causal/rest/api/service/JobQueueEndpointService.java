@@ -18,12 +18,12 @@
  */
 package edu.pitt.dbmi.ccd.causal.rest.api.service;
 
-import edu.pitt.dbmi.ccd.causal.rest.api.dto.FgsContinuousDataValidation;
-import edu.pitt.dbmi.ccd.causal.rest.api.dto.FgsContinuousNewJob;
-import edu.pitt.dbmi.ccd.causal.rest.api.dto.FgsContinuousParameters;
-import edu.pitt.dbmi.ccd.causal.rest.api.dto.FgsDiscreteDataValidation;
-import edu.pitt.dbmi.ccd.causal.rest.api.dto.FgsDiscreteNewJob;
-import edu.pitt.dbmi.ccd.causal.rest.api.dto.FgsDiscreteParameters;
+import edu.pitt.dbmi.ccd.causal.rest.api.dto.FgesContinuousDataValidation;
+import edu.pitt.dbmi.ccd.causal.rest.api.dto.FgesContinuousNewJob;
+import edu.pitt.dbmi.ccd.causal.rest.api.dto.FgesContinuousParameters;
+import edu.pitt.dbmi.ccd.causal.rest.api.dto.FgesDiscreteDataValidation;
+import edu.pitt.dbmi.ccd.causal.rest.api.dto.FgesDiscreteNewJob;
+import edu.pitt.dbmi.ccd.causal.rest.api.dto.FgesDiscreteParameters;
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.GfciContinuousDataValidation;
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.GfciContinuousNewJob;
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.GfciContinuousParameters;
@@ -247,14 +247,14 @@ public class JobQueueEndpointService {
     }
 
     /**
-     * Add a new job to the job queue and run the FGS Discrete algorithm
+     * Add a new job to the job queue and run the FGES Discrete algorithm
      *
      * @param uid
      * @param newJob
      * @return Job ID
      */
-    public JobInfoDTO addFgsDiscreteNewJob(Long uid, FgsDiscreteNewJob newJob) {
-        String algorithm = causalRestProperties.getFgsDiscrete();
+    public JobInfoDTO addFgsDiscreteNewJob(Long uid, FgesDiscreteNewJob newJob) {
+        String algorithm = causalRestProperties.getFgesDiscrete();
 
         // When we can get here vai AuthFilterSerice, it means the user exists
         // so no need to check if (userAccount == null) and throw UserNotFoundException(uid)
@@ -310,7 +310,7 @@ public class JobQueueEndpointService {
         }
 
         // Algorithm parameters
-        FgsDiscreteParameters algorithmParameters = newJob.getAlgorithmParameters();
+        FgesDiscreteParameters algorithmParameters = newJob.getAlgorithmParameters();
 
         commands.add("--delimiter");
         commands.add(getFileDelimiter(newJob.getDatasetFileId()));
@@ -333,7 +333,7 @@ public class JobQueueEndpointService {
         }
 
         // Data validation
-        FgsDiscreteDataValidation dataValidation = newJob.getDataValidation();
+        FgesDiscreteDataValidation dataValidation = newJob.getDataValidation();
 
         if (!dataValidation.isSkipCategoryLimit()) {
             commands.add("--skip-category-limit");
@@ -397,14 +397,14 @@ public class JobQueueEndpointService {
     }
 
     /**
-     * Add a new job to the job queue and run the FGS Continuous algorithm
+     * Add a new job to the job queue and run the FGES Continuous algorithm
      *
      * @param uid
      * @param newJob
      * @return JobInfoDTO
      */
-    public JobInfoDTO addFgsContinuousNewJob(Long uid, FgsContinuousNewJob newJob) {
-        String algorithm = causalRestProperties.getFgs();
+    public JobInfoDTO addFgsContinuousNewJob(Long uid, FgesContinuousNewJob newJob) {
+        String algorithm = causalRestProperties.getFges();
 
         // When we can get here vai AuthFilterSerice, it means the user exists
         // so no need to check if (userAccount == null) and throw UserNotFoundException(uid)
@@ -460,7 +460,7 @@ public class JobQueueEndpointService {
         }
 
         // Algorithm parameters
-        FgsContinuousParameters algorithmParameters = newJob.getAlgorithmParameters();
+        FgesContinuousParameters algorithmParameters = newJob.getAlgorithmParameters();
 
         commands.add("--delimiter");
         commands.add(getFileDelimiter(newJob.getDatasetFileId()));
@@ -480,7 +480,7 @@ public class JobQueueEndpointService {
         }
 
         // Data validation
-        FgsContinuousDataValidation dataValidation = newJob.getDataValidation();
+        FgesContinuousDataValidation dataValidation = newJob.getDataValidation();
 
         if (!dataValidation.isSkipNonzeroVariance()) {
             commands.add("--skip-nonzero-variance");

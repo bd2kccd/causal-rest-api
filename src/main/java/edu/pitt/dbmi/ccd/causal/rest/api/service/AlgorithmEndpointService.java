@@ -50,8 +50,8 @@ public class AlgorithmEndpointService {
         List<AlgorithmDTO> ALGORITHMS = new LinkedList<>();
 
         // Get the actual algorithm short name from the properties file
-        ALGORITHMS.add(new AlgorithmDTO(1, causalRestProperties.getFgs(), "FGS continuous"));
-        ALGORITHMS.add(new AlgorithmDTO(2, causalRestProperties.getFgsDiscrete(), "FGS discrete"));
+        ALGORITHMS.add(new AlgorithmDTO(1, causalRestProperties.getFges(), "FGES continuous"));
+        ALGORITHMS.add(new AlgorithmDTO(2, causalRestProperties.getFgesDiscrete(), "FGES discrete"));
         ALGORITHMS.add(new AlgorithmDTO(3, causalRestProperties.getGfci(), "GFCI continuous"));
 
         return ALGORITHMS;

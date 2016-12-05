@@ -19,8 +19,8 @@
 package edu.pitt.dbmi.ccd.causal.rest.api.endpoint;
 
 import edu.pitt.dbmi.ccd.causal.rest.api.Role;
-import edu.pitt.dbmi.ccd.causal.rest.api.dto.FgsContinuousNewJob;
-import edu.pitt.dbmi.ccd.causal.rest.api.dto.FgsDiscreteNewJob;
+import edu.pitt.dbmi.ccd.causal.rest.api.dto.FgesContinuousNewJob;
+import edu.pitt.dbmi.ccd.causal.rest.api.dto.FgesDiscreteNewJob;
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.GfciContinuousNewJob;
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.JobInfoDTO;
 import edu.pitt.dbmi.ccd.causal.rest.api.service.JobQueueEndpointService;
@@ -94,7 +94,7 @@ public class JobQueueEndpoint {
     @Consumes(APPLICATION_JSON)
     @Produces({APPLICATION_JSON, APPLICATION_XML})
     @RolesAllowed(Role.USER)
-    public Response addFgsContinuousNewJob(@PathParam("uid") Long uid, @Valid FgsContinuousNewJob newJob) throws IOException {
+    public Response addFgsContinuousNewJob(@PathParam("uid") Long uid, @Valid FgesContinuousNewJob newJob) throws IOException {
         JobInfoDTO jobInfo = jobQueueEndpointService.addFgsContinuousNewJob(uid, newJob);
         GenericEntity<JobInfoDTO> jobRequestEntity = new GenericEntity<JobInfoDTO>(jobInfo) {
         };
@@ -115,7 +115,7 @@ public class JobQueueEndpoint {
     @Consumes(APPLICATION_JSON)
     @Produces({APPLICATION_JSON, APPLICATION_XML})
     @RolesAllowed(Role.USER)
-    public Response addFgsDiscreteNewJob(@PathParam("uid") Long uid, @Valid FgsDiscreteNewJob newJob) throws IOException {
+    public Response addFgsDiscreteNewJob(@PathParam("uid") Long uid, @Valid FgesDiscreteNewJob newJob) throws IOException {
         JobInfoDTO jobInfo = jobQueueEndpointService.addFgsDiscreteNewJob(uid, newJob);
         GenericEntity<JobInfoDTO> jobRequestEntity = new GenericEntity<JobInfoDTO>(jobInfo) {
         };
