@@ -82,7 +82,7 @@ public class JobQueueEndpoint {
     }
 
     /**
-     * Adding a new job and run FGS continuous
+     * Adding a new job and run FGES continuous
      *
      * @param uid
      * @param newJob
@@ -90,7 +90,7 @@ public class JobQueueEndpoint {
      * @throws IOException
      */
     @POST
-    @Path("/jobs/fgsc")
+    @Path("/jobs/fgesc")
     @Consumes(APPLICATION_JSON)
     @Produces({APPLICATION_JSON, APPLICATION_XML})
     @RolesAllowed(Role.USER)
@@ -103,7 +103,7 @@ public class JobQueueEndpoint {
     }
 
     /**
-     * Adding a new job and run FGS discrete
+     * Adding a new job and run FGES discrete
      *
      * @param uid
      * @param newJob
@@ -111,7 +111,7 @@ public class JobQueueEndpoint {
      * @throws IOException
      */
     @POST
-    @Path("/jobs/fgsd")
+    @Path("/jobs/fgesd")
     @Consumes(APPLICATION_JSON)
     @Produces({APPLICATION_JSON, APPLICATION_XML})
     @RolesAllowed(Role.USER)
