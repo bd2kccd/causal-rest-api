@@ -35,11 +35,11 @@ public class CausalRestProperties {
     @Value("${ccd.jar.algorithm}")
     private String algorithmJar;
 
-    @Value("${ccd.algorithm.fgs:fgs}")
-    private String fgs;
+    @Value("${ccd.algorithm.fges:FGESc}")
+    private String fges;
 
-    @Value("${ccd.algorithm.fgs.discrete:fgsc}")
-    private String fgsDiscrete;
+    @Value("${ccd.algorithm.fges.discrete:FGESd}")
+    private String fgesDiscrete;
 
     @Value("${ccd.algorithm.gfci:gfci}")
     private String gfci;
@@ -85,20 +85,20 @@ public class CausalRestProperties {
         this.algorithmJar = algorithmJar;
     }
 
-    public String getFgs() {
-        return fgs;
+    public String getFges() {
+        return fges;
     }
 
-    public void setFgs(String fgs) {
-        this.fgs = fgs;
+    public void setFges(String fges) {
+        this.fges = fges;
     }
 
-    public String getFgsDiscrete() {
-        return fgsDiscrete;
+    public String getFgesDiscrete() {
+        return fgesDiscrete;
     }
 
-    public void setFgsDiscrete(String fgsDiscrete) {
-        this.fgsDiscrete = fgsDiscrete;
+    public void setFgesDiscrete(String fgesDiscrete) {
+        this.fgesDiscrete = fgesDiscrete;
     }
 
     public String getGfci() {
