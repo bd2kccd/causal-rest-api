@@ -104,7 +104,10 @@ public class JobQueueEndpointService {
      * @return JobInfoDTO
      */
     public JobInfoDTO addGfciContinuousNewJob(Long uid, GfciContinuousNewJob newJob) {
-        String algorithm = causalRestProperties.getAlgoFgesCont();
+        String algorithmName = "GFCIc";
+
+        // This is the algo to pass to causal-cmd, case-insensitive
+        String algorithm = causalRestProperties.getAlgoGfciCont();
 
         // When we can get here vai AuthFilterSerice, it means the user exists
         // so no need to check if (userAccount == null) and throw UserNotFoundException(uid)
@@ -203,7 +206,8 @@ public class JobQueueEndpointService {
         String fileName;
 
         DataFile df = dataFileService.findByIdAndUserAccount(datasetFileId, userAccount);
-        fileName = String.format("%s_%s_%d", algorithm, df.getName(), currentTime);
+        // The algorithm name can be different from the value of causalRestProperties.getAlgoFgesCont()
+        fileName = String.format("%s_%s_%d", algorithmName, df.getName(), currentTime);
 
         commands.add("--output-prefix");
         commands.add(fileName);
@@ -216,7 +220,7 @@ public class JobQueueEndpointService {
         // Insert to database table `job_queue_info`
         JobQueueInfo jobQueueInfo = new JobQueueInfo();
         jobQueueInfo.setAddedTime(new Date(System.currentTimeMillis()));
-        jobQueueInfo.setAlgorName(algorithm);
+        jobQueueInfo.setAlgorName(algorithmName);
         jobQueueInfo.setCommands(cmd);
         jobQueueInfo.setFileName(fileName);
         jobQueueInfo.setOutputDirectory(map.get("resultDir"));
@@ -237,7 +241,7 @@ public class JobQueueEndpointService {
         JobInfoDTO jobInfo = new JobInfoDTO();
         jobInfo.setStatus(0);
         jobInfo.setAddedTime(jobQueueInfo.getAddedTime());
-        jobInfo.setAlgorithmName(algorithm);
+        jobInfo.setAlgorithmName(algorithmName);
         jobInfo.setResultFileName(fileName);
         jobInfo.setResultJsonFileName(resultJsonFileName);
         jobInfo.setErrorResultFileName(errorFileName);
@@ -254,6 +258,9 @@ public class JobQueueEndpointService {
      * @return Job ID
      */
     public JobInfoDTO addFgesDiscreteNewJob(Long uid, FgesDiscreteNewJob newJob) {
+        String algorithmName = "FGESd";
+
+        // This is the algo to pass to causal-cmd, case-insensitive
         String algorithm = causalRestProperties.getAlgoFgesDisc();
 
         // When we can get here vai AuthFilterSerice, it means the user exists
@@ -353,7 +360,8 @@ public class JobQueueEndpointService {
         String fileName;
 
         DataFile df = dataFileService.findByIdAndUserAccount(datasetFileId, userAccount);
-        fileName = String.format("%s_%s_%d", algorithm, df.getName(), currentTime);
+        // The algorithm name can be different from the value of causalRestProperties.getAlgoFgesCont()
+        fileName = String.format("%s_%s_%d", algorithmName, df.getName(), currentTime);
 
         commands.add("--output-prefix");
         commands.add(fileName);
@@ -366,7 +374,7 @@ public class JobQueueEndpointService {
         // Insert to database table `job_queue_info`
         JobQueueInfo jobQueueInfo = new JobQueueInfo();
         jobQueueInfo.setAddedTime(new Date(System.currentTimeMillis()));
-        jobQueueInfo.setAlgorName(algorithm);
+        jobQueueInfo.setAlgorName(algorithmName);
         jobQueueInfo.setCommands(cmd);
         jobQueueInfo.setFileName(fileName);
         jobQueueInfo.setOutputDirectory(map.get("resultDir"));
@@ -387,7 +395,7 @@ public class JobQueueEndpointService {
         JobInfoDTO jobInfo = new JobInfoDTO();
         jobInfo.setStatus(0);
         jobInfo.setAddedTime(jobQueueInfo.getAddedTime());
-        jobInfo.setAlgorithmName(algorithm);
+        jobInfo.setAlgorithmName(algorithmName);
         jobInfo.setResultFileName(fileName);
         jobInfo.setResultJsonFileName(resultJsonFileName);
         jobInfo.setErrorResultFileName(errorFileName);
@@ -404,7 +412,10 @@ public class JobQueueEndpointService {
      * @return JobInfoDTO
      */
     public JobInfoDTO addFgesContinuousNewJob(Long uid, FgesContinuousNewJob newJob) {
-        String algorithm = causalRestProperties.getAlgoGfciCont();
+        String algorithmName = "FGESc";
+
+        // This is the algo to pass to causal-cmd, case-insensitive
+        String algorithm = causalRestProperties.getAlgoFgesCont();
 
         // When we can get here vai AuthFilterSerice, it means the user exists
         // so no need to check if (userAccount == null) and throw UserNotFoundException(uid)
@@ -500,7 +511,8 @@ public class JobQueueEndpointService {
         String fileName;
 
         DataFile df = dataFileService.findByIdAndUserAccount(datasetFileId, userAccount);
-        fileName = String.format("%s_%s_%d", algorithm, df.getName(), currentTime);
+        // The algorithm name can be different from the value of causalRestProperties.getAlgoFgesCont()
+        fileName = String.format("%s_%s_%d", algorithmName, df.getName(), currentTime);
 
         commands.add("--output-prefix");
         commands.add(fileName);
@@ -513,7 +525,7 @@ public class JobQueueEndpointService {
         // Insert to database table `job_queue_info`
         JobQueueInfo jobQueueInfo = new JobQueueInfo();
         jobQueueInfo.setAddedTime(new Date(System.currentTimeMillis()));
-        jobQueueInfo.setAlgorName(algorithm);
+        jobQueueInfo.setAlgorName(algorithmName);
         jobQueueInfo.setCommands(cmd);
         jobQueueInfo.setFileName(fileName);
         jobQueueInfo.setOutputDirectory(map.get("resultDir"));
@@ -534,7 +546,7 @@ public class JobQueueEndpointService {
         JobInfoDTO jobInfo = new JobInfoDTO();
         jobInfo.setStatus(0);
         jobInfo.setAddedTime(jobQueueInfo.getAddedTime());
-        jobInfo.setAlgorithmName(algorithm);
+        jobInfo.setAlgorithmName(algorithmName);
         jobInfo.setResultFileName(fileName);
         jobInfo.setResultJsonFileName(resultJsonFileName);
         jobInfo.setErrorResultFileName(errorFileName);
