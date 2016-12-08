@@ -69,7 +69,7 @@ public class JobQueueEndpoint {
      * @throws IOException
      */
     @POST
-    @Path("/jobs/gfcic")
+    @Path("/jobs/GFCIc")
     @Consumes(APPLICATION_JSON)
     @Produces({APPLICATION_JSON, APPLICATION_XML})
     @RolesAllowed(Role.USER)

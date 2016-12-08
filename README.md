@@ -680,7 +680,7 @@ Currently we support "FGES continuous" and "FGES discrete".
   },
   {
     "id": 3,
-    "name": "gfcic",
+    "name": "GFCIc",
     "description": "GFCI continuous"
   }
 ]
