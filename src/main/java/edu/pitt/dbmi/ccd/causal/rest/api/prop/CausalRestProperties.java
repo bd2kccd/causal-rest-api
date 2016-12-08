@@ -35,14 +35,14 @@ public class CausalRestProperties {
     @Value("${ccd.jar.algorithm}")
     private String algorithmJar;
 
-    @Value("${ccd.algorithm.fges:FGESc}")
-    private String fges;
+    @Value("${ccd.algorithm.fges.cont:FGESc}")
+    private String algoFgesCont;
 
-    @Value("${ccd.algorithm.fges.discrete:FGESd}")
-    private String fgesDiscrete;
+    @Value("${ccd.algorithm.fges.disc:FGESd}")
+    private String algoFgesDisc;
 
-    @Value("${ccd.algorithm.gfci:gfci}")
-    private String gfci;
+    @Value("${ccd.algorithm.gfci.cont:GFCIc}")
+    private String algoGfciCont;
 
     @Value("${ccd.server.workspace:}")
     private String workspaceDir;
@@ -85,28 +85,28 @@ public class CausalRestProperties {
         this.algorithmJar = algorithmJar;
     }
 
-    public String getFges() {
-        return fges;
+    public String getAlgoFgesCont() {
+        return algoFgesCont;
     }
 
-    public void setFges(String fges) {
-        this.fges = fges;
+    public void setAlgoFgesCont(String algoFgesCont) {
+        this.algoFgesCont = algoFgesCont;
     }
 
-    public String getFgesDiscrete() {
-        return fgesDiscrete;
+    public String getAlgoFgesDisc() {
+        return algoFgesDisc;
     }
 
-    public void setFgesDiscrete(String fgesDiscrete) {
-        this.fgesDiscrete = fgesDiscrete;
+    public void setAlgoFgesDisc(String algoFgesDisc) {
+        this.algoFgesDisc = algoFgesDisc;
     }
 
-    public String getGfci() {
-        return gfci;
+    public String getAlgoGfciCont() {
+        return algoGfciCont;
     }
 
-    public void setGfci(String gfci) {
-        this.gfci = gfci;
+    public void setAlgoGfciCont(String algoGfciCont) {
+        this.algoGfciCont = algoGfciCont;
     }
 
     public String getWorkspaceDir() {

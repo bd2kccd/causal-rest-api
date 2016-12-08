@@ -104,7 +104,7 @@ public class JobQueueEndpointService {
      * @return JobInfoDTO
      */
     public JobInfoDTO addGfciContinuousNewJob(Long uid, GfciContinuousNewJob newJob) {
-        String algorithm = causalRestProperties.getGfci();
+        String algorithm = causalRestProperties.getAlgoFgesCont();
 
         // When we can get here vai AuthFilterSerice, it means the user exists
         // so no need to check if (userAccount == null) and throw UserNotFoundException(uid)
@@ -254,7 +254,7 @@ public class JobQueueEndpointService {
      * @return Job ID
      */
     public JobInfoDTO addFgesDiscreteNewJob(Long uid, FgesDiscreteNewJob newJob) {
-        String algorithm = causalRestProperties.getFgesDiscrete();
+        String algorithm = causalRestProperties.getAlgoFgesDisc();
 
         // When we can get here vai AuthFilterSerice, it means the user exists
         // so no need to check if (userAccount == null) and throw UserNotFoundException(uid)
@@ -404,7 +404,7 @@ public class JobQueueEndpointService {
      * @return JobInfoDTO
      */
     public JobInfoDTO addFgesContinuousNewJob(Long uid, FgesContinuousNewJob newJob) {
-        String algorithm = causalRestProperties.getFges();
+        String algorithm = causalRestProperties.getAlgoGfciCont();
 
         // When we can get here vai AuthFilterSerice, it means the user exists
         // so no need to check if (userAccount == null) and throw UserNotFoundException(uid)
