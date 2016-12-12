@@ -22,20 +22,31 @@ package edu.pitt.dbmi.ccd.causal.rest.api.dto;
  *
  * @author Zhou Yuan (zhy19@pitt.edu)
  */
-public class FgsDiscreteDataValidation extends BasicDataValidation {
+public class FgesDiscreteNewJob extends NewJob {
 
-    //  Skip 'limit number of categories' check
-    private boolean skipCategoryLimit;
+    // Algorithm parameters
+    private FgesDiscreteParameters algorithmParameters;
 
-    public FgsDiscreteDataValidation() {
+    // Data validation flag
+    private FgesDiscreteDataValidation dataValidation;
+
+    public FgesDiscreteNewJob() {
     }
 
-    public boolean isSkipCategoryLimit() {
-        return skipCategoryLimit;
+    public FgesDiscreteParameters getAlgorithmParameters() {
+        return algorithmParameters;
     }
 
-    public void setSkipCategoryLimit(boolean skipCategoryLimit) {
-        this.skipCategoryLimit = skipCategoryLimit;
+    public void setAlgorithmParameters(FgesDiscreteParameters algorithmParameters) {
+        this.algorithmParameters = algorithmParameters;
+    }
+
+    public FgesDiscreteDataValidation getDataValidation() {
+        return dataValidation;
+    }
+
+    public void setDataValidation(FgesDiscreteDataValidation dataValidation) {
+        this.dataValidation = dataValidation;
     }
 
 }

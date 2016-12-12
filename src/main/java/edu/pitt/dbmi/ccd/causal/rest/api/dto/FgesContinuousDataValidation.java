@@ -22,29 +22,20 @@ package edu.pitt.dbmi.ccd.causal.rest.api.dto;
  *
  * @author Zhou Yuan (zhy19@pitt.edu)
  */
-public class FgsDiscreteParameters extends FgsParameters {
+public class FgesContinuousDataValidation extends BasicDataValidation {
 
-    private double structurePrior;
+    // Skip check for zero variance variables
+    protected boolean skipNonzeroVariance;
 
-    private double samplePrior;
-
-    public FgsDiscreteParameters() {
+    public FgesContinuousDataValidation() {
     }
 
-    public double getStructurePrior() {
-        return structurePrior;
+    public boolean isSkipNonzeroVariance() {
+        return skipNonzeroVariance;
     }
 
-    public void setStructurePrior(double structurePrior) {
-        this.structurePrior = structurePrior;
-    }
-
-    public double getSamplePrior() {
-        return samplePrior;
-    }
-
-    public void setSamplePrior(double samplePrior) {
-        this.samplePrior = samplePrior;
+    public void setSkipNonzeroVariance(boolean skipNonzeroVariance) {
+        this.skipNonzeroVariance = skipNonzeroVariance;
     }
 
 }

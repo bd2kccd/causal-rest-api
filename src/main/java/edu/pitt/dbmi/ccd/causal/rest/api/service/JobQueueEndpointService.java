@@ -18,12 +18,12 @@
  */
 package edu.pitt.dbmi.ccd.causal.rest.api.service;
 
-import edu.pitt.dbmi.ccd.causal.rest.api.dto.FgsContinuousDataValidation;
-import edu.pitt.dbmi.ccd.causal.rest.api.dto.FgsContinuousNewJob;
-import edu.pitt.dbmi.ccd.causal.rest.api.dto.FgsContinuousParameters;
-import edu.pitt.dbmi.ccd.causal.rest.api.dto.FgsDiscreteDataValidation;
-import edu.pitt.dbmi.ccd.causal.rest.api.dto.FgsDiscreteNewJob;
-import edu.pitt.dbmi.ccd.causal.rest.api.dto.FgsDiscreteParameters;
+import edu.pitt.dbmi.ccd.causal.rest.api.dto.FgesContinuousDataValidation;
+import edu.pitt.dbmi.ccd.causal.rest.api.dto.FgesContinuousNewJob;
+import edu.pitt.dbmi.ccd.causal.rest.api.dto.FgesContinuousParameters;
+import edu.pitt.dbmi.ccd.causal.rest.api.dto.FgesDiscreteDataValidation;
+import edu.pitt.dbmi.ccd.causal.rest.api.dto.FgesDiscreteNewJob;
+import edu.pitt.dbmi.ccd.causal.rest.api.dto.FgesDiscreteParameters;
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.GfciContinuousDataValidation;
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.GfciContinuousNewJob;
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.GfciContinuousParameters;
@@ -97,14 +97,17 @@ public class JobQueueEndpointService {
     }
 
     /**
-     * Add a new job to the job queue and run the GFCI Continuous algorithm
+     * Add a new job to the job queue and run the GFCI continuous algorithm
      *
      * @param uid
      * @param newJob
      * @return JobInfoDTO
      */
     public JobInfoDTO addGfciContinuousNewJob(Long uid, GfciContinuousNewJob newJob) {
-        String algorithm = causalRestProperties.getGfci();
+        String algorithmName = "GFCIc";
+
+        // This is the algo to pass to causal-cmd, case-insensitive
+        String algorithm = causalRestProperties.getAlgoGfciCont();
 
         // When we can get here vai AuthFilterSerice, it means the user exists
         // so no need to check if (userAccount == null) and throw UserNotFoundException(uid)
@@ -203,7 +206,8 @@ public class JobQueueEndpointService {
         String fileName;
 
         DataFile df = dataFileService.findByIdAndUserAccount(datasetFileId, userAccount);
-        fileName = String.format("%s_%s_%d", algorithm, df.getName(), currentTime);
+        // The algorithm name can be different from the value of causalRestProperties.getAlgoFgesCont()
+        fileName = String.format("%s_%s_%d", algorithmName, df.getName(), currentTime);
 
         commands.add("--output-prefix");
         commands.add(fileName);
@@ -216,7 +220,7 @@ public class JobQueueEndpointService {
         // Insert to database table `job_queue_info`
         JobQueueInfo jobQueueInfo = new JobQueueInfo();
         jobQueueInfo.setAddedTime(new Date(System.currentTimeMillis()));
-        jobQueueInfo.setAlgorName(algorithm);
+        jobQueueInfo.setAlgorName(algorithmName);
         jobQueueInfo.setCommands(cmd);
         jobQueueInfo.setFileName(fileName);
         jobQueueInfo.setOutputDirectory(map.get("resultDir"));
@@ -228,7 +232,7 @@ public class JobQueueEndpointService {
 
         Long newJobId = jobQueueInfo.getId();
 
-        LOGGER.info(String.format("New GFCI Continuous job submitted. Job ID: %d", newJobId));
+        LOGGER.info(String.format("New GFCI continuous job submitted. Job ID: %d", newJobId));
 
         String resultJsonFileName = fileName + ".json";
         fileName = fileName + ".txt";
@@ -237,7 +241,7 @@ public class JobQueueEndpointService {
         JobInfoDTO jobInfo = new JobInfoDTO();
         jobInfo.setStatus(0);
         jobInfo.setAddedTime(jobQueueInfo.getAddedTime());
-        jobInfo.setAlgorithmName(algorithm);
+        jobInfo.setAlgorithmName(algorithmName);
         jobInfo.setResultFileName(fileName);
         jobInfo.setResultJsonFileName(resultJsonFileName);
         jobInfo.setErrorResultFileName(errorFileName);
@@ -247,14 +251,17 @@ public class JobQueueEndpointService {
     }
 
     /**
-     * Add a new job to the job queue and run the FGS Discrete algorithm
+     * Add a new job to the job queue and run the FGES discrete algorithm
      *
      * @param uid
      * @param newJob
      * @return Job ID
      */
-    public JobInfoDTO addFgsDiscreteNewJob(Long uid, FgsDiscreteNewJob newJob) {
-        String algorithm = causalRestProperties.getFgsDiscrete();
+    public JobInfoDTO addFgesDiscreteNewJob(Long uid, FgesDiscreteNewJob newJob) {
+        String algorithmName = "FGESd";
+
+        // This is the algo to pass to causal-cmd, case-insensitive
+        String algorithm = causalRestProperties.getAlgoFgesDisc();
 
         // When we can get here vai AuthFilterSerice, it means the user exists
         // so no need to check if (userAccount == null) and throw UserNotFoundException(uid)
@@ -310,7 +317,7 @@ public class JobQueueEndpointService {
         }
 
         // Algorithm parameters
-        FgsDiscreteParameters algorithmParameters = newJob.getAlgorithmParameters();
+        FgesDiscreteParameters algorithmParameters = newJob.getAlgorithmParameters();
 
         commands.add("--delimiter");
         commands.add(getFileDelimiter(newJob.getDatasetFileId()));
@@ -333,7 +340,7 @@ public class JobQueueEndpointService {
         }
 
         // Data validation
-        FgsDiscreteDataValidation dataValidation = newJob.getDataValidation();
+        FgesDiscreteDataValidation dataValidation = newJob.getDataValidation();
 
         if (!dataValidation.isSkipCategoryLimit()) {
             commands.add("--skip-category-limit");
@@ -353,7 +360,8 @@ public class JobQueueEndpointService {
         String fileName;
 
         DataFile df = dataFileService.findByIdAndUserAccount(datasetFileId, userAccount);
-        fileName = String.format("%s_%s_%d", algorithm, df.getName(), currentTime);
+        // The algorithm name can be different from the value of causalRestProperties.getAlgoFgesCont()
+        fileName = String.format("%s_%s_%d", algorithmName, df.getName(), currentTime);
 
         commands.add("--output-prefix");
         commands.add(fileName);
@@ -366,7 +374,7 @@ public class JobQueueEndpointService {
         // Insert to database table `job_queue_info`
         JobQueueInfo jobQueueInfo = new JobQueueInfo();
         jobQueueInfo.setAddedTime(new Date(System.currentTimeMillis()));
-        jobQueueInfo.setAlgorName(algorithm);
+        jobQueueInfo.setAlgorName(algorithmName);
         jobQueueInfo.setCommands(cmd);
         jobQueueInfo.setFileName(fileName);
         jobQueueInfo.setOutputDirectory(map.get("resultDir"));
@@ -378,7 +386,7 @@ public class JobQueueEndpointService {
 
         Long newJobId = jobQueueInfo.getId();
 
-        LOGGER.info(String.format("New FGS Discrete job submitted. Job ID: %d", newJobId));
+        LOGGER.info(String.format("New FGES discrete job submitted. Job ID: %d", newJobId));
 
         String resultJsonFileName = fileName + ".json";
         fileName = fileName + ".txt";
@@ -387,7 +395,7 @@ public class JobQueueEndpointService {
         JobInfoDTO jobInfo = new JobInfoDTO();
         jobInfo.setStatus(0);
         jobInfo.setAddedTime(jobQueueInfo.getAddedTime());
-        jobInfo.setAlgorithmName(algorithm);
+        jobInfo.setAlgorithmName(algorithmName);
         jobInfo.setResultFileName(fileName);
         jobInfo.setResultJsonFileName(resultJsonFileName);
         jobInfo.setErrorResultFileName(errorFileName);
@@ -397,14 +405,17 @@ public class JobQueueEndpointService {
     }
 
     /**
-     * Add a new job to the job queue and run the FGS Continuous algorithm
+     * Add a new job to the job queue and run the FGES Continuous algorithm
      *
      * @param uid
      * @param newJob
      * @return JobInfoDTO
      */
-    public JobInfoDTO addFgsContinuousNewJob(Long uid, FgsContinuousNewJob newJob) {
-        String algorithm = causalRestProperties.getFgs();
+    public JobInfoDTO addFgesContinuousNewJob(Long uid, FgesContinuousNewJob newJob) {
+        String algorithmName = "FGESc";
+
+        // This is the algo to pass to causal-cmd, case-insensitive
+        String algorithm = causalRestProperties.getAlgoFgesCont();
 
         // When we can get here vai AuthFilterSerice, it means the user exists
         // so no need to check if (userAccount == null) and throw UserNotFoundException(uid)
@@ -460,7 +471,7 @@ public class JobQueueEndpointService {
         }
 
         // Algorithm parameters
-        FgsContinuousParameters algorithmParameters = newJob.getAlgorithmParameters();
+        FgesContinuousParameters algorithmParameters = newJob.getAlgorithmParameters();
 
         commands.add("--delimiter");
         commands.add(getFileDelimiter(newJob.getDatasetFileId()));
@@ -480,7 +491,7 @@ public class JobQueueEndpointService {
         }
 
         // Data validation
-        FgsContinuousDataValidation dataValidation = newJob.getDataValidation();
+        FgesContinuousDataValidation dataValidation = newJob.getDataValidation();
 
         if (!dataValidation.isSkipNonzeroVariance()) {
             commands.add("--skip-nonzero-variance");
@@ -500,7 +511,8 @@ public class JobQueueEndpointService {
         String fileName;
 
         DataFile df = dataFileService.findByIdAndUserAccount(datasetFileId, userAccount);
-        fileName = String.format("%s_%s_%d", algorithm, df.getName(), currentTime);
+        // The algorithm name can be different from the value of causalRestProperties.getAlgoFgesCont()
+        fileName = String.format("%s_%s_%d", algorithmName, df.getName(), currentTime);
 
         commands.add("--output-prefix");
         commands.add(fileName);
@@ -513,7 +525,7 @@ public class JobQueueEndpointService {
         // Insert to database table `job_queue_info`
         JobQueueInfo jobQueueInfo = new JobQueueInfo();
         jobQueueInfo.setAddedTime(new Date(System.currentTimeMillis()));
-        jobQueueInfo.setAlgorName(algorithm);
+        jobQueueInfo.setAlgorName(algorithmName);
         jobQueueInfo.setCommands(cmd);
         jobQueueInfo.setFileName(fileName);
         jobQueueInfo.setOutputDirectory(map.get("resultDir"));
@@ -525,7 +537,7 @@ public class JobQueueEndpointService {
 
         Long newJobId = jobQueueInfo.getId();
 
-        LOGGER.info(String.format("New FGS Continuous job submitted. Job ID: %d", newJobId));
+        LOGGER.info(String.format("New FGES Continuous job submitted. Job ID: %d", newJobId));
 
         String resultJsonFileName = fileName + ".json";
         fileName = fileName + ".txt";
@@ -534,7 +546,7 @@ public class JobQueueEndpointService {
         JobInfoDTO jobInfo = new JobInfoDTO();
         jobInfo.setStatus(0);
         jobInfo.setAddedTime(jobQueueInfo.getAddedTime());
-        jobInfo.setAlgorithmName(algorithm);
+        jobInfo.setAlgorithmName(algorithmName);
         jobInfo.setResultFileName(fileName);
         jobInfo.setResultJsonFileName(resultJsonFileName);
         jobInfo.setErrorResultFileName(errorFileName);
