@@ -796,6 +796,7 @@ In this example, we are running the "FGES continuous" algorithm on the file with
 {
   "id": 5,
   "algorithmName": "FGESc",
+  "status": 0,
   "addedTime": 1472742564355,
   "resultFileName": "FGESc_data_small.txt_1472742564353.txt",
   "errorResultFileName": "error_FGESc_data_small.txt_1472742564353.txt"
