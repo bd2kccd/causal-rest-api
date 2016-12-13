@@ -22,20 +22,20 @@ package edu.pitt.dbmi.ccd.causal.rest.api.dto;
  *
  * @author Zhou Yuan (zhy19@pitt.edu)
  */
-public class FgsContinuousDataValidation extends BasicDataValidation {
+public class FgesDiscreteDataValidation extends BasicDataValidation {
 
-    // Skip check for zero variance variables
-    protected boolean skipNonzeroVariance;
+    //  Skip 'limit number of categories' check
+    private boolean skipCategoryLimit;
 
-    public FgsContinuousDataValidation() {
+    public FgesDiscreteDataValidation() {
     }
 
-    public boolean isSkipNonzeroVariance() {
-        return skipNonzeroVariance;
+    public boolean isSkipCategoryLimit() {
+        return skipCategoryLimit;
     }
 
-    public void setSkipNonzeroVariance(boolean skipNonzeroVariance) {
-        this.skipNonzeroVariance = skipNonzeroVariance;
+    public void setSkipCategoryLimit(boolean skipCategoryLimit) {
+        this.skipCategoryLimit = skipCategoryLimit;
     }
 
 }

@@ -24,7 +24,7 @@ import javax.validation.constraints.Min;
  *
  * @author Zhou Yuan (zhy19@pitt.edu)
  */
-public abstract class FgsParameters {
+public abstract class FgesParameters {
 
     // Search max degree must be at least -1
     @Min(-1)
@@ -34,7 +34,7 @@ public abstract class FgsParameters {
 
     protected boolean verbose;
 
-    public FgsParameters() {
+    public FgesParameters() {
     }
 
     public int getMaxDegree() {
