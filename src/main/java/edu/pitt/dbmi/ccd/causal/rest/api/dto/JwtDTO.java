@@ -24,6 +24,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Profile;
 
 /**
  *
@@ -48,6 +49,14 @@ public class JwtDTO {
 
     @XmlElement
     private Date expireTime;
+
+    @XmlElement
+    @Value("${ccd.hpc.wall.time:-1}")
+    private int wallTime;
+
+    @XmlElement
+    @Value("${ccd.hpc.wall.time.max:-1}")
+    private int wallTimeMax;
 
     public JwtDTO() {
     }
@@ -91,5 +100,21 @@ public class JwtDTO {
     public void setExpireTime(Date expireTime) {
         this.expireTime = expireTime;
     }
+
+	public int getWallTime() {
+		return wallTime;
+	}
+
+	public void setWallTime(int wallTime) {
+		this.wallTime = wallTime;
+	}
+
+	public int getWallTimeMax() {
+		return wallTimeMax;
+	}
+
+	public void setWallTimeMax(int wallTimeMax) {
+		this.wallTimeMax = wallTimeMax;
+	}
 
 }

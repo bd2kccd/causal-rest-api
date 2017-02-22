@@ -74,6 +74,12 @@ public class CausalRestProperties {
     @Value("${ccd.jwt.lifetime}")
     private long jwtLifetime;
 
+	@Value("${ccd.hpc.wall.time:-1}")
+	private int wallTime;
+
+	@Value("${ccd.hpc.wall.time.max:-1}")
+	private int wallTimeMax;
+    
     public CausalRestProperties() {
     }
 
@@ -188,5 +194,21 @@ public class CausalRestProperties {
     public void setJwtLifetime(long jwtLifetime) {
         this.jwtLifetime = jwtLifetime;
     }
+
+	public int getWallTime() {
+		return wallTime;
+	}
+
+	public void setWallTime(int wallTime) {
+		this.wallTime = wallTime;
+	}
+
+	public int getWallTimeMax() {
+		return wallTimeMax;
+	}
+
+	public void setWallTimeMax(int wallTimeMax) {
+		this.wallTimeMax = wallTimeMax;
+	}
 
 }
