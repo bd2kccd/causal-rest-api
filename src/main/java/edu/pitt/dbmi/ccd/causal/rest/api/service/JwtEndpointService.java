@@ -31,6 +31,7 @@ import java.util.StringTokenizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 /**
@@ -47,6 +48,9 @@ public class JwtEndpointService {
     private final CausalRestProperties causalRestProperties;
 
     private final UserAccountService userAccountService;
+    
+    @Value("${ccd.hpc.wall.time}")
+    private int[] wallTime;
 
     @Autowired
     public JwtEndpointService(CausalRestProperties causalRestProperties, UserAccountService userAccountService) {
@@ -110,6 +114,7 @@ public class JwtEndpointService {
         jwtDTO.setIssuedTime(iatDate);
         jwtDTO.setLifetime(causalRestProperties.getJwtLifetime());
         jwtDTO.setExpireTime(expDate);
+        jwtDTO.setWallTime(wallTime);
 
         return jwtDTO;
     }
