@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 University of Pittsburgh.
+ * Copyright (C) 2015 University of Pittsburgh.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -18,23 +18,33 @@
  */
 package edu.pitt.dbmi.ccd.causal.rest.api;
 
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
 /**
+ * 
+ * Feb 24, 2017 1:36:27 PM
+ * 
+ * @author Chirayu Kong Wongchokprasitti, PhD (chw20@pitt.edu)
  *
- * Jun 3, 2016 3:05:57 PM
- *
- * @author Kevin V. Bui (kvb2@pitt.edu)
  */
 @RunWith(SpringRunner.class)
 @SpringBootTest
-public class CausalRestApiApplicationTest {
+public class HpcParametersTest {
+
+	@Value("${ccd.hpc.wall.time}")
+	private int[] wallTime;
 
 	@Test
-    public void contextLoads() {
-    }
-
+	public void testHpcParametersLoad(){
+		Assert.assertNotNull(wallTime);
+		for(int i=0;i<wallTime.length;i++){
+			System.out.println(wallTime[i]);
+		}
+	}
+	
 }
