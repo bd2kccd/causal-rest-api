@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 University of Pittsburgh.
+ * Copyright (C) 2015 University of Pittsburgh.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -16,25 +16,34 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301  USA
  */
-package edu.pitt.dbmi.ccd.causal.rest.api;
-
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
+package edu.pitt.dbmi.ccd.causal.rest.api.dto;
 
 /**
+ * 
+ * Feb 21, 2017 12:24:39 PM
+ * 
+ * @author Chirayu Kong Wongchokprasitti, PhD (chw20@pitt.edu)
  *
- * Jun 3, 2016 3:05:57 PM
- *
- * @author Kevin V. Bui (kvb2@pitt.edu)
  */
-@RunWith(SpringRunner.class)
-@SpringBootTest
-public class CausalRestApiApplicationTest {
+public class HpcParameter {
 
-	@Test
-    public void contextLoads() {
-    }
+	private String key;
+	
+	private String value;
 
+	public String getKey() {
+		return key;
+	}
+
+	public void setKey(String key) {
+		this.key = key;
+	}
+
+	public String getValue() {
+		return value;
+	}
+
+	public void setValue(String value) {
+		this.value = value;
+	}
 }

@@ -35,6 +35,7 @@ import edu.pitt.dbmi.ccd.causal.rest.api.prop.CausalRestProperties;
 import edu.pitt.dbmi.ccd.db.entity.DataFile;
 import edu.pitt.dbmi.ccd.db.entity.DataFileInfo;
 import edu.pitt.dbmi.ccd.db.entity.FileDelimiter;
+import edu.pitt.dbmi.ccd.db.entity.HpcParameter;
 import edu.pitt.dbmi.ccd.db.entity.JobQueueInfo;
 import edu.pitt.dbmi.ccd.db.entity.UserAccount;
 import edu.pitt.dbmi.ccd.db.service.DataFileService;
@@ -45,9 +46,12 @@ import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -128,7 +132,7 @@ public class JobQueueEndpointService {
             JvmOptions jvmOptions = newJob.getJvmOptions();
             commands.add(String.format("-Xmx%dG", jvmOptions.getMaxHeapSize()));
         }
-
+        
         // Add causal-cmd jar path
         commands.add("-jar");
         commands.add(map.get("algorithmJarPath"));
@@ -227,6 +231,18 @@ public class JobQueueEndpointService {
         jobQueueInfo.setStatus(0);
         jobQueueInfo.setTmpDirectory(map.get("tmpDir"));
         jobQueueInfo.setUserAccounts(Collections.singleton(userAccount));
+
+        // Hpc Parameters
+        if(newJob.getHpcParameters() != null){
+        	Set<HpcParameter> hpcParameters = new HashSet<>();
+        	newJob.getHpcParameters().forEach(param -> {
+        		HpcParameter hpcParameter = new HpcParameter();
+        		hpcParameter.setKey(param.getKey());
+        		hpcParameter.setValue(param.getValue());
+        		hpcParameters.add(hpcParameter);
+        	});
+        	jobQueueInfo.setHpcParameters(hpcParameters);
+        }
 
         jobQueueInfo = jobQueueInfoService.saveJobIntoQueue(jobQueueInfo);
 
@@ -382,6 +398,18 @@ public class JobQueueEndpointService {
         jobQueueInfo.setTmpDirectory(map.get("tmpDir"));
         jobQueueInfo.setUserAccounts(Collections.singleton(userAccount));
 
+        // Hpc Parameters
+        if(newJob.getHpcParameters() != null){
+        	Set<HpcParameter> hpcParameters = new HashSet<>();
+        	newJob.getHpcParameters().forEach(param -> {
+        		HpcParameter hpcParameter = new HpcParameter();
+        		hpcParameter.setKey(param.getKey());
+        		hpcParameter.setValue(param.getValue());
+        		hpcParameters.add(hpcParameter);
+        	});
+        	jobQueueInfo.setHpcParameters(hpcParameters);
+        }
+
         jobQueueInfo = jobQueueInfoService.saveJobIntoQueue(jobQueueInfo);
 
         Long newJobId = jobQueueInfo.getId();
@@ -532,6 +560,18 @@ public class JobQueueEndpointService {
         jobQueueInfo.setStatus(0);
         jobQueueInfo.setTmpDirectory(map.get("tmpDir"));
         jobQueueInfo.setUserAccounts(Collections.singleton(userAccount));
+        
+        // Hpc Parameters
+        if(newJob.getHpcParameters() != null){
+        	Set<HpcParameter> hpcParameters = new HashSet<>();
+        	newJob.getHpcParameters().forEach(param -> {
+        		HpcParameter hpcParameter = new HpcParameter();
+        		hpcParameter.setKey(param.getKey());
+        		hpcParameter.setValue(param.getValue());
+        		hpcParameters.add(hpcParameter);
+        	});
+        	jobQueueInfo.setHpcParameters(hpcParameters);
+        }
 
         jobQueueInfo = jobQueueInfoService.saveJobIntoQueue(jobQueueInfo);
 

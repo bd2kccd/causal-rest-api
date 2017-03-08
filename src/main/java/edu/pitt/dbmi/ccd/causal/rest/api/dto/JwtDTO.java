@@ -19,6 +19,7 @@
 package edu.pitt.dbmi.ccd.causal.rest.api.dto;
 
 import java.util.Date;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -48,6 +49,10 @@ public class JwtDTO {
 
     @XmlElement
     private Date expireTime;
+
+    @XmlElement
+    @Value("${ccd.hpc.wall.time}")
+    private int[] wallTime;
 
     public JwtDTO() {
     }
@@ -91,5 +96,15 @@ public class JwtDTO {
     public void setExpireTime(Date expireTime) {
         this.expireTime = expireTime;
     }
+
+	public int[] getWallTime() {
+		return wallTime;
+	}
+
+	public void setWallTime(int[] wallTime) {
+		this.wallTime = wallTime;
+	}
+
+
 
 }
