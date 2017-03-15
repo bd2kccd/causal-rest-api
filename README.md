@@ -736,8 +736,8 @@ Algorithm parameters:
 | ------------- | ------------- | ----- |
 | `structurePrior`      | Structure prior      | 1.0 |
 | `samplePrior` | Sample prior      | 1.0 |
-| `faithfulnessAssumed`      | Yes if (one edge) faithfulness should be assumed      |   true |
 | `maxDegree`      | The maximum degree of the output graph, at least -1      |  -1 |
+| `faithfulnessAssumed`      | Yes if (one edge) faithfulness should be assumed      |   true |
 | `verbose` | Print additional information      |    true |
 
 **GFCI continuous** 
@@ -775,8 +775,8 @@ Algorithm parameters:
 | ------------- | ------------- | ----- |
 | `structurePrior`      | Structure prior      | 1.0 |
 | `samplePrior` | Sample prior      | 1.0 |
-| `faithfulnessAssumed`      | Yes if (one edge) faithfulness should be assumed      |   true |
 | `maxDegree`      | The maximum degree of the output graph, at least -1      |  -1 |
+| `faithfulnessAssumed`      | Yes if (one edge) faithfulness should be assumed      |   true |
 | `verbose` | Print additional information      |    true |
 
 
