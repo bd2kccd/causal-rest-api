@@ -664,7 +664,6 @@ GET /ccd-api/22/algorithms HTTP/1.1
 Host: ccd2.vm.bridges.psc.edu
 Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL2Nsb3VkLmNjZC5waXR0LmVkdS8iLCJuYW1lIjoiemh5MTkiLCJleHAiOjE0NzU4NTA2NzY4MDQsImlhdCI6MTQ3NTg0NzA3NjgwNH0.8azVEoNPfETczXb-vn7dfyDd98eRt7iiLBXehGpPGzY
 ````
-Currently we support "FGES continuous" and "FGES discrete".
 
 ````javascript
 [
@@ -682,11 +681,16 @@ Currently we support "FGES continuous" and "FGES discrete".
     "id": 3,
     "name": "GFCIc",
     "description": "GFCI continuous"
+  },
+  {
+    "id": 4,
+    "name": "GFCId",
+    "description": "GFCI discrete"
   }
 ]
 ````
 
-Currently we support "FGES continuous", "FGES discrete" and "GFCI continuous". They also share a common JSON structure as of their input, for example:
+Currently we support "FGES continuous", "FGES discrete", "GFCI continuous", and "GFCI discrete". They also share a common JSON structure as of their input, for example:
 
 | Input JSON Fields | Description |
 | --- | --- |
@@ -754,6 +758,27 @@ Algorithm parameters:
 | `maxDegree`      |  The maximum degree of the output graph, at least -1 |  -1 |
 | `faithfulnessAssumed`      | Yes if (one edge) faithfulness should be assumed      |  true |
 | `verbose` | Print additional information      |    true |
+
+**GFCI discrete** 
+
+Data validation:
+
+| Parameters        | Description           | Default Value  |
+| ------------- | ------------- | ----- |
+| `skipUniqueVarName`      | Skip check for unique variable names       |  false |
+| `skipCategoryLimit`      | Skip 'limit number of categories' check | false |
+
+
+Algorithm parameters:
+
+| Parameters        | Description           | Default Value  |
+| ------------- | ------------- | ----- |
+| `structurePrior`      | Structure prior      | 1.0 |
+| `samplePrior` | Sample prior      | 1.0 |
+| `faithfulnessAssumed`      | Yes if (one edge) faithfulness should be assumed      |   true |
+| `maxDegree`      | The maximum degree of the output graph, at least -1      |  -1 |
+| `verbose` | Print additional information      |    true |
+
 
 #### Add a new job to run the desired algorithm on a given data file
 
