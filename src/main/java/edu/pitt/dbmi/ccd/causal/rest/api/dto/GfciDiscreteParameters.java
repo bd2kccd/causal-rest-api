@@ -11,23 +11,26 @@ package edu.pitt.dbmi.ccd.causal.rest.api.dto;
  */
 public class GfciDiscreteParameters extends FciParameters {
 
-    private double alpha;
+    private double structurePrior;
 
-    private double penaltyDiscount;
+    private double samplePrior;
 
-    public double getAlpha() {
-        return alpha;
+    public GfciDiscreteParameters() {
     }
 
-    public void setAlpha(double alpha) {
-        this.alpha = alpha;
+    public double getStructurePrior() {
+        return structurePrior;
     }
 
-    public double getPenaltyDiscount() {
-        return penaltyDiscount;
+    public void setStructurePrior(double structurePrior) {
+        this.structurePrior = structurePrior;
     }
 
-    public void setPenaltyDiscount(double penaltyDiscount) {
-        this.penaltyDiscount = penaltyDiscount;
+    public double getSamplePrior() {
+        return samplePrior;
+    }
+
+    public void setSamplePrior(double samplePrior) {
+        this.samplePrior = samplePrior;
     }
 }
