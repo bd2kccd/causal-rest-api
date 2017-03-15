@@ -62,6 +62,48 @@ public class JobQueueEndpoint {
     }
 
     /**
+     * Adding a new job and run FGES continuous
+     *
+     * @param uid
+     * @param newJob
+     * @return 201 Created status code with new job ID
+     * @throws IOException
+     */
+    @POST
+    @Path("/jobs/FGESc")
+    @Consumes(APPLICATION_JSON)
+    @Produces({APPLICATION_JSON, APPLICATION_XML})
+    @RolesAllowed(Role.USER)
+    public Response addFgesContinuousNewJob(@PathParam("uid") Long uid, @Valid FgesContinuousNewJob newJob) throws IOException {
+        JobInfoDTO jobInfo = jobQueueEndpointService.addFgesContinuousNewJob(uid, newJob);
+        GenericEntity<JobInfoDTO> jobRequestEntity = new GenericEntity<JobInfoDTO>(jobInfo) {
+        };
+        // Return 201 Created status code and the job id in body
+        return Response.status(Status.CREATED).entity(jobRequestEntity).build();
+    }
+
+    /**
+     * Adding a new job and run FGES discrete
+     *
+     * @param uid
+     * @param newJob
+     * @return 201 Created status code with new job ID
+     * @throws IOException
+     */
+    @POST
+    @Path("/jobs/FGESd")
+    @Consumes(APPLICATION_JSON)
+    @Produces({APPLICATION_JSON, APPLICATION_XML})
+    @RolesAllowed(Role.USER)
+    public Response addFgesDiscreteNewJob(@PathParam("uid") Long uid, @Valid FgesDiscreteNewJob newJob) throws IOException {
+        JobInfoDTO jobInfo = jobQueueEndpointService.addFgesDiscreteNewJob(uid, newJob);
+        GenericEntity<JobInfoDTO> jobRequestEntity = new GenericEntity<JobInfoDTO>(jobInfo) {
+        };
+        // Return 201 Created status code and the job id in body
+        return Response.status(Status.CREATED).entity(jobRequestEntity).build();
+    }
+
+    /**
      * Adding a new job and run GFCI continuous
      *
      * @param uid
@@ -97,48 +139,6 @@ public class JobQueueEndpoint {
     @RolesAllowed(Role.USER)
     public Response addGfciDiscreteNewJob(@PathParam("uid") Long uid, @Valid GfciDiscreteNewJob newJob) throws IOException {
         JobInfoDTO jobInfo = jobQueueEndpointService.addGfciDiscreteNewJob(uid, newJob);
-        GenericEntity<JobInfoDTO> jobRequestEntity = new GenericEntity<JobInfoDTO>(jobInfo) {
-        };
-        // Return 201 Created status code and the job id in body
-        return Response.status(Status.CREATED).entity(jobRequestEntity).build();
-    }
-
-    /**
-     * Adding a new job and run FGES continuous
-     *
-     * @param uid
-     * @param newJob
-     * @return 201 Created status code with new job ID
-     * @throws IOException
-     */
-    @POST
-    @Path("/jobs/FGESc")
-    @Consumes(APPLICATION_JSON)
-    @Produces({APPLICATION_JSON, APPLICATION_XML})
-    @RolesAllowed(Role.USER)
-    public Response addFgsContinuousNewJob(@PathParam("uid") Long uid, @Valid FgesContinuousNewJob newJob) throws IOException {
-        JobInfoDTO jobInfo = jobQueueEndpointService.addFgesContinuousNewJob(uid, newJob);
-        GenericEntity<JobInfoDTO> jobRequestEntity = new GenericEntity<JobInfoDTO>(jobInfo) {
-        };
-        // Return 201 Created status code and the job id in body
-        return Response.status(Status.CREATED).entity(jobRequestEntity).build();
-    }
-
-    /**
-     * Adding a new job and run FGES discrete
-     *
-     * @param uid
-     * @param newJob
-     * @return 201 Created status code with new job ID
-     * @throws IOException
-     */
-    @POST
-    @Path("/jobs/FGESd")
-    @Consumes(APPLICATION_JSON)
-    @Produces({APPLICATION_JSON, APPLICATION_XML})
-    @RolesAllowed(Role.USER)
-    public Response addFgsDiscreteNewJob(@PathParam("uid") Long uid, @Valid FgesDiscreteNewJob newJob) throws IOException {
-        JobInfoDTO jobInfo = jobQueueEndpointService.addFgesDiscreteNewJob(uid, newJob);
         GenericEntity<JobInfoDTO> jobRequestEntity = new GenericEntity<JobInfoDTO>(jobInfo) {
         };
         // Return 201 Created status code and the job id in body
