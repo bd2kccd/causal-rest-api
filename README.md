@@ -1,4 +1,4 @@
-# Causal REST API v0.0.7
+# Causal REST API v0.0.8
 
 This RESTful API is designed for causal web. And it implements the [JAX-RS](https://en.wikipedia.org/wiki/Java_API_for_RESTful_Web_Services) specifications using Jersey.
 
@@ -753,7 +753,7 @@ Algorithm parameters:
 
 | Parameters        | Description           | Default Value  |
 | ------------- | ------------- | ----- |
-| `alpha`      | Search depth. Integer value |  1.0 | 
+| `alpha`      | Search depth |  1.0 | 
 | `penaltyDiscount`      | Penalty discount      |   4.0 |
 | `maxDegree`      |  The maximum degree of the output graph, at least -1 |  -1 |
 | `faithfulnessAssumed`      | Yes if (one edge) faithfulness should be assumed      |  true |
@@ -773,6 +773,7 @@ Algorithm parameters:
 
 | Parameters        | Description           | Default Value  |
 | ------------- | ------------- | ----- |
+| `alpha`      | Search depth |  1.0 | 
 | `structurePrior`      | Structure prior      | 1.0 |
 | `samplePrior` | Sample prior      | 1.0 |
 | `maxDegree`      | The maximum degree of the output graph, at least -1      |  -1 |
