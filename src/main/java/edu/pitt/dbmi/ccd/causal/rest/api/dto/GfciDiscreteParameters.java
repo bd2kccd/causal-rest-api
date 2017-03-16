@@ -11,9 +11,19 @@ package edu.pitt.dbmi.ccd.causal.rest.api.dto;
  */
 public class GfciDiscreteParameters extends FciParameters {
 
+    private double alpha;
+
     private double structurePrior;
 
     private double samplePrior;
+
+    public double getAlpha() {
+        return alpha;
+    }
+
+    public void setAlpha(double alpha) {
+        this.alpha = alpha;
+    }
 
     public GfciDiscreteParameters() {
     }

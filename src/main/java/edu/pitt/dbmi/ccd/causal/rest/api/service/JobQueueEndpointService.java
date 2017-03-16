@@ -276,7 +276,7 @@ public class JobQueueEndpointService {
      * @return JobInfoDTO
      */
     public JobInfoDTO addGfciDiscreteNewJob(Long uid, GfciDiscreteNewJob newJob) {
-        String algorithmName = "GFCIc";
+        String algorithmName = "GFCId";
 
         // This is the algo to pass to causal-cmd, case-insensitive
         String algorithm = causalRestProperties.getAlgoGfciCont();
@@ -339,6 +339,9 @@ public class JobQueueEndpointService {
 
         commands.add("--delimiter");
         commands.add(getFileDelimiter(newJob.getDatasetFileId()));
+
+        commands.add("--alpha");
+        commands.add(Double.toString(algorithmParameters.getAlpha()));
 
         commands.add("--structure-prior");
         commands.add(Double.toString(algorithmParameters.getStructurePrior()));
