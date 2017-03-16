@@ -716,7 +716,7 @@ Algorithm parameters:
 | Parameters        | Description           | Default Value  |
 | ------------- | ------------- | ----- |
 | `faithfulnessAssumed`      | Yes if (one edge) faithfulness should be assumed      |   true |
-| `maxDegree`      | The maximum degree of the output graph, at least -1      |   -1 |
+| `maxDegree`      | The maximum degree of the output graph      |  100 |
 | `penaltyDiscount`      | Penalty discount      |   4.0 |
 | `verbose` | Print additional information      |    true |
 
@@ -727,16 +727,16 @@ Data validation:
 | Parameters        | Description           | Default Value  |
 | ------------- | ------------- | ----- |
 | `skipUniqueVarName`      | Skip check for unique variable names       |  false |
-| `skipCategoryLimit`      | Skip 'limit number of categories' check | false |
+| `skipCategoryLimit`      | Skip 'limit number of categories' check  | false |
 
 
 Algorithm parameters:
 
 | Parameters        | Description           | Default Value  |
 | ------------- | ------------- | ----- |
-| `structurePrior`      | Structure prior      | 1.0 |
+| `structurePrior`      | Structure prior coefficient     | 1.0 |
 | `samplePrior` | Sample prior      | 1.0 |
-| `maxDegree`      | The maximum degree of the output graph, at least -1      |  -1 |
+| `maxDegree`      | The maximum degree of the output graph      |  100 |
 | `faithfulnessAssumed`      | Yes if (one edge) faithfulness should be assumed      |   true |
 | `verbose` | Print additional information      |    true |
 
@@ -747,16 +747,16 @@ Data validation:
 | Parameters        | Description           | Default Value  |
 | ------------- | ------------- | ----- |
 | `skipNonzeroVariance`      | Skip check for zero variance variables | false |
-| `skipUniqueVarName`      | Skip check for unique variable names       |  false |
+| `skipUniqueVarName`      | Skip check for unique variable names     |  false |
 
 Algorithm parameters:
 
 | Parameters        | Description           | Default Value  |
 | ------------- | ------------- | ----- |
-| `alpha`      | Search depth |  1.0 | 
+| `alpha`      | Cutoff for p values (alpha) |  0.01 | 
 | `penaltyDiscount`      | Penalty discount      |   4.0 |
-| `maxDegree`      |  The maximum degree of the output graph, at least -1 |  -1 |
-| `faithfulnessAssumed`      | Yes if (one edge) faithfulness should be assumed      |  true |
+| `maxDegree`      | The maximum degree of the output graph      |  100 |
+| `faithfulnessAssumed`      | Yes if (one edge) faithfulness should be assumed      |  false |
 | `verbose` | Print additional information      |    true |
 
 **GFCI discrete** 
@@ -773,11 +773,11 @@ Algorithm parameters:
 
 | Parameters        | Description           | Default Value  |
 | ------------- | ------------- | ----- |
-| `alpha`      | Search depth |  1.0 | 
-| `structurePrior`      | Structure prior      | 1.0 |
+| `alpha`      | Cutoff for p values (alpha) |  0.01 | 
+| `structurePrior`      | Structure prior coefficient     | 1.0 |
 | `samplePrior` | Sample prior      | 1.0 |
-| `maxDegree`      | The maximum degree of the output graph, at least -1      |  -1 |
-| `faithfulnessAssumed`      | Yes if (one edge) faithfulness should be assumed      |   true |
+| `maxDegree`      | The maximum degree of the output graph      |  100 |
+| `faithfulnessAssumed`      | Yes if (one edge) faithfulness should be assumed      |   false |
 | `verbose` | Print additional information      |    true |
 
 
