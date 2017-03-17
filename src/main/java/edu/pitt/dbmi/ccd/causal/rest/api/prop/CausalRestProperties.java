@@ -44,6 +44,9 @@ public class CausalRestProperties {
     @Value("${ccd.algorithm.gfci.cont:GFCIc}")
     private String algoGfciCont;
 
+    @Value("${ccd.algorithm.gfci.disc:GFCId}")
+    private String algoGfciDisc;
+
     @Value("${ccd.server.workspace:}")
     private String workspaceDir;
 
@@ -107,6 +110,14 @@ public class CausalRestProperties {
 
     public void setAlgoGfciCont(String algoGfciCont) {
         this.algoGfciCont = algoGfciCont;
+    }
+
+    public String getAlgoGfciDisc() {
+        return algoGfciDisc;
+    }
+
+    public void setAlgoGfciDisc(String algoGfciDisc) {
+        this.algoGfciDisc = algoGfciDisc;
     }
 
     public String getWorkspaceDir() {

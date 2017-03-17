@@ -279,7 +279,7 @@ public class JobQueueEndpointService {
         String algorithmName = "GFCId";
 
         // This is the algo to pass to causal-cmd, case-insensitive
-        String algorithm = causalRestProperties.getAlgoGfciCont();
+        String algorithm = causalRestProperties.getAlgoGfciDisc();
 
         // When we can get here vai AuthFilterSerice, it means the user exists
         // so no need to check if (userAccount == null) and throw UserNotFoundException(uid)
@@ -364,7 +364,7 @@ public class JobQueueEndpointService {
         GfciDiscreteDataValidation dataValidation = newJob.getDataValidation();
 
         if (!dataValidation.isSkipCategoryLimit()) {
-            commands.add("--skip-nonzero-variance");
+            commands.add("--skip-category-limit");
         }
 
         if (!dataValidation.isSkipUniqueVarName()) {
