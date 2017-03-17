@@ -1,4 +1,4 @@
-# Causal REST API v0.0.7
+# Causal REST API v0.0.8
 
 This RESTful API is designed for causal web. And it implements the [JAX-RS](https://en.wikipedia.org/wiki/Java_API_for_RESTful_Web_Services) specifications using Jersey.
 
@@ -664,7 +664,6 @@ GET /ccd-api/22/algorithms HTTP/1.1
 Host: ccd2.vm.bridges.psc.edu
 Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL2Nsb3VkLmNjZC5waXR0LmVkdS8iLCJuYW1lIjoiemh5MTkiLCJleHAiOjE0NzU4NTA2NzY4MDQsImlhdCI6MTQ3NTg0NzA3NjgwNH0.8azVEoNPfETczXb-vn7dfyDd98eRt7iiLBXehGpPGzY
 ````
-Currently we support "FGES continuous" and "FGES discrete".
 
 ````javascript
 [
@@ -682,11 +681,16 @@ Currently we support "FGES continuous" and "FGES discrete".
     "id": 3,
     "name": "GFCIc",
     "description": "GFCI continuous"
+  },
+  {
+    "id": 4,
+    "name": "GFCId",
+    "description": "GFCI discrete"
   }
 ]
 ````
 
-Currently we support "FGES continuous", "FGES discrete" and "GFCI continuous". They also share a common JSON structure as of their input, for example:
+Currently we support "FGES continuous", "FGES discrete", "GFCI continuous", and "GFCI discrete". They also share a common JSON structure as of their input, for example:
 
 | Input JSON Fields | Description |
 | --- | --- |
@@ -712,11 +716,50 @@ Algorithm parameters:
 | Parameters        | Description           | Default Value  |
 | ------------- | ------------- | ----- |
 | `faithfulnessAssumed`      | Yes if (one edge) faithfulness should be assumed      |   true |
-| `maxDegree`      | The maximum degree of the output graph, at least -1      |   -1 |
+| `maxDegree`      | The maximum degree of the output graph      |  100 |
 | `penaltyDiscount`      | Penalty discount      |   4.0 |
 | `verbose` | Print additional information      |    true |
 
 **FGES discrete** 
+
+Data validation:
+
+| Parameters        | Description           | Default Value  |
+| ------------- | ------------- | ----- |
+| `skipUniqueVarName`      | Skip check for unique variable names       |  false |
+| `skipCategoryLimit`      | Skip 'limit number of categories' check  | false |
+
+
+Algorithm parameters:
+
+| Parameters        | Description           | Default Value  |
+| ------------- | ------------- | ----- |
+| `structurePrior`      | Structure prior coefficient     | 1.0 |
+| `samplePrior` | Sample prior      | 1.0 |
+| `maxDegree`      | The maximum degree of the output graph      |  100 |
+| `faithfulnessAssumed`      | Yes if (one edge) faithfulness should be assumed      |   true |
+| `verbose` | Print additional information      |    true |
+
+**GFCI continuous** 
+
+Data validation:
+
+| Parameters        | Description           | Default Value  |
+| ------------- | ------------- | ----- |
+| `skipNonzeroVariance`      | Skip check for zero variance variables | false |
+| `skipUniqueVarName`      | Skip check for unique variable names     |  false |
+
+Algorithm parameters:
+
+| Parameters        | Description           | Default Value  |
+| ------------- | ------------- | ----- |
+| `alpha`      | Cutoff for p values (alpha) |  0.01 | 
+| `penaltyDiscount`      | Penalty discount      |   4.0 |
+| `maxDegree`      | The maximum degree of the output graph      |  100 |
+| `faithfulnessAssumed`      | Yes if (one edge) faithfulness should be assumed      |  false |
+| `verbose` | Print additional information      |    true |
+
+**GFCI discrete** 
 
 Data validation:
 
@@ -730,30 +773,13 @@ Algorithm parameters:
 
 | Parameters        | Description           | Default Value  |
 | ------------- | ------------- | ----- |
-| `structurePrior`      | Structure prior      | 1.0 |
+| `alpha`      | Cutoff for p values (alpha) |  0.01 | 
+| `structurePrior`      | Structure prior coefficient     | 1.0 |
 | `samplePrior` | Sample prior      | 1.0 |
-| `faithfulnessAssumed`      | Yes if (one edge) faithfulness should be assumed      |   true |
-| `maxDegree`      | The maximum degree of the output graph, at least -1      |  -1 |
+| `maxDegree`      | The maximum degree of the output graph      |  100 |
+| `faithfulnessAssumed`      | Yes if (one edge) faithfulness should be assumed      |   false |
 | `verbose` | Print additional information      |    true |
 
-**GFCI continuous** 
-
-Data validation:
-
-| Parameters        | Description           | Default Value  |
-| ------------- | ------------- | ----- |
-| `skipNonzeroVariance`      | Skip check for zero variance variables | false |
-| `skipUniqueVarName`      | Skip check for unique variable names       |  false |
-
-Algorithm parameters:
-
-| Parameters        | Description           | Default Value  |
-| ------------- | ------------- | ----- |
-| `alpha`      | Search depth. Integer value |  1.0 | 
-| `penaltyDiscount`      | Penalty discount      |   4.0 |
-| `maxDegree`      |  The maximum degree of the output graph, at least -1 |  -1 |
-| `faithfulnessAssumed`      | Yes if (one edge) faithfulness should be assumed      |  true |
-| `verbose` | Print additional information      |    true |
 
 #### Add a new job to run the desired algorithm on a given data file
 

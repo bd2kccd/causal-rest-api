@@ -53,6 +53,7 @@ public class AlgorithmEndpointService {
         ALGORITHMS.add(new AlgorithmDTO(1, causalRestProperties.getAlgoFgesCont(), "FGES continuous"));
         ALGORITHMS.add(new AlgorithmDTO(2, causalRestProperties.getAlgoFgesDisc(), "FGES discrete"));
         ALGORITHMS.add(new AlgorithmDTO(3, causalRestProperties.getAlgoGfciCont(), "GFCI continuous"));
+        ALGORITHMS.add(new AlgorithmDTO(4, causalRestProperties.getAlgoGfciDisc(), "GFCI discrete"));
 
         return ALGORITHMS;
     }
