@@ -19,7 +19,6 @@
 package edu.pitt.dbmi.ccd.causal.rest.api.dto;
 
 import java.util.Set;
-
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import org.hibernate.validator.constraints.Range;
@@ -45,7 +44,7 @@ public abstract class NewJob {
 
     @Valid
     protected Set<HpcParameter> hpcParameters;
-    
+
     public NewJob() {
     }
 
@@ -73,12 +72,12 @@ public abstract class NewJob {
         this.jvmOptions = jvmOptions;
     }
 
-	public Set<HpcParameter> getHpcParameters() {
-		return hpcParameters;
-	}
+    public Set<HpcParameter> getHpcParameters() {
+        return hpcParameters;
+    }
 
-	public void setHpcParameters(Set<HpcParameter> hpcParameters) {
-		this.hpcParameters = hpcParameters;
-	}
+    public void setHpcParameters(Set<HpcParameter> hpcParameters) {
+        this.hpcParameters = hpcParameters;
+    }
 
 }

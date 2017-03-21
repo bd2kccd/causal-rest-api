@@ -48,7 +48,7 @@ public class JwtEndpointService {
     private final CausalRestProperties causalRestProperties;
 
     private final UserAccountService userAccountService;
-    
+
     @Value("${ccd.hpc.wall.time}")
     private int[] wallTime;
 
