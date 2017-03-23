@@ -19,7 +19,6 @@
 package edu.pitt.dbmi.ccd.causal.rest.api.dto;
 
 import java.util.Date;
-
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -97,14 +96,12 @@ public class JwtDTO {
         this.expireTime = expireTime;
     }
 
-	public int[] getWallTime() {
-		return wallTime;
-	}
+    public int[] getWallTime() {
+        return wallTime;
+    }
 
-	public void setWallTime(int[] wallTime) {
-		this.wallTime = wallTime;
-	}
-
-
+    public void setWallTime(int[] wallTime) {
+        this.wallTime = wallTime;
+    }
 
 }

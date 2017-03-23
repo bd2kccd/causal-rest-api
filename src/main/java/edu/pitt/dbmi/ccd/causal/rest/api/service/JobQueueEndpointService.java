@@ -239,8 +239,8 @@ public class JobQueueEndpointService {
             Set<HpcParameter> hpcParameters = new HashSet<>();
             newJob.getHpcParameters().forEach(param -> {
                 HpcParameter hpcParameter = new HpcParameter();
-                hpcParameter.setKey(param.getKey());
-                hpcParameter.setValue(param.getValue());
+                hpcParameter.setParameterKey(param.getKey());
+                hpcParameter.setParameterValue(param.getValue());
                 hpcParameters.add(hpcParameter);
             });
             jobQueueInfo.setHpcParameters(hpcParameters);
@@ -408,8 +408,8 @@ public class JobQueueEndpointService {
             Set<HpcParameter> hpcParameters = new HashSet<>();
             newJob.getHpcParameters().forEach(param -> {
                 HpcParameter hpcParameter = new HpcParameter();
-                hpcParameter.setKey(param.getKey());
-                hpcParameter.setValue(param.getValue());
+                hpcParameter.setParameterKey(param.getKey());
+                hpcParameter.setParameterValue(param.getValue());
                 hpcParameters.add(hpcParameter);
             });
             jobQueueInfo.setHpcParameters(hpcParameters);
@@ -571,8 +571,8 @@ public class JobQueueEndpointService {
             Set<HpcParameter> hpcParameters = new HashSet<>();
             newJob.getHpcParameters().forEach(param -> {
                 HpcParameter hpcParameter = new HpcParameter();
-                hpcParameter.setKey(param.getKey());
-                hpcParameter.setValue(param.getValue());
+                hpcParameter.setParameterKey(param.getKey());
+                hpcParameter.setParameterValue(param.getValue());
                 hpcParameters.add(hpcParameter);
             });
             jobQueueInfo.setHpcParameters(hpcParameters);
@@ -737,8 +737,8 @@ public class JobQueueEndpointService {
             Set<HpcParameter> hpcParameters = new HashSet<>();
             newJob.getHpcParameters().forEach(param -> {
                 HpcParameter hpcParameter = new HpcParameter();
-                hpcParameter.setKey(param.getKey());
-                hpcParameter.setValue(param.getValue());
+                hpcParameter.setParameterKey(param.getKey());
+                hpcParameter.setParameterValue(param.getValue());
                 hpcParameters.add(hpcParameter);
             });
             jobQueueInfo.setHpcParameters(hpcParameters);

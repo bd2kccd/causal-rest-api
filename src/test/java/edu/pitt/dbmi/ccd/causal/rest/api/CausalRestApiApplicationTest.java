@@ -33,7 +33,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 @SpringBootTest
 public class CausalRestApiApplicationTest {
 
-	@Test
+    @Test
     public void contextLoads() {
     }
 

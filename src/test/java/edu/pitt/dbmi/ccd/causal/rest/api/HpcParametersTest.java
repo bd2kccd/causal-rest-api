@@ -26,9 +26,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
 /**
- * 
+ *
  * Feb 24, 2017 1:36:27 PM
- * 
+ *
  * @author Chirayu Kong Wongchokprasitti, PhD (chw20@pitt.edu)
  *
  */
@@ -36,15 +36,15 @@ import org.springframework.test.context.junit4.SpringRunner;
 @SpringBootTest
 public class HpcParametersTest {
 
-	@Value("${ccd.hpc.wall.time}")
-	private int[] wallTime;
+    @Value("${ccd.hpc.wall.time}")
+    private int[] wallTime;
 
-	@Test
-	public void testHpcParametersLoad(){
-		Assert.assertNotNull(wallTime);
-		for(int i=0;i<wallTime.length;i++){
-			System.out.println(wallTime[i]);
-		}
-	}
-	
+    @Test
+    public void testHpcParametersLoad() {
+        Assert.assertNotNull(wallTime);
+        for (int i = 0; i < wallTime.length; i++) {
+            System.out.println(wallTime[i]);
+        }
+    }
+
 }
