@@ -128,11 +128,18 @@ Once the request is processed successfully, the user ID together with a JWT will
   "jwt": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL2Nsb3VkLmNjZC5waXR0LmVkdS8iLCJuYW1lIjoiemh5MTkiLCJleHAiOjE0NzU4NTA0Mjg1OTcsImlhdCI6MTQ3NTg0NjgyODU5N30.FcE7aEpg0u2c-gUVugIjJkzjhlDu5qav_XHtgLu3c6E",
   "issuedTime": 1475846828597,
   "lifetime": 3600,
-  "expireTime": 1475850428597
+  "expireTime": 1475850428597,
+  "wallTime": [
+    1,
+    3,
+    6
+  ]
 }
 ````
 
 We'll need to use this `userId` in the URI path of all subsequent requests. And this `jwt` expires in 3600 seconds(1 hour), so the API consumer will need to request for another JWT otherwise the API query to other API endpoints will be denied. And this JWT will need to be sent via the HTTP `Authorization` header as well, but using the `Bearer` schema.
+
+The `wallTime` field is designed for users who want to specify the the maximum CPU time when Slurm handles the jobs on PSC. Normally, a job is expected to finish before the specified maximum walltime.  After the walltime reaches the maximum, the job terminates regardless whether the job processes are still running or not. In this example, you can pick 1 hour, 3 or 6 hours as the wallTime.
 
 Note: querying the JWT endpoint again before the current JWT expires will generate a new JWT, which makes the old JWT expired automatically. And this newly generated JWT will be valid in another hour unless there's another new JWT being queried.
 
@@ -699,6 +706,7 @@ Currently we support "FGES continuous", "FGES discrete", "GFCI continuous", and 
 | `dataValidation` | Algorithm specific input data validation flags, JSON object |
 | `algorithmParameters` | Algorithm specific parameters, JSON object |
 | `jvmOptions` | Advanced Options For Java Virtual Machine (JVM), JSON object. Currently only support `maxHeapSize` (Gigabyte, max value is 100) |
+| `hpcParameters` | Parameters for High-Performance Computing, JSON array of key-value objects. Currently only support `wallTime` |
 
 Below are the data validation flags and parameters that you can use for each algorithm.
 
@@ -812,11 +820,17 @@ Content-Type: application/json
     },
     "jvmOptions": {
       "maxHeapSize": 100
-    }
+    },
+    "hpcParameters": [
+       {
+       	"key":"wallTime",
+       	"value":1
+       }
+    ]
 }
 ````
 
-In this example, we are running the "FGES continuous" algorithm on the file with ID 8. And this call will return the job info with a 201 Created response status code.
+In this example, we are running the "FGES continuous" algorithm on the file of ID 8. We also set the wallTime as 1 hour. And this call will return the job info with a 201 Created response status code.
 
 ````
 {
