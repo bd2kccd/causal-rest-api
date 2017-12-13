@@ -32,7 +32,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class AlgorithmDTO {
 
     @XmlElement
-    private int id;
+    private String id;
 
     @XmlElement
     private String name;
@@ -43,17 +43,17 @@ public class AlgorithmDTO {
     public AlgorithmDTO() {
     }
 
-    public AlgorithmDTO(int id, String name, String description) {
+    public AlgorithmDTO(String id, String name, String description) {
         this.id = id;
         this.name = name;
         this.description = description;
     }
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
 

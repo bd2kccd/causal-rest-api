@@ -57,11 +57,12 @@ public class AlgorithmEndpointService {
         AlgorithmAnnotations algoAnno = AlgorithmAnnotations.getInstance();
         
         List<AnnotatedClass<Algorithm>> algoAnnoList = algoAnno.filterOutExperimental(algoAnno.getAnnotatedClasses());
-        
-        AtomicInteger at = new AtomicInteger(0);
 
         for (AnnotatedClass<Algorithm> algoAnnoClass: algoAnnoList) {
-            ALGORITHMS.add(new AlgorithmDTO(at.incrementAndGet(), algoAnnoClass.getAnnotation().name(), algoAnnoClass.getAnnotation().description()));
+            Algorithm algo = algoAnnoClass.getAnnotation();
+            
+            // Use command name as ID
+            ALGORITHMS.add(new AlgorithmDTO(algo.command(), algo.name(), algo.description()));
         }
         
         // Get the actual algorithm short name from the properties file
