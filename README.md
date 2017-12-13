@@ -1,4 +1,4 @@
-# Causal REST API v0.0.8
+# Causal REST API v1.0.0
 
 This RESTful API is designed for causal web. And it implements the [JAX-RS](https://en.wikipedia.org/wiki/Java_API_for_RESTful_Web_Services) specifications using Jersey.
 
@@ -44,32 +44,6 @@ You must have the following installed to build/install Causal REST API:
 
 - [Oracle Java SE Development Kit 8](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html)
 - [Maven 3.x](https://maven.apache.org/download.cgi)
-
-### Dependencies
-
-If you want to run this API server and expose the API to your users, you'll first need to have the [Causal Web Application](https://github.com/bd2kccd/causal-web) installed and running. Your API users will use this web app to create their user accounts before they can consume the API. 
-
-**Note: currently new users can also be created using Auth0 login option, but the API doesn't work for these users.**
-
-In order to build the API server, you'll need the released version of [ccd-commons-0.3.1](https://github.com/bd2kccd/ccd-commons/releases/tag/v0.3.1) by going to the repo and checkout this specific release version:
-
-````
-git clone https://github.com/bd2kccd/ccd-commons.git
-cd ccd-commons
-git checkout tags/v0.3.1
-mvn clean install
-````
-
-You'll also need to download released [ccd-db-0.6.3](https://github.com/bd2kccd/ccd-db/releases/tag/v0.6.3):
-
-````
-git clone https://github.com/bd2kccd/ccd-db.git
-cd ccd-db
-git checkout tags/v0.6.3
-mvn clean install
-````
-
-Then you can go get and install `causal-rest-api`:
 
 ````
 git clone https://github.com/bd2kccd/causal-rest-api.git
