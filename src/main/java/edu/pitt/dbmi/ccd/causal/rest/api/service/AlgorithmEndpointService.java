@@ -18,11 +18,15 @@
  */
 package edu.pitt.dbmi.ccd.causal.rest.api.service;
 
+import edu.cmu.tetrad.annotation.Algorithm;
+import edu.cmu.tetrad.annotation.AlgorithmAnnotations;
+import edu.cmu.tetrad.annotation.AnnotatedClass;
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.AlgorithmDTO;
 import edu.pitt.dbmi.ccd.causal.rest.api.prop.CausalRestProperties;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -49,11 +53,22 @@ public class AlgorithmEndpointService {
     public List<AlgorithmDTO> listAlgorithms() throws IOException {
         List<AlgorithmDTO> ALGORITHMS = new LinkedList<>();
 
+        
+        AlgorithmAnnotations algoAnno = AlgorithmAnnotations.getInstance();
+        
+        List<AnnotatedClass<Algorithm>> algoAnnoList = algoAnno.filterOutExperimental(algoAnno.getAnnotatedClasses());
+        
+        AtomicInteger at = new AtomicInteger(0);
+
+        for (AnnotatedClass<Algorithm> algoAnnoClass: algoAnnoList) {
+            ALGORITHMS.add(new AlgorithmDTO(at.incrementAndGet(), algoAnnoClass.getAnnotation().name(), algoAnnoClass.getAnnotation().description()));
+        }
+        
         // Get the actual algorithm short name from the properties file
-        ALGORITHMS.add(new AlgorithmDTO(1, causalRestProperties.getAlgoFgesCont(), "FGES continuous"));
-        ALGORITHMS.add(new AlgorithmDTO(2, causalRestProperties.getAlgoFgesDisc(), "FGES discrete"));
-        ALGORITHMS.add(new AlgorithmDTO(3, causalRestProperties.getAlgoGfciCont(), "GFCI continuous"));
-        ALGORITHMS.add(new AlgorithmDTO(4, causalRestProperties.getAlgoGfciDisc(), "GFCI discrete"));
+//        ALGORITHMS.add(new AlgorithmDTO(1, causalRestProperties.getAlgoFgesCont(), "FGES continuous"));
+//        ALGORITHMS.add(new AlgorithmDTO(2, causalRestProperties.getAlgoFgesDisc(), "FGES discrete"));
+//        ALGORITHMS.add(new AlgorithmDTO(3, causalRestProperties.getAlgoGfciCont(), "GFCI continuous"));
+//        ALGORITHMS.add(new AlgorithmDTO(4, causalRestProperties.getAlgoGfciDisc(), "GFCI discrete"));
 
         return ALGORITHMS;
     }
