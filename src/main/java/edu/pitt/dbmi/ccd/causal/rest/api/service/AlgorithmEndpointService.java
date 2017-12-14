@@ -18,15 +18,22 @@
  */
 package edu.pitt.dbmi.ccd.causal.rest.api.service;
 
+import edu.cmu.tetrad.algcomparison.algorithm.AlgorithmFactory;
 import edu.cmu.tetrad.annotation.Algorithm;
 import edu.cmu.tetrad.annotation.AlgorithmAnnotations;
 import edu.cmu.tetrad.annotation.AnnotatedClass;
+import edu.cmu.tetrad.annotation.Score;
+import edu.cmu.tetrad.annotation.ScoreAnnotations;
+import edu.cmu.tetrad.annotation.TestOfIndependence;
+import edu.cmu.tetrad.annotation.TestOfIndependenceAnnotations;
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.AlgorithmDTO;
-import edu.pitt.dbmi.ccd.causal.rest.api.prop.CausalRestProperties;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.Map;
+import java.util.TreeMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -37,13 +44,30 @@ import org.springframework.stereotype.Service;
 @Service
 public class AlgorithmEndpointService {
 
-    private final CausalRestProperties causalRestProperties;
+    private final Map<String, AnnotatedClass<Algorithm>> annotatedAlgoClasses;
+    private final Map<String, AnnotatedClass<TestOfIndependence>> annotatedTestClasses;
+    private final Map<String, AnnotatedClass<Score>> annotatedScoreClasses;
 
     @Autowired
-    public AlgorithmEndpointService(CausalRestProperties causalRestProperties) {
-        this.causalRestProperties = causalRestProperties;
+    public AlgorithmEndpointService(Map<String, AnnotatedClass<Algorithm>> annotatedAlgoClasses,
+            Map<String, AnnotatedClass<TestOfIndependence>> annotatedTestClasses,
+            Map<String, AnnotatedClass<Score>> annotatedScoreClasses) {
+        this.annotatedAlgoClasses = AlgorithmAnnotations.getInstance().getAnnotatedClasses().stream()
+                .collect(() -> new TreeMap<>(String.CASE_INSENSITIVE_ORDER),
+                        (m, e) -> m.put(e.getAnnotation().command(), e),
+                        (m, u) -> m.putAll(u));
+        
+        this.annotatedTestClasses = TestOfIndependenceAnnotations.getInstance().getAnnotatedClasses().stream()
+                .collect(() -> new TreeMap<>(String.CASE_INSENSITIVE_ORDER),
+                        (m, e) -> m.put(e.getAnnotation().command(), e),
+                        (m, u) -> m.putAll(u));
+        
+        this.annotatedScoreClasses = ScoreAnnotations.getInstance().getAnnotatedClasses().stream()
+                .collect(() -> new TreeMap<>(String.CASE_INSENSITIVE_ORDER),
+                        (m, e) -> m.put(e.getAnnotation().command(), e),
+                        (m, u) -> m.putAll(u));
     }
-
+    
     /**
      * List all the available algorithms
      *
@@ -51,26 +75,76 @@ public class AlgorithmEndpointService {
      * @throws IOException
      */
     public List<AlgorithmDTO> listAlgorithms() throws IOException {
-        List<AlgorithmDTO> ALGORITHMS = new LinkedList<>();
+        List<AlgorithmDTO> algorithms = new LinkedList<>();
 
-        
         AlgorithmAnnotations algoAnno = AlgorithmAnnotations.getInstance();
         
         List<AnnotatedClass<Algorithm>> algoAnnoList = algoAnno.filterOutExperimental(algoAnno.getAnnotatedClasses());
 
-        for (AnnotatedClass<Algorithm> algoAnnoClass: algoAnnoList) {
-            Algorithm algo = algoAnnoClass.getAnnotation();
-            
+        algoAnnoList.stream().map((algoAnnoClass) -> algoAnnoClass.getAnnotation()).forEachOrdered((algo) -> {
             // Use command name as ID
-            ALGORITHMS.add(new AlgorithmDTO(algo.command(), algo.name(), algo.description()));
+            algorithms.add(new AlgorithmDTO(algo.command(), algo.name(), algo.description()));
+        });
+
+        return algorithms;
+    }
+    
+    /**
+     * List all the parameters of a given algorithm
+     * 
+     * @param algoId
+     * @param testId
+     * @param scoreId
+     * @return A list of available parameters
+     */
+    public List<String> listAlgorithmParameters(String algoId, String testId, String scoreId) {
+        List<String> parameters = new LinkedList<>();
+
+        Class algoClass = getAlgorithmClass(algoId);
+        Class testClass = getIndenpendenceTestClass(testId);
+        Class scoreClass = getScoreClass(scoreId);
+        
+        // This is Tetrad Algorithm
+        edu.cmu.tetrad.algcomparison.algorithm.Algorithm algorithm = null;
+        
+        try {
+            algorithm = AlgorithmFactory.create(algoClass, testClass, scoreClass);
+        } catch (IllegalAccessException | InstantiationException ex) {
+            Logger.getLogger(AlgorithmEndpointService.class.getName()).log(Level.SEVERE, null, ex);
         }
         
-        // Get the actual algorithm short name from the properties file
-//        ALGORITHMS.add(new AlgorithmDTO(1, causalRestProperties.getAlgoFgesCont(), "FGES continuous"));
-//        ALGORITHMS.add(new AlgorithmDTO(2, causalRestProperties.getAlgoFgesDisc(), "FGES discrete"));
-//        ALGORITHMS.add(new AlgorithmDTO(3, causalRestProperties.getAlgoGfciCont(), "GFCI continuous"));
-//        ALGORITHMS.add(new AlgorithmDTO(4, causalRestProperties.getAlgoGfciDisc(), "GFCI discrete"));
+        parameters = algorithm.getParameters();
+        
+        return parameters;
+    }
+    
+    private Class getAlgorithmClass(String command) {
+        if (command == null) {
+            return null;
+        }
 
-        return ALGORITHMS;
+        AnnotatedClass<Algorithm> annotatedClass = annotatedAlgoClasses.get(command);
+
+        return (annotatedClass == null) ? null : annotatedClass.getClazz();
+    }
+    
+    private Class getIndenpendenceTestClass(String command) {
+        if (command == null) {
+            return null;
+        }
+
+        AnnotatedClass<TestOfIndependence> annotatedClass = annotatedTestClasses.get(command);
+
+        return (annotatedClass == null) ? null : annotatedClass.getClazz();
+    }
+    
+    private Class getScoreClass(String command) {
+        if (command == null) {
+            return null;
+        }
+
+        AnnotatedClass<Score> annotatedClass = annotatedScoreClasses.get(command);
+
+        return (annotatedClass == null) ? null : annotatedClass.getClazz();
     }
 }

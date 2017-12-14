@@ -27,6 +27,7 @@ import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.GenericEntity;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
@@ -62,9 +63,27 @@ public class AlgorithmEndpoint {
     @Path("/algorithms")
     @Produces({APPLICATION_JSON, APPLICATION_XML})
     @RolesAllowed(Role.USER)
-    public Response listAlgorithmResultFiles() throws IOException {
+    public Response listAllAlgorithms() throws IOException {
         List<AlgorithmDTO> algorithmDTOs = algorithmEndpointService.listAlgorithms();
         GenericEntity<List<AlgorithmDTO>> entity = new GenericEntity<List<AlgorithmDTO>>(algorithmDTOs) {
+        };
+
+        return Response.ok(entity).build();
+    }
+    
+    /**
+     * List all parameters of a given algorithm, test, and score
+     *
+     * @return 200 with a list of available algorithms
+     * @throws IOException
+     */
+    @GET
+    @Path("/algorithmParameters/{algoId}/{testId}/{scoreId}")
+    @Produces({APPLICATION_JSON, APPLICATION_XML})
+    @RolesAllowed(Role.USER)
+    public Response listAlgorithmParameters(@PathParam("uid") Long uid, @PathParam("algoId") String algoId, @PathParam("testId") String testId, @PathParam("scoreId") String scoreId) throws IOException {
+        List<String> algorithmParameters = algorithmEndpointService.listAlgorithmParameters(algoId, testId, scoreId);
+        GenericEntity<List<String>> entity = new GenericEntity<List<String>>(algorithmParameters) {
         };
 
         return Response.ok(entity).build();
