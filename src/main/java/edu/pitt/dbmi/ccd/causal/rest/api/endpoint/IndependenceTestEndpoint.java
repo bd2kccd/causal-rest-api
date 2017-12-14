@@ -47,7 +47,7 @@ public class IndependenceTestEndpoint {
     @Path("/tests")
     @Produces({APPLICATION_JSON, APPLICATION_XML})
     @RolesAllowed(Role.USER)
-    public Response listAllAlgorithms() throws IOException {
+    public Response listAllIndependenceTests() throws IOException {
         List<IndependenceTestDTO> independenceTestDTOs = independenceTestEndpointService.listIndependenceTests();
         GenericEntity<List<IndependenceTestDTO>> entity = new GenericEntity<List<IndependenceTestDTO>>(independenceTestDTOs) {
         };

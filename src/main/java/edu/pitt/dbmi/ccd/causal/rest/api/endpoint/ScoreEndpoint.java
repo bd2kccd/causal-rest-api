@@ -47,11 +47,12 @@ public class ScoreEndpoint {
     @Path("/scores")
     @Produces({APPLICATION_JSON, APPLICATION_XML})
     @RolesAllowed(Role.USER)
-    public Response listAllAlgorithms() throws IOException {
+    public Response listAllScores() throws IOException {
         List<ScoreDTO> scoreDTOs = scoreEndpointService.listScores();
         GenericEntity<List<ScoreDTO>> entity = new GenericEntity<List<ScoreDTO>>(scoreDTOs) {
         };
 
         return Response.ok(entity).build();
     }
+
 }
