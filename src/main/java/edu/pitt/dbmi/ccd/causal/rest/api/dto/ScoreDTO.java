@@ -5,6 +5,7 @@
  */
 package edu.pitt.dbmi.ccd.causal.rest.api.dto;
 
+import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -24,17 +25,17 @@ public class ScoreDTO {
     private String name;
     
     @XmlElement
-    private String dataType;
+    private List<String> supportedDataTypes;
 
     public ScoreDTO() {
     }
-    
-    public ScoreDTO(String id, String name, String dataType) {
+
+    public ScoreDTO(String id, String name, List<String> supportedDataTypes) {
         this.id = id;
         this.name = name;
-        this.dataType = dataType;
+        this.supportedDataTypes = supportedDataTypes;
     }
-
+    
     public String getId() {
         return id;
     }
@@ -51,13 +52,15 @@ public class ScoreDTO {
         this.name = name;
     }
 
-    public String getDataType() {
-        return dataType;
+    public List<String> getSupportedDataTypes() {
+        return supportedDataTypes;
     }
 
-    public void setDataType(String dataType) {
-        this.dataType = dataType;
+    public void setSupportedDataTypes(List<String> supportedDataTypes) {
+        this.supportedDataTypes = supportedDataTypes;
     }
-    
+
+
+
     
 }

@@ -81,7 +81,7 @@ public class AlgorithmEndpoint {
     @Path("/algorithmParameters/{algoId}/{testId}/{scoreId}")
     @Produces({APPLICATION_JSON, APPLICATION_XML})
     @RolesAllowed(Role.USER)
-    public Response listAlgorithmParameters(@PathParam("uid") Long uid, @PathParam("algoId") String algoId, @PathParam("testId") String testId, @PathParam("scoreId") String scoreId) throws IOException {
+    public Response listAlgorithmParameters(@PathParam("algoId") String algoId, @PathParam("testId") String testId, @PathParam("scoreId") String scoreId) throws IOException {
         List<String> algorithmParameters = algorithmEndpointService.listAlgorithmParameters(algoId, testId, scoreId);
         GenericEntity<List<String>> entity = new GenericEntity<List<String>>(algorithmParameters) {
         };

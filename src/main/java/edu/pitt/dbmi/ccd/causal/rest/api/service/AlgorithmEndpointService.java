@@ -32,9 +32,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 /**
@@ -44,29 +42,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class AlgorithmEndpointService {
 
-    private final Map<String, AnnotatedClass<Algorithm>> annotatedAlgoClasses;
-    private final Map<String, AnnotatedClass<TestOfIndependence>> annotatedTestClasses;
-    private final Map<String, AnnotatedClass<Score>> annotatedScoreClasses;
-
-    @Autowired
-    public AlgorithmEndpointService(Map<String, AnnotatedClass<Algorithm>> annotatedAlgoClasses,
-            Map<String, AnnotatedClass<TestOfIndependence>> annotatedTestClasses,
-            Map<String, AnnotatedClass<Score>> annotatedScoreClasses) {
-        this.annotatedAlgoClasses = AlgorithmAnnotations.getInstance().getAnnotatedClasses().stream()
-                .collect(() -> new TreeMap<>(String.CASE_INSENSITIVE_ORDER),
-                        (m, e) -> m.put(e.getAnnotation().command(), e),
-                        (m, u) -> m.putAll(u));
-        
-        this.annotatedTestClasses = TestOfIndependenceAnnotations.getInstance().getAnnotatedClasses().stream()
-                .collect(() -> new TreeMap<>(String.CASE_INSENSITIVE_ORDER),
-                        (m, e) -> m.put(e.getAnnotation().command(), e),
-                        (m, u) -> m.putAll(u));
-        
-        this.annotatedScoreClasses = ScoreAnnotations.getInstance().getAnnotatedClasses().stream()
-                .collect(() -> new TreeMap<>(String.CASE_INSENSITIVE_ORDER),
-                        (m, e) -> m.put(e.getAnnotation().command(), e),
-                        (m, u) -> m.putAll(u));
-    }
+    private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(AlgorithmEndpointService.class);
     
     /**
      * List all the available algorithms
@@ -100,9 +76,24 @@ public class AlgorithmEndpointService {
     public List<String> listAlgorithmParameters(String algoId, String testId, String scoreId) {
         List<String> parameters = new LinkedList<>();
 
-        Class algoClass = getAlgorithmClass(algoId);
-        Class testClass = getIndenpendenceTestClass(testId);
-        Class scoreClass = getScoreClass(scoreId);
+        Map<String, AnnotatedClass<Algorithm>> annotatedAlgoClasses = AlgorithmAnnotations.getInstance().getAnnotatedClasses().stream()
+                .collect(() -> new TreeMap<>(String.CASE_INSENSITIVE_ORDER),
+                        (m, e) -> m.put(e.getAnnotation().command(), e),
+                        (m, u) -> m.putAll(u));
+        
+        Map<String, AnnotatedClass<TestOfIndependence>> annotatedTestClasses = TestOfIndependenceAnnotations.getInstance().getAnnotatedClasses().stream()
+                .collect(() -> new TreeMap<>(String.CASE_INSENSITIVE_ORDER),
+                        (m, e) -> m.put(e.getAnnotation().command(), e),
+                        (m, u) -> m.putAll(u));
+        
+        Map<String, AnnotatedClass<Score>> annotatedScoreClasses = ScoreAnnotations.getInstance().getAnnotatedClasses().stream()
+                .collect(() -> new TreeMap<>(String.CASE_INSENSITIVE_ORDER),
+                        (m, e) -> m.put(e.getAnnotation().command(), e),
+                        (m, u) -> m.putAll(u));
+        
+        Class algoClass = annotatedAlgoClasses.get(algoId).getClazz();
+        Class testClass = annotatedTestClasses.get(testId).getClazz();
+        Class scoreClass = annotatedScoreClasses.get(scoreId).getClazz();
         
         // This is Tetrad Algorithm
         edu.cmu.tetrad.algcomparison.algorithm.Algorithm algorithm = null;
@@ -110,41 +101,14 @@ public class AlgorithmEndpointService {
         try {
             algorithm = AlgorithmFactory.create(algoClass, testClass, scoreClass);
         } catch (IllegalAccessException | InstantiationException ex) {
-            Logger.getLogger(AlgorithmEndpointService.class.getName()).log(Level.SEVERE, null, ex);
+            LOGGER.error(String.format("Failed to create Algorithm instance for algoId='%s', testId='%s', scoreId='%s'.", algoId, testId, scoreId));
         }
         
-        parameters = algorithm.getParameters();
-        
+        if (algorithm != null) {
+            parameters = algorithm.getParameters();
+        }
+
         return parameters;
     }
     
-    private Class getAlgorithmClass(String command) {
-        if (command == null) {
-            return null;
-        }
-
-        AnnotatedClass<Algorithm> annotatedClass = annotatedAlgoClasses.get(command);
-
-        return (annotatedClass == null) ? null : annotatedClass.getClazz();
-    }
-    
-    private Class getIndenpendenceTestClass(String command) {
-        if (command == null) {
-            return null;
-        }
-
-        AnnotatedClass<TestOfIndependence> annotatedClass = annotatedTestClasses.get(command);
-
-        return (annotatedClass == null) ? null : annotatedClass.getClazz();
-    }
-    
-    private Class getScoreClass(String command) {
-        if (command == null) {
-            return null;
-        }
-
-        AnnotatedClass<Score> annotatedClass = annotatedScoreClasses.get(command);
-
-        return (annotatedClass == null) ? null : annotatedClass.getClazz();
-    }
 }

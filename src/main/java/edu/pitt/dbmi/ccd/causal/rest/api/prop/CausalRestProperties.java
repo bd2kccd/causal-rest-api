@@ -32,9 +32,6 @@ import org.springframework.stereotype.Component;
 @PropertySource("classpath:causal.properties")
 public class CausalRestProperties {
 
-    @Value("${ccd.jar.algorithm}")
-    private String algorithmJar;
-
     @Value("${ccd.algorithm.fges.cont:FGESc}")
     private String algoFgesCont;
 
@@ -52,9 +49,6 @@ public class CausalRestProperties {
 
     @Value("${ccd.folder.data:data}")
     private String dataFolder;
-
-    @Value("${ccd.folder.lib:lib}")
-    private String libFolder;
 
     @Value("${ccd.folder.tmp:tmp}")
     private String tmpFolder;
@@ -78,14 +72,6 @@ public class CausalRestProperties {
     private long jwtLifetime;
 
     public CausalRestProperties() {
-    }
-
-    public String getAlgorithmJar() {
-        return algorithmJar;
-    }
-
-    public void setAlgorithmJar(String algorithmJar) {
-        this.algorithmJar = algorithmJar;
     }
 
     public String getAlgoFgesCont() {
@@ -134,14 +120,6 @@ public class CausalRestProperties {
 
     public void setDataFolder(String dataFolder) {
         this.dataFolder = dataFolder;
-    }
-
-    public String getLibFolder() {
-        return libFolder;
-    }
-
-    public void setLibFolder(String libFolder) {
-        this.libFolder = libFolder;
     }
 
     public String getTmpFolder() {

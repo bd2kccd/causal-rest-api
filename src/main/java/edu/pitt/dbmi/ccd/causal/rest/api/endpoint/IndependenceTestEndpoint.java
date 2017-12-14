@@ -44,7 +44,7 @@ public class IndependenceTestEndpoint {
      * @throws IOException
      */
     @GET
-    @Path("/scores")
+    @Path("/tests")
     @Produces({APPLICATION_JSON, APPLICATION_XML})
     @RolesAllowed(Role.USER)
     public Response listAllAlgorithms() throws IOException {

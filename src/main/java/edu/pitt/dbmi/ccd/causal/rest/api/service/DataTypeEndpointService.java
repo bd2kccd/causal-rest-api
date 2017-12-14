@@ -11,11 +11,13 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import org.springframework.stereotype.Service;
 
 /**
  *
  * @author Zhou Yuan <zhy19@pitt.edu>
  */
+@Service
 public class DataTypeEndpointService {
     /**
      * List all the available algorithms: Continuous, Discrete, Mixed, Graph, Covariance

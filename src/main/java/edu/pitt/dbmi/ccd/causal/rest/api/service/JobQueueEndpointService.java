@@ -783,26 +783,21 @@ public class JobQueueEndpointService {
         Map<String, String> map = new HashMap<>();
 
         String workspaceDir = causalRestProperties.getWorkspaceDir();
-        String libFolder = causalRestProperties.getLibFolder();
         String tmpFolder = causalRestProperties.getTmpFolder();
         String dataFolder = causalRestProperties.getDataFolder();
         String resultsFolder = causalRestProperties.getResultsFolder();
         String algorithmFolder = causalRestProperties.getAlgorithmFolder();
-        String algorithmJar = causalRestProperties.getAlgorithmJar();
 
-        Path algorithmJarPath = Paths.get(workspaceDir, libFolder, algorithmJar);
         Path dataDir = Paths.get(workspaceDir, username, dataFolder);
         Path tmpDir = Paths.get(workspaceDir, username, tmpFolder);
         Path resultDir = Paths.get(workspaceDir, username, resultsFolder, algorithmFolder);
 
         if (env.acceptsProfiles("slurm")) {
             tmpDir = Paths.get(remoteworkspace, username, tmpFolder);
-            algorithmJarPath = Paths.get(remoteworkspace, libFolder, algorithmJar);
             dataDir = Paths.get(remotedataspace, username, dataFolder);
         }
 
         // The following keys will be shared when running each algorithm
-        map.put("algorithmJarPath", algorithmJarPath.toString());
         map.put("dataDir", dataDir.toAbsolutePath().toString());
         map.put("tmpDir", tmpDir.toAbsolutePath().toString());
         map.put("resultDir", resultDir.toAbsolutePath().toString());

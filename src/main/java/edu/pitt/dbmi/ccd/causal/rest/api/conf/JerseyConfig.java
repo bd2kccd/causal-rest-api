@@ -19,12 +19,15 @@
 package edu.pitt.dbmi.ccd.causal.rest.api.conf;
 
 import edu.pitt.dbmi.ccd.causal.rest.api.endpoint.AlgorithmEndpoint;
+import edu.pitt.dbmi.ccd.causal.rest.api.endpoint.DataTypeEndpoint;
 import edu.pitt.dbmi.ccd.causal.rest.api.endpoint.DatasetFileEndpoint;
 import edu.pitt.dbmi.ccd.causal.rest.api.endpoint.FileUploadEndpoint;
+import edu.pitt.dbmi.ccd.causal.rest.api.endpoint.IndependenceTestEndpoint;
 import edu.pitt.dbmi.ccd.causal.rest.api.endpoint.JobQueueEndpoint;
 import edu.pitt.dbmi.ccd.causal.rest.api.endpoint.JwtEndpoint;
 import edu.pitt.dbmi.ccd.causal.rest.api.endpoint.PriorKnowledgeFileEndpoint;
 import edu.pitt.dbmi.ccd.causal.rest.api.endpoint.ResultFileEndpoint;
+import edu.pitt.dbmi.ccd.causal.rest.api.endpoint.ScoreEndpoint;
 import edu.pitt.dbmi.ccd.causal.rest.api.exception.mapper.WebApplicationExceptionMapper;
 import edu.pitt.dbmi.ccd.causal.rest.api.filter.AuthFilter;
 import edu.pitt.dbmi.ccd.causal.rest.api.filter.CORSFilter;
@@ -54,6 +57,10 @@ public class JerseyConfig extends ResourceConfig {
 //        );
 
         // Register all endpoint calsses
+        register(AlgorithmEndpoint.class);
+        register(IndependenceTestEndpoint.class);
+        register(ScoreEndpoint.class);
+        register(DataTypeEndpoint.class);
         register(AlgorithmEndpoint.class);
         register(DatasetFileEndpoint.class);
         register(FileUploadEndpoint.class);
