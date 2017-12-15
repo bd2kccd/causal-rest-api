@@ -20,6 +20,7 @@ package edu.pitt.dbmi.ccd.causal.rest.api.endpoint;
 
 import edu.pitt.dbmi.ccd.causal.rest.api.Role;
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.AlgorithmDTO;
+import edu.pitt.dbmi.ccd.causal.rest.api.dto.AlgorithmParameterDTO;
 import edu.pitt.dbmi.ccd.causal.rest.api.service.AlgorithmEndpointService;
 import java.io.IOException;
 import java.util.List;
@@ -74,6 +75,9 @@ public class AlgorithmEndpoint {
     /**
      * List all parameters of a given algorithm, test, and score
      *
+     * @param algoId
+     * @param testId
+     * @param scoreId
      * @return 200 with a list of available algorithms
      * @throws IOException
      */
@@ -82,8 +86,8 @@ public class AlgorithmEndpoint {
     @Produces({APPLICATION_JSON, APPLICATION_XML})
     @RolesAllowed(Role.USER)
     public Response listAlgorithmParameters(@PathParam("algoId") String algoId, @PathParam("testId") String testId, @PathParam("scoreId") String scoreId) throws IOException {
-        List<String> algorithmParameters = algorithmEndpointService.listAlgorithmParameters(algoId, testId, scoreId);
-        GenericEntity<List<String>> entity = new GenericEntity<List<String>>(algorithmParameters) {
+        List<AlgorithmParameterDTO> algoParamsDTOs = algorithmEndpointService.listAlgorithmParameters(algoId, testId, scoreId);
+        GenericEntity<List<AlgorithmParameterDTO>> entity = new GenericEntity<List<AlgorithmParameterDTO>>(algoParamsDTOs) {
         };
 
         return Response.ok(entity).build();

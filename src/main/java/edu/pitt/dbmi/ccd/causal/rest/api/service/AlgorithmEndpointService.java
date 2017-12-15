@@ -26,7 +26,10 @@ import edu.cmu.tetrad.annotation.Score;
 import edu.cmu.tetrad.annotation.ScoreAnnotations;
 import edu.cmu.tetrad.annotation.TestOfIndependence;
 import edu.cmu.tetrad.annotation.TestOfIndependenceAnnotations;
+import edu.cmu.tetrad.util.ParamDescription;
+import edu.cmu.tetrad.util.ParamDescriptions;
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.AlgorithmDTO;
+import edu.pitt.dbmi.ccd.causal.rest.api.dto.AlgorithmParameterDTO;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
@@ -73,8 +76,8 @@ public class AlgorithmEndpointService {
      * @param scoreId
      * @return A list of available parameters
      */
-    public List<String> listAlgorithmParameters(String algoId, String testId, String scoreId) {
-        List<String> parameters = new LinkedList<>();
+    public List<AlgorithmParameterDTO> listAlgorithmParameters(String algoId, String testId, String scoreId) {
+        List<AlgorithmParameterDTO> algoParamsDTOs = new LinkedList<>();
 
         Map<String, AnnotatedClass<Algorithm>> annotatedAlgoClasses = AlgorithmAnnotations.getInstance().getAnnotatedClasses().stream()
                 .collect(() -> new TreeMap<>(String.CASE_INSENSITIVE_ORDER),
@@ -105,10 +108,15 @@ public class AlgorithmEndpointService {
         }
         
         if (algorithm != null) {
-            parameters = algorithm.getParameters();
+            List<String> algoParams = algorithm.getParameters();
+            
+            for (String param : algoParams) {
+                ParamDescription paramDesc = ParamDescriptions.getInstance().get(param);
+                algoParamsDTOs.add(new AlgorithmParameterDTO(param, paramDesc.getDescription(), paramDesc.getDefaultValue()));
+            }
         }
 
-        return parameters;
+        return algoParamsDTOs;
     }
     
 }
