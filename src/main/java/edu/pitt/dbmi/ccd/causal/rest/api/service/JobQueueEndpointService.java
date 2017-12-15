@@ -18,20 +18,11 @@
  */
 package edu.pitt.dbmi.ccd.causal.rest.api.service;
 
-import edu.pitt.dbmi.ccd.causal.rest.api.dto.FgesContinuousDataValidation;
-import edu.pitt.dbmi.ccd.causal.rest.api.dto.FgesContinuousNewJob;
-import edu.pitt.dbmi.ccd.causal.rest.api.dto.FgesContinuousParameters;
-import edu.pitt.dbmi.ccd.causal.rest.api.dto.FgesDiscreteDataValidation;
-import edu.pitt.dbmi.ccd.causal.rest.api.dto.FgesDiscreteNewJob;
-import edu.pitt.dbmi.ccd.causal.rest.api.dto.FgesDiscreteParameters;
-import edu.pitt.dbmi.ccd.causal.rest.api.dto.GfciContinuousDataValidation;
-import edu.pitt.dbmi.ccd.causal.rest.api.dto.GfciContinuousNewJob;
-import edu.pitt.dbmi.ccd.causal.rest.api.dto.GfciContinuousParameters;
-import edu.pitt.dbmi.ccd.causal.rest.api.dto.GfciDiscreteDataValidation;
-import edu.pitt.dbmi.ccd.causal.rest.api.dto.GfciDiscreteNewJob;
-import edu.pitt.dbmi.ccd.causal.rest.api.dto.GfciDiscreteParameters;
+import edu.pitt.dbmi.ccd.causal.rest.api.dto.AlgoParameter;
+import edu.pitt.dbmi.ccd.causal.rest.api.dto.DataValidationParameter;
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.JobInfoDTO;
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.JvmOptions;
+import edu.pitt.dbmi.ccd.causal.rest.api.dto.NewJob;
 import edu.pitt.dbmi.ccd.causal.rest.api.exception.NotFoundByIdException;
 import edu.pitt.dbmi.ccd.causal.rest.api.exception.ResourceNotFoundException;
 import edu.pitt.dbmi.ccd.causal.rest.api.prop.CausalRestProperties;
@@ -101,20 +92,8 @@ public class JobQueueEndpointService {
         this.dataFileService = dataFileService;
         this.jobQueueInfoService = jobQueueInfoService;
     }
-
-    /**
-     * Add a new job to the job queue and run the GFCI continuous algorithm
-     *
-     * @param uid
-     * @param newJob
-     * @return JobInfoDTO
-     */
-    public JobInfoDTO addGfciContinuousNewJob(Long uid, GfciContinuousNewJob newJob) {
-        String algorithmName = "GFCIc";
-
-        // This is the algo to pass to causal-cmd, case-insensitive
-        String algorithm = causalRestProperties.getAlgoGfciCont();
-
+    
+    public JobInfoDTO addNewJob(Long uid, String algoId, NewJob newJob) {
         // When we can get here vai AuthFilterSerice, it means the user exists
         // so no need to check if (userAccount == null) and throw UserNotFoundException(uid)
         UserAccount userAccount = userAccountService.findById(uid);
@@ -141,7 +120,7 @@ public class JobQueueEndpointService {
 
         // Add algorithm
         commands.add("--algorithm");
-        commands.add(algorithm);
+        commands.add(algoId);
 
         // Get dataset file name by file id
         Long datasetFileId = newJob.getDatasetFileId();
@@ -168,40 +147,27 @@ public class JobQueueEndpointService {
             commands.add(priorKnowledgePath.toAbsolutePath().toString());
         }
 
-        // Algorithm parameters
-        GfciContinuousParameters algorithmParameters = newJob.getAlgorithmParameters();
-
+        
+        // Set delimiter
         commands.add("--delimiter");
         commands.add(getFileDelimiter(newJob.getDatasetFileId()));
 
-        commands.add("--alpha");
-        commands.add(Double.toString(algorithmParameters.getAlpha()));
-
-        commands.add("--penalty-discount");
-        commands.add(Double.toString(algorithmParameters.getPenaltyDiscount()));
-
-        commands.add("--max-degree");
-        commands.add(Integer.toString(algorithmParameters.getMaxDegree()));
-
-        if (algorithmParameters.isVerbose()) {
-            commands.add("--verbose");
-        }
-
-        if (algorithmParameters.isFaithfulnessAssumed()) {
-            commands.add("--faithfulness-assumed");
-        }
-
+        // Algorithm parameters
+        Set<AlgoParameter> algorithmParameters = newJob.getAlgoParameters();
+        // Get key-value from algo parameters
+        algorithmParameters.forEach(param -> {
+            commands.add("--" + param.getKey());
+            commands.add(param.getValue().toString());
+        });
+        
         // Data validation
-        GfciContinuousDataValidation dataValidation = newJob.getDataValidation();
-
-        if (!dataValidation.isSkipNonzeroVariance()) {
-            commands.add("--skip-nonzero-variance");
-        }
-
-        if (!dataValidation.isSkipUniqueVarName()) {
-            commands.add("--skip-unique-var-name");
-        }
-
+        Set<DataValidationParameter> dataValidationParameters = newJob.getDataValidationParameters();
+        // Get key from algo parameters
+        // Will add checks based on value
+        dataValidationParameters.forEach(param -> {
+            commands.add("--" + param.getKey());
+        });
+        
         commands.add("--tetrad-graph-json");
 
         // Don't create any validation files
@@ -213,7 +179,7 @@ public class JobQueueEndpointService {
 
         DataFile df = dataFileService.findByIdAndUserAccount(datasetFileId, userAccount);
         // The algorithm name can be different from the value of causalRestProperties.getAlgoFgesCont()
-        fileName = String.format("%s_%s_%d", algorithmName, df.getName(), currentTime);
+        fileName = String.format("%s_%s_%d", algoId, df.getName(), currentTime);
 
         commands.add("--output-prefix");
         commands.add(fileName);
@@ -226,7 +192,7 @@ public class JobQueueEndpointService {
         // Insert to database table `job_queue_info`
         JobQueueInfo jobQueueInfo = new JobQueueInfo();
         jobQueueInfo.setAddedTime(new Date(System.currentTimeMillis()));
-        jobQueueInfo.setAlgorName(algorithmName);
+        jobQueueInfo.setAlgorName(algoId);
         jobQueueInfo.setCommands(cmd);
         jobQueueInfo.setFileName(fileName);
         jobQueueInfo.setOutputDirectory(map.get("resultDir"));
@@ -250,7 +216,7 @@ public class JobQueueEndpointService {
 
         Long newJobId = jobQueueInfo.getId();
 
-        LOGGER.info(String.format("New GFCI continuous job submitted. Job ID: %d", newJobId));
+        LOGGER.info(String.format("New job submitted. Job ID: %d", newJobId));
 
         String resultJsonFileName = fileName + ".json";
         fileName = fileName + ".txt";
@@ -259,505 +225,7 @@ public class JobQueueEndpointService {
         JobInfoDTO jobInfo = new JobInfoDTO();
         jobInfo.setStatus(0);
         jobInfo.setAddedTime(jobQueueInfo.getAddedTime());
-        jobInfo.setAlgorithmName(algorithmName);
-        jobInfo.setResultFileName(fileName);
-        jobInfo.setResultJsonFileName(resultJsonFileName);
-        jobInfo.setErrorResultFileName(errorFileName);
-        jobInfo.setId(jobQueueInfo.getId());
-
-        return jobInfo;
-    }
-
-    /**
-     * Add a new job to the job queue and run the GFCI discrete algorithm
-     *
-     * @param uid
-     * @param newJob
-     * @return JobInfoDTO
-     */
-    public JobInfoDTO addGfciDiscreteNewJob(Long uid, GfciDiscreteNewJob newJob) {
-        String algorithmName = "GFCId";
-
-        // This is the algo to pass to causal-cmd, case-insensitive
-        String algorithm = causalRestProperties.getAlgoGfciDisc();
-
-        // When we can get here vai AuthFilterSerice, it means the user exists
-        // so no need to check if (userAccount == null) and throw UserNotFoundException(uid)
-        UserAccount userAccount = userAccountService.findById(uid);
-
-        // algorithmJarPath, dataDir, tmpDir, resultDir
-        // will be used in all algorithms
-        Map<String, String> map = createSharedMapping(uid);
-
-        // Building the command line
-        List<String> commands = new LinkedList<>();
-
-        // The first command
-        commands.add("java");
-
-        // Add JVM options
-        if (newJob.getJvmOptions() != null) {
-            JvmOptions jvmOptions = newJob.getJvmOptions();
-            commands.add(String.format("-Xmx%dG", jvmOptions.getMaxHeapSize()));
-        }
-
-        // Add causal-cmd jar path
-        commands.add("-jar");
-        commands.add(map.get("algorithmJarPath"));
-
-        // Add algorithm
-        commands.add("--algorithm");
-        commands.add(algorithm);
-
-        // Get dataset file name by file id
-        Long datasetFileId = newJob.getDatasetFileId();
-        DataFile datasetFile = dataFileService.findByIdAndUserAccount(datasetFileId, userAccount);
-        if (datasetFile == null) {
-            throw new NotFoundByIdException(datasetFileId);
-        }
-        Path datasetPath = Paths.get(map.get("dataDir"), datasetFile.getName());
-
-        commands.add("--data");
-        commands.add(datasetPath.toAbsolutePath().toString());
-
-        // Add prior knowloedge file (optional)
-        if (newJob.getPriorKnowledgeFileId() != null) {
-            // Get prior knowledge file name by file id
-            Long priorKnowledgeFileId = newJob.getPriorKnowledgeFileId();
-            DataFile priorKnowledgeFile = dataFileService.findByIdAndUserAccount(priorKnowledgeFileId, userAccount);
-            if (priorKnowledgeFile == null) {
-                throw new NotFoundByIdException(priorKnowledgeFileId);
-            }
-            Path priorKnowledgePath = Paths.get(map.get("dataDir"), priorKnowledgeFile.getName());
-
-            commands.add("--knowledge");
-            commands.add(priorKnowledgePath.toAbsolutePath().toString());
-        }
-
-        // Algorithm parameters
-        GfciDiscreteParameters algorithmParameters = newJob.getAlgorithmParameters();
-
-        commands.add("--delimiter");
-        commands.add(getFileDelimiter(newJob.getDatasetFileId()));
-
-        commands.add("--alpha");
-        commands.add(Double.toString(algorithmParameters.getAlpha()));
-
-        commands.add("--structure-prior");
-        commands.add(Double.toString(algorithmParameters.getStructurePrior()));
-
-        commands.add("--sample-prior");
-        commands.add(Double.toString(algorithmParameters.getSamplePrior()));
-
-        commands.add("--max-degree");
-        commands.add(Integer.toString(algorithmParameters.getMaxDegree()));
-
-        if (algorithmParameters.isVerbose()) {
-            commands.add("--verbose");
-        }
-
-        if (algorithmParameters.isFaithfulnessAssumed()) {
-            commands.add("--faithfulness-assumed");
-        }
-
-        // Data validation
-        GfciDiscreteDataValidation dataValidation = newJob.getDataValidation();
-
-        if (!dataValidation.isSkipCategoryLimit()) {
-            commands.add("--skip-category-limit");
-        }
-
-        if (!dataValidation.isSkipUniqueVarName()) {
-            commands.add("--skip-unique-var-name");
-        }
-
-        commands.add("--tetrad-graph-json");
-
-        // Don't create any validation files
-        commands.add("--no-validation-output");
-
-        long currentTime = System.currentTimeMillis();
-        // Algorithm result file name
-        String fileName;
-
-        DataFile df = dataFileService.findByIdAndUserAccount(datasetFileId, userAccount);
-        // The algorithm name can be different from the value of causalRestProperties.getAlgoFgesCont()
-        fileName = String.format("%s_%s_%d", algorithmName, df.getName(), currentTime);
-
-        commands.add("--output-prefix");
-        commands.add(fileName);
-
-        // Then separate those commands with ; and store the whole string into database
-        // ccd-job-queue will assemble the command line again at
-        // https://github.com/bd2kccd/ccd-job-queue/blob/master/src/main/java/edu/pitt/dbmi/ccd/queue/service/AlgorithmQueueService.java#L79
-        String cmd = listToSeparatedValues(commands, ";");
-
-        // Insert to database table `job_queue_info`
-        JobQueueInfo jobQueueInfo = new JobQueueInfo();
-        jobQueueInfo.setAddedTime(new Date(System.currentTimeMillis()));
-        jobQueueInfo.setAlgorName(algorithmName);
-        jobQueueInfo.setCommands(cmd);
-        jobQueueInfo.setFileName(fileName);
-        jobQueueInfo.setOutputDirectory(map.get("resultDir"));
-        jobQueueInfo.setStatus(0);
-        jobQueueInfo.setTmpDirectory(map.get("tmpDir"));
-        jobQueueInfo.setUserAccounts(Collections.singleton(userAccount));
-
-        // Hpc Parameters
-        if (newJob.getHpcParameters() != null) {
-            Set<HpcParameter> hpcParameters = new HashSet<>();
-            newJob.getHpcParameters().forEach(param -> {
-                HpcParameter hpcParameter = new HpcParameter();
-                hpcParameter.setParameterKey(param.getKey());
-                hpcParameter.setParameterValue(param.getValue());
-                hpcParameters.add(hpcParameter);
-            });
-            jobQueueInfo.setHpcParameters(hpcParameters);
-        }
-
-        jobQueueInfo = jobQueueInfoService.saveJobIntoQueue(jobQueueInfo);
-
-        Long newJobId = jobQueueInfo.getId();
-
-        LOGGER.info(String.format("New GFCI discrete job submitted. Job ID: %d", newJobId));
-
-        String resultJsonFileName = fileName + ".json";
-        fileName = fileName + ".txt";
-        String errorFileName = String.format("error_%s", fileName);
-
-        JobInfoDTO jobInfo = new JobInfoDTO();
-        jobInfo.setStatus(0);
-        jobInfo.setAddedTime(jobQueueInfo.getAddedTime());
-        jobInfo.setAlgorithmName(algorithmName);
-        jobInfo.setResultFileName(fileName);
-        jobInfo.setResultJsonFileName(resultJsonFileName);
-        jobInfo.setErrorResultFileName(errorFileName);
-        jobInfo.setId(jobQueueInfo.getId());
-
-        return jobInfo;
-    }
-
-    /**
-     * Add a new job to the job queue and run the FGES Continuous algorithm
-     *
-     * @param uid
-     * @param newJob
-     * @return JobInfoDTO
-     */
-    public JobInfoDTO addFgesContinuousNewJob(Long uid, FgesContinuousNewJob newJob) {
-        String algorithmName = "FGESc";
-
-        // This is the algo to pass to causal-cmd, case-insensitive
-        String algorithm = causalRestProperties.getAlgoFgesCont();
-
-        // When we can get here vai AuthFilterSerice, it means the user exists
-        // so no need to check if (userAccount == null) and throw UserNotFoundException(uid)
-        UserAccount userAccount = userAccountService.findById(uid);
-
-        // algorithmJarPath, dataDir, tmpDir, resultDir
-        // will be used in both "fgs" and "fgs-discrete"
-        Map<String, String> map = createSharedMapping(uid);
-
-        // Building the command line
-        List<String> commands = new LinkedList<>();
-
-        // The first command
-        commands.add("java");
-
-        // Add JVM options
-        if (newJob.getJvmOptions() != null) {
-            JvmOptions jvmOptions = newJob.getJvmOptions();
-            commands.add(String.format("-Xmx%dG", jvmOptions.getMaxHeapSize()));
-        }
-
-        // Add causal-cmd jar path
-        commands.add("-jar");
-        commands.add(map.get("algorithmJarPath"));
-
-        // Add algorithm
-        commands.add("--algorithm");
-        commands.add(algorithm);
-
-        // Get dataset file name by file id
-        Long datasetFileId = newJob.getDatasetFileId();
-        DataFile datasetFile = dataFileService.findByIdAndUserAccount(datasetFileId, userAccount);
-        if (datasetFile == null) {
-            throw new NotFoundByIdException(datasetFileId);
-        }
-        Path datasetPath = Paths.get(map.get("dataDir"), datasetFile.getName());
-
-        commands.add("--data");
-        commands.add(datasetPath.toAbsolutePath().toString());
-
-        // Add prior knowloedge file (optional)
-        if (newJob.getPriorKnowledgeFileId() != null) {
-            // Get prior knowledge file name by file id
-            Long priorKnowledgeFileId = newJob.getPriorKnowledgeFileId();
-            DataFile priorKnowledgeFile = dataFileService.findByIdAndUserAccount(priorKnowledgeFileId, userAccount);
-            if (priorKnowledgeFile == null) {
-                throw new NotFoundByIdException(priorKnowledgeFileId);
-            }
-            Path priorKnowledgePath = Paths.get(map.get("dataDir"), priorKnowledgeFile.getName());
-
-            commands.add("--knowledge");
-            commands.add(priorKnowledgePath.toAbsolutePath().toString());
-        }
-
-        // Algorithm parameters
-        FgesContinuousParameters algorithmParameters = newJob.getAlgorithmParameters();
-
-        commands.add("--delimiter");
-        commands.add(getFileDelimiter(newJob.getDatasetFileId()));
-
-        commands.add("--penalty-discount");
-        commands.add(Double.toString(algorithmParameters.getPenaltyDiscount()));
-
-        commands.add("--max-degree");
-        commands.add(Integer.toString(algorithmParameters.getMaxDegree()));
-
-        if (algorithmParameters.isVerbose()) {
-            commands.add("--verbose");
-        }
-
-        if (algorithmParameters.isFaithfulnessAssumed()) {
-            commands.add("--faithfulness-assumed");
-        }
-
-        // Data validation
-        FgesContinuousDataValidation dataValidation = newJob.getDataValidation();
-
-        if (!dataValidation.isSkipNonzeroVariance()) {
-            commands.add("--skip-nonzero-variance");
-        }
-
-        if (!dataValidation.isSkipUniqueVarName()) {
-            commands.add("--skip-unique-var-name");
-        }
-
-        commands.add("--tetrad-graph-json");
-
-        // Don't create any validation files
-        commands.add("--no-validation-output");
-
-        long currentTime = System.currentTimeMillis();
-        // Algorithm result file name
-        String fileName;
-
-        DataFile df = dataFileService.findByIdAndUserAccount(datasetFileId, userAccount);
-        // The algorithm name can be different from the value of causalRestProperties.getAlgoFgesCont()
-        fileName = String.format("%s_%s_%d", algorithmName, df.getName(), currentTime);
-
-        commands.add("--output-prefix");
-        commands.add(fileName);
-
-        // Then separate those commands with ; and store the whole string into database
-        // ccd-job-queue will assemble the command line again at
-        // https://github.com/bd2kccd/ccd-job-queue/blob/master/src/main/java/edu/pitt/dbmi/ccd/queue/service/AlgorithmQueueService.java#L79
-        String cmd = listToSeparatedValues(commands, ";");
-
-        // Insert to database table `job_queue_info`
-        JobQueueInfo jobQueueInfo = new JobQueueInfo();
-        jobQueueInfo.setAddedTime(new Date(System.currentTimeMillis()));
-        jobQueueInfo.setAlgorName(algorithmName);
-        jobQueueInfo.setCommands(cmd);
-        jobQueueInfo.setFileName(fileName);
-        jobQueueInfo.setOutputDirectory(map.get("resultDir"));
-        jobQueueInfo.setStatus(0);
-        jobQueueInfo.setTmpDirectory(map.get("tmpDir"));
-        jobQueueInfo.setUserAccounts(Collections.singleton(userAccount));
-
-        // Hpc Parameters
-        if (newJob.getHpcParameters() != null) {
-            Set<HpcParameter> hpcParameters = new HashSet<>();
-            newJob.getHpcParameters().forEach(param -> {
-                HpcParameter hpcParameter = new HpcParameter();
-                hpcParameter.setParameterKey(param.getKey());
-                hpcParameter.setParameterValue(param.getValue());
-                hpcParameters.add(hpcParameter);
-            });
-            jobQueueInfo.setHpcParameters(hpcParameters);
-        }
-
-        jobQueueInfo = jobQueueInfoService.saveJobIntoQueue(jobQueueInfo);
-
-        Long newJobId = jobQueueInfo.getId();
-
-        LOGGER.info(String.format("New FGES Continuous job submitted. Job ID: %d", newJobId));
-
-        String resultJsonFileName = fileName + ".json";
-        fileName = fileName + ".txt";
-        String errorFileName = String.format("error_%s", fileName);
-
-        JobInfoDTO jobInfo = new JobInfoDTO();
-        jobInfo.setStatus(0);
-        jobInfo.setAddedTime(jobQueueInfo.getAddedTime());
-        jobInfo.setAlgorithmName(algorithmName);
-        jobInfo.setResultFileName(fileName);
-        jobInfo.setResultJsonFileName(resultJsonFileName);
-        jobInfo.setErrorResultFileName(errorFileName);
-        jobInfo.setId(jobQueueInfo.getId());
-
-        return jobInfo;
-    }
-
-    /**
-     * Add a new job to the job queue and run the FGES discrete algorithm
-     *
-     * @param uid
-     * @param newJob
-     * @return Job ID
-     */
-    public JobInfoDTO addFgesDiscreteNewJob(Long uid, FgesDiscreteNewJob newJob) {
-        String algorithmName = "FGESd";
-
-        // This is the algo to pass to causal-cmd, case-insensitive
-        String algorithm = causalRestProperties.getAlgoFgesDisc();
-
-        // When we can get here vai AuthFilterSerice, it means the user exists
-        // so no need to check if (userAccount == null) and throw UserNotFoundException(uid)
-        UserAccount userAccount = userAccountService.findById(uid);
-
-        // algorithmJarPath, dataDir, tmpDir, resultDir
-        // will be used in both "fgs" and "fgs-discrete"
-        Map<String, String> map = createSharedMapping(uid);
-
-        // Building the command line
-        List<String> commands = new LinkedList<>();
-
-        // The first command
-        commands.add("java");
-
-        // Add JVM options
-        if (newJob.getJvmOptions() != null) {
-            JvmOptions jvmOptions = newJob.getJvmOptions();
-            commands.add(String.format("-Xmx%dG", jvmOptions.getMaxHeapSize()));
-        }
-
-        // Add algorithm jar file path
-        commands.add("-jar");
-        commands.add(map.get("algorithmJarPath"));
-
-        // Add algorithm
-        commands.add("--algorithm");
-        commands.add(algorithm);
-
-        // Get dataset file name by file id
-        Long datasetFileId = newJob.getDatasetFileId();
-        DataFile datasetFile = dataFileService.findByIdAndUserAccount(datasetFileId, userAccount);
-        if (datasetFile == null) {
-            throw new NotFoundByIdException(datasetFileId);
-        }
-        Path datasetPath = Paths.get(map.get("dataDir"), datasetFile.getName());
-
-        commands.add("--data");
-        commands.add(datasetPath.toAbsolutePath().toString());
-
-        // Add prior knowloedge file (optional)
-        if (newJob.getPriorKnowledgeFileId() != null) {
-            // Get prior knowledge file name by file id
-            Long priorKnowledgeFileId = newJob.getPriorKnowledgeFileId();
-            DataFile priorKnowledgeFile = dataFileService.findByIdAndUserAccount(priorKnowledgeFileId, userAccount);
-            if (priorKnowledgeFile == null) {
-                throw new NotFoundByIdException(priorKnowledgeFileId);
-            }
-            Path priorKnowledgePath = Paths.get(map.get("dataDir"), priorKnowledgeFile.getName());
-
-            commands.add("--knowledge");
-            commands.add(priorKnowledgePath.toAbsolutePath().toString());
-        }
-
-        // Algorithm parameters
-        FgesDiscreteParameters algorithmParameters = newJob.getAlgorithmParameters();
-
-        commands.add("--delimiter");
-        commands.add(getFileDelimiter(newJob.getDatasetFileId()));
-
-        commands.add("--structure-prior");
-        commands.add(Double.toString(algorithmParameters.getStructurePrior()));
-
-        commands.add("--sample-prior");
-        commands.add(Double.toString(algorithmParameters.getSamplePrior()));
-
-        commands.add("--max-degree");
-        commands.add(Integer.toString(algorithmParameters.getMaxDegree()));
-
-        if (algorithmParameters.isVerbose()) {
-            commands.add("--verbose");
-        }
-
-        if (algorithmParameters.isFaithfulnessAssumed()) {
-            commands.add("--faithfulness-assumed");
-        }
-
-        // Data validation
-        FgesDiscreteDataValidation dataValidation = newJob.getDataValidation();
-
-        if (!dataValidation.isSkipCategoryLimit()) {
-            commands.add("--skip-category-limit");
-        }
-
-        if (!dataValidation.isSkipUniqueVarName()) {
-            commands.add("--skip-unique-var-name");
-        }
-
-        commands.add("--tetrad-graph-json");
-
-        // Don't create any validation files
-        commands.add("--no-validation-output");
-
-        long currentTime = System.currentTimeMillis();
-        // Algorithm result file name
-        String fileName;
-
-        DataFile df = dataFileService.findByIdAndUserAccount(datasetFileId, userAccount);
-        // The algorithm name can be different from the value of causalRestProperties.getAlgoFgesCont()
-        fileName = String.format("%s_%s_%d", algorithmName, df.getName(), currentTime);
-
-        commands.add("--output-prefix");
-        commands.add(fileName);
-
-        // Then separate those commands with ; and store the whole string into database
-        // ccd-job-queue will assemble the command line again at
-        // https://github.com/bd2kccd/ccd-job-queue/blob/master/src/main/java/edu/pitt/dbmi/ccd/queue/service/AlgorithmQueueService.java#L79
-        String cmd = listToSeparatedValues(commands, ";");
-
-        // Insert to database table `job_queue_info`
-        JobQueueInfo jobQueueInfo = new JobQueueInfo();
-        jobQueueInfo.setAddedTime(new Date(System.currentTimeMillis()));
-        jobQueueInfo.setAlgorName(algorithmName);
-        jobQueueInfo.setCommands(cmd);
-        jobQueueInfo.setFileName(fileName);
-        jobQueueInfo.setOutputDirectory(map.get("resultDir"));
-        jobQueueInfo.setStatus(0);
-        jobQueueInfo.setTmpDirectory(map.get("tmpDir"));
-        jobQueueInfo.setUserAccounts(Collections.singleton(userAccount));
-
-        // Hpc Parameters
-        if (newJob.getHpcParameters() != null) {
-            Set<HpcParameter> hpcParameters = new HashSet<>();
-            newJob.getHpcParameters().forEach(param -> {
-                HpcParameter hpcParameter = new HpcParameter();
-                hpcParameter.setParameterKey(param.getKey());
-                hpcParameter.setParameterValue(param.getValue());
-                hpcParameters.add(hpcParameter);
-            });
-            jobQueueInfo.setHpcParameters(hpcParameters);
-        }
-
-        jobQueueInfo = jobQueueInfoService.saveJobIntoQueue(jobQueueInfo);
-
-        Long newJobId = jobQueueInfo.getId();
-
-        LOGGER.info(String.format("New FGES discrete job submitted. Job ID: %d", newJobId));
-
-        String resultJsonFileName = fileName + ".json";
-        fileName = fileName + ".txt";
-        String errorFileName = String.format("error_%s", fileName);
-
-        JobInfoDTO jobInfo = new JobInfoDTO();
-        jobInfo.setStatus(0);
-        jobInfo.setAddedTime(jobQueueInfo.getAddedTime());
-        jobInfo.setAlgorithmName(algorithmName);
+        jobInfo.setAlgorithmName(algoId);
         jobInfo.setResultFileName(fileName);
         jobInfo.setResultJsonFileName(resultJsonFileName);
         jobInfo.setErrorResultFileName(errorFileName);
@@ -783,21 +251,26 @@ public class JobQueueEndpointService {
         Map<String, String> map = new HashMap<>();
 
         String workspaceDir = causalRestProperties.getWorkspaceDir();
+        String libFolder = causalRestProperties.getLibFolder();
         String tmpFolder = causalRestProperties.getTmpFolder();
         String dataFolder = causalRestProperties.getDataFolder();
         String resultsFolder = causalRestProperties.getResultsFolder();
         String algorithmFolder = causalRestProperties.getAlgorithmFolder();
+        String algorithmJar = causalRestProperties.getAlgorithmJar();
 
+        Path algorithmJarPath = Paths.get(workspaceDir, libFolder, algorithmJar);
         Path dataDir = Paths.get(workspaceDir, username, dataFolder);
         Path tmpDir = Paths.get(workspaceDir, username, tmpFolder);
         Path resultDir = Paths.get(workspaceDir, username, resultsFolder, algorithmFolder);
 
         if (env.acceptsProfiles("slurm")) {
             tmpDir = Paths.get(remoteworkspace, username, tmpFolder);
+            algorithmJarPath = Paths.get(remoteworkspace, libFolder, algorithmJar);
             dataDir = Paths.get(remotedataspace, username, dataFolder);
         }
 
         // The following keys will be shared when running each algorithm
+        map.put("algorithmJarPath", algorithmJarPath.toString());
         map.put("dataDir", dataDir.toAbsolutePath().toString());
         map.put("tmpDir", tmpDir.toAbsolutePath().toString());
         map.put("resultDir", resultDir.toAbsolutePath().toString());

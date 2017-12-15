@@ -36,6 +36,12 @@ public abstract class NewJob {
     @Range(min = 1, max = Long.MAX_VALUE)
     protected Long priorKnowledgeFileId;
 
+    @Valid
+    protected Set<DataValidationParameter> dataValidationParameters;
+    
+    @Valid
+    protected Set<AlgoParameter> algoParameters;
+    
     // We must ues @Valid annoation here again to enable the bean validation in JvmOptions,
     // because the @Valid annoation used in endpopint only works on this NewJob bean,
     // the validation won't populate to the nested bean without this @Valid here
@@ -62,6 +68,22 @@ public abstract class NewJob {
 
     public void setPriorKnowledgeFileId(Long priorKnowledgeFileId) {
         this.priorKnowledgeFileId = priorKnowledgeFileId;
+    }
+
+    public Set<DataValidationParameter> getDataValidationParameters() {
+        return dataValidationParameters;
+    }
+
+    public void setDataValidationParameters(Set<DataValidationParameter> dataValidationParameters) {
+        this.dataValidationParameters = dataValidationParameters;
+    }
+
+    public Set<AlgoParameter> getAlgoParameters() {
+        return algoParameters;
+    }
+
+    public void setAlgoParameters(Set<AlgoParameter> algoParameters) {
+        this.algoParameters = algoParameters;
     }
 
     public JvmOptions getJvmOptions() {

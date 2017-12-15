@@ -19,11 +19,8 @@
 package edu.pitt.dbmi.ccd.causal.rest.api.endpoint;
 
 import edu.pitt.dbmi.ccd.causal.rest.api.Role;
-import edu.pitt.dbmi.ccd.causal.rest.api.dto.FgesContinuousNewJob;
-import edu.pitt.dbmi.ccd.causal.rest.api.dto.FgesDiscreteNewJob;
-import edu.pitt.dbmi.ccd.causal.rest.api.dto.GfciContinuousNewJob;
-import edu.pitt.dbmi.ccd.causal.rest.api.dto.GfciDiscreteNewJob;
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.JobInfoDTO;
+import edu.pitt.dbmi.ccd.causal.rest.api.dto.NewJob;
 import edu.pitt.dbmi.ccd.causal.rest.api.service.JobQueueEndpointService;
 import java.io.IOException;
 import java.util.List;
@@ -61,90 +58,28 @@ public class JobQueueEndpoint {
         this.jobQueueEndpointService = jobQueueEndpointService;
     }
 
+    
     /**
-     * Adding a new job and run FGES continuous
-     *
+     * Adding a new job and run a given algorithm with user provided parameters
+     * 
      * @param uid
+     * @param algoId
      * @param newJob
-     * @return 201 Created status code with new job ID
-     * @throws IOException
+     * @return
      */
     @POST
-    @Path("/jobs/FGESc")
+    @Path("/jobs/{algoId}")
     @Consumes(APPLICATION_JSON)
     @Produces({APPLICATION_JSON, APPLICATION_XML})
     @RolesAllowed(Role.USER)
-    public Response addFgesContinuousNewJob(@PathParam("uid") Long uid, @Valid FgesContinuousNewJob newJob) throws IOException {
-        JobInfoDTO jobInfo = jobQueueEndpointService.addFgesContinuousNewJob(uid, newJob);
+    public Response addNewJob(@PathParam("uid") Long uid, @PathParam("algoId") String algoId, @Valid NewJob newJob) {
+        JobInfoDTO jobInfo = jobQueueEndpointService.addNewJob(uid, algoId, newJob);
         GenericEntity<JobInfoDTO> jobRequestEntity = new GenericEntity<JobInfoDTO>(jobInfo) {
         };
         // Return 201 Created status code and the job id in body
         return Response.status(Status.CREATED).entity(jobRequestEntity).build();
     }
-
-    /**
-     * Adding a new job and run FGES discrete
-     *
-     * @param uid
-     * @param newJob
-     * @return 201 Created status code with new job ID
-     * @throws IOException
-     */
-    @POST
-    @Path("/jobs/FGESd")
-    @Consumes(APPLICATION_JSON)
-    @Produces({APPLICATION_JSON, APPLICATION_XML})
-    @RolesAllowed(Role.USER)
-    public Response addFgesDiscreteNewJob(@PathParam("uid") Long uid, @Valid FgesDiscreteNewJob newJob) throws IOException {
-        JobInfoDTO jobInfo = jobQueueEndpointService.addFgesDiscreteNewJob(uid, newJob);
-        GenericEntity<JobInfoDTO> jobRequestEntity = new GenericEntity<JobInfoDTO>(jobInfo) {
-        };
-        // Return 201 Created status code and the job id in body
-        return Response.status(Status.CREATED).entity(jobRequestEntity).build();
-    }
-
-    /**
-     * Adding a new job and run GFCI continuous
-     *
-     * @param uid
-     * @param newJob
-     * @return 201 Created status code with new job ID
-     * @throws IOException
-     */
-    @POST
-    @Path("/jobs/GFCIc")
-    @Consumes(APPLICATION_JSON)
-    @Produces({APPLICATION_JSON, APPLICATION_XML})
-    @RolesAllowed(Role.USER)
-    public Response addGfciContinuousNewJob(@PathParam("uid") Long uid, @Valid GfciContinuousNewJob newJob) throws IOException {
-        JobInfoDTO jobInfo = jobQueueEndpointService.addGfciContinuousNewJob(uid, newJob);
-        GenericEntity<JobInfoDTO> jobRequestEntity = new GenericEntity<JobInfoDTO>(jobInfo) {
-        };
-        // Return 201 Created status code and the job id in body
-        return Response.status(Status.CREATED).entity(jobRequestEntity).build();
-    }
-
-    /**
-     * Adding a new job and run GFCI discrete
-     *
-     * @param uid
-     * @param newJob
-     * @return 201 Created status code with new job ID
-     * @throws IOException
-     */
-    @POST
-    @Path("/jobs/GFCId")
-    @Consumes(APPLICATION_JSON)
-    @Produces({APPLICATION_JSON, APPLICATION_XML})
-    @RolesAllowed(Role.USER)
-    public Response addGfciDiscreteNewJob(@PathParam("uid") Long uid, @Valid GfciDiscreteNewJob newJob) throws IOException {
-        JobInfoDTO jobInfo = jobQueueEndpointService.addGfciDiscreteNewJob(uid, newJob);
-        GenericEntity<JobInfoDTO> jobRequestEntity = new GenericEntity<JobInfoDTO>(jobInfo) {
-        };
-        // Return 201 Created status code and the job id in body
-        return Response.status(Status.CREATED).entity(jobRequestEntity).build();
-    }
-
+    
     /**
      * List all Queued or Running jobs associated with the user
      *

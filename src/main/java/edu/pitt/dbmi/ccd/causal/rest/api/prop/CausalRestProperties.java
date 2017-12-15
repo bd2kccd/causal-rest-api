@@ -32,23 +32,17 @@ import org.springframework.stereotype.Component;
 @PropertySource("classpath:causal.properties")
 public class CausalRestProperties {
 
-    @Value("${ccd.algorithm.fges.cont:FGESc}")
-    private String algoFgesCont;
-
-    @Value("${ccd.algorithm.fges.disc:FGESd}")
-    private String algoFgesDisc;
-
-    @Value("${ccd.algorithm.gfci.cont:GFCIc}")
-    private String algoGfciCont;
-
-    @Value("${ccd.algorithm.gfci.disc:GFCId}")
-    private String algoGfciDisc;
+    @Value("${ccd.cmd.jar}")
+    private String algorithmJar;
 
     @Value("${ccd.server.workspace:}")
     private String workspaceDir;
 
     @Value("${ccd.folder.data:data}")
     private String dataFolder;
+
+    @Value("${ccd.folder.lib:lib}")
+    private String libFolder;
 
     @Value("${ccd.folder.tmp:tmp}")
     private String tmpFolder;
@@ -74,36 +68,12 @@ public class CausalRestProperties {
     public CausalRestProperties() {
     }
 
-    public String getAlgoFgesCont() {
-        return algoFgesCont;
+    public String getAlgorithmJar() {
+        return algorithmJar;
     }
 
-    public void setAlgoFgesCont(String algoFgesCont) {
-        this.algoFgesCont = algoFgesCont;
-    }
-
-    public String getAlgoFgesDisc() {
-        return algoFgesDisc;
-    }
-
-    public void setAlgoFgesDisc(String algoFgesDisc) {
-        this.algoFgesDisc = algoFgesDisc;
-    }
-
-    public String getAlgoGfciCont() {
-        return algoGfciCont;
-    }
-
-    public void setAlgoGfciCont(String algoGfciCont) {
-        this.algoGfciCont = algoGfciCont;
-    }
-
-    public String getAlgoGfciDisc() {
-        return algoGfciDisc;
-    }
-
-    public void setAlgoGfciDisc(String algoGfciDisc) {
-        this.algoGfciDisc = algoGfciDisc;
+    public void setAlgorithmJar(String algorithmJar) {
+        this.algorithmJar = algorithmJar;
     }
 
     public String getWorkspaceDir() {
@@ -120,6 +90,14 @@ public class CausalRestProperties {
 
     public void setDataFolder(String dataFolder) {
         this.dataFolder = dataFolder;
+    }
+
+    public String getLibFolder() {
+        return libFolder;
+    }
+
+    public void setLibFolder(String libFolder) {
+        this.libFolder = libFolder;
     }
 
     public String getTmpFolder() {
