@@ -19,7 +19,6 @@
 package edu.pitt.dbmi.ccd.causal.rest.api.service;
 
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.AlgoParameter;
-import edu.pitt.dbmi.ccd.causal.rest.api.dto.DataValidationParameter;
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.JobInfoDTO;
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.JvmOptions;
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.NewJob;
@@ -159,15 +158,7 @@ public class JobQueueEndpointService {
             commands.add("--" + param.getKey());
             commands.add(param.getValue().toString());
         });
-        
-        // Data validation
-        Set<DataValidationParameter> dataValidationParameters = newJob.getDataValidationParameters();
-        // Get key from algo parameters
-        // Will add checks based on value
-        dataValidationParameters.forEach(param -> {
-            commands.add("--" + param.getKey());
-        });
-        
+
         commands.add("--tetrad-graph-json");
 
         // Don't create any validation files
