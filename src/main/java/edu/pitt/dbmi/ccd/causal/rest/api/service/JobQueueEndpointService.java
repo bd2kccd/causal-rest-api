@@ -129,7 +129,7 @@ public class JobQueueEndpointService {
         }
         Path datasetPath = Paths.get(map.get("dataDir"), datasetFile.getName());
 
-        commands.add("--data");
+        commands.add("--dataset");
         commands.add(datasetPath.toAbsolutePath().toString());
 
         // Add prior knowloedge file (optional)
@@ -159,11 +159,6 @@ public class JobQueueEndpointService {
             commands.add(param.getValue().toString());
         });
 
-        commands.add("--tetrad-graph-json");
-
-        // Don't create any validation files
-        commands.add("--no-validation-output");
-
         long currentTime = System.currentTimeMillis();
         // Algorithm result file name
         String fileName;
@@ -172,9 +167,18 @@ public class JobQueueEndpointService {
         // The algorithm name can be different from the value of causalRestProperties.getAlgoFgesCont()
         fileName = String.format("%s_%s_%d", algoId, df.getName(), currentTime);
 
-        commands.add("--output-prefix");
+        // Output file name prefix
+        commands.add("--prefix");
         commands.add(fileName);
 
+        // Skip data validation?
+        if (newJob.getSkipDataValidation()) {
+            commands.add("--skip-validation");
+        } 
+        
+        // Show version 
+        commands.add("--version");
+        
         // Then separate those commands with ; and store the whole string into database
         // ccd-job-queue will assemble the command line again at
         // https://github.com/bd2kccd/ccd-job-queue/blob/master/src/main/java/edu/pitt/dbmi/ccd/queue/service/AlgorithmQueueService.java#L79

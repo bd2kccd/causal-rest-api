@@ -37,7 +37,7 @@ public abstract class NewJob {
     protected Long priorKnowledgeFileId;
 
     @Valid
-    protected Boolean dataValidation;
+    protected Boolean skipDataValidation;
     
     @Valid
     protected Set<AlgoParameter> algoParameters;
@@ -70,12 +70,12 @@ public abstract class NewJob {
         this.priorKnowledgeFileId = priorKnowledgeFileId;
     }
 
-    public Boolean getDataValidation() {
-        return dataValidation;
+    public Boolean getSkipDataValidation() {
+        return skipDataValidation;
     }
 
-    public void setDataValidation(Boolean dataValidation) {
-        this.dataValidation = dataValidation;
+    public void setSkipDataValidation(Boolean skipDataValidation) {
+        this.skipDataValidation = skipDataValidation;
     }
 
     public Set<AlgoParameter> getAlgoParameters() {
