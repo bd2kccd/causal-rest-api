@@ -127,7 +127,7 @@ public class AlgorithmEndpointService {
                     valueType = "Boolean";
                 }
                 
-                algoParamsDTOs.add(new AlgorithmParameterDTO(param, paramDesc.getDescription(), defaultValue, valueType));
+                algoParamsDTOs.add(new AlgorithmParameterDTO(param, paramDesc.getDescription(), valueType, defaultValue));
             });
         }
 
