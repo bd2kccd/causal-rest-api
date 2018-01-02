@@ -25,6 +25,7 @@ import edu.pitt.dbmi.ccd.causal.rest.api.dto.NewJob;
 import edu.pitt.dbmi.ccd.causal.rest.api.exception.NotFoundByIdException;
 import edu.pitt.dbmi.ccd.causal.rest.api.exception.ResourceNotFoundException;
 import edu.pitt.dbmi.ccd.causal.rest.api.prop.CausalRestProperties;
+import edu.pitt.dbmi.ccd.causal.rest.api.util.CmdOptions;
 import edu.pitt.dbmi.ccd.db.entity.DataFile;
 import edu.pitt.dbmi.ccd.db.entity.DataFileInfo;
 import edu.pitt.dbmi.ccd.db.entity.FileDelimiter;
@@ -129,7 +130,7 @@ public class JobQueueEndpointService {
         }
         Path datasetPath = Paths.get(map.get("dataDir"), datasetFile.getName());
 
-        commands.add("--dataset");
+        commands.add(CmdOptions.DATASET);
         commands.add(datasetPath.toAbsolutePath().toString());
 
         // Add prior knowloedge file (optional)
@@ -142,13 +143,13 @@ public class JobQueueEndpointService {
             }
             Path priorKnowledgePath = Paths.get(map.get("dataDir"), priorKnowledgeFile.getName());
 
-            commands.add("--knowledge");
+            commands.add(CmdOptions.KNOWLEDGE);
             commands.add(priorKnowledgePath.toAbsolutePath().toString());
         }
 
         
         // Set delimiter
-        commands.add("--delimiter");
+        commands.add(CmdOptions.DELIMITER);
         commands.add(getFileDelimiter(newJob.getDatasetFileId()));
 
         // Algorithm parameters
@@ -168,16 +169,16 @@ public class JobQueueEndpointService {
         fileName = String.format("%s_%s_%d", algoId, df.getName(), currentTime);
 
         // Output file name prefix
-        commands.add("--prefix");
+        commands.add(CmdOptions.OUTPUT_PREFIX);
         commands.add(fileName);
 
         // Skip data validation?
         if (newJob.getSkipDataValidation()) {
-            commands.add("--skip-validation");
+            commands.add(CmdOptions.SKIP_VALIDATION);
         } 
         
         // Show version 
-        commands.add("--version");
+        commands.add(CmdOptions.VERSION);
         
         // Then separate those commands with ; and store the whole string into database
         // ccd-job-queue will assemble the command line again at
