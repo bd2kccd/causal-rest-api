@@ -31,6 +31,7 @@ import edu.cmu.tetrad.util.ParamDescriptions;
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.AlgorithmDTO;
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.AlgorithmParameterDTO;
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -110,10 +111,24 @@ public class AlgorithmEndpointService {
         if (algorithm != null) {
             List<String> algoParams = algorithm.getParameters();
             
-            for (String param : algoParams) {
+            algoParams.forEach((param) -> {
                 ParamDescription paramDesc = ParamDescriptions.getInstance().get(param);
-                algoParamsDTOs.add(new AlgorithmParameterDTO(param, paramDesc.getDescription(), paramDesc.getDefaultValue()));
-            }
+                Serializable defaultValue = paramDesc.getDefaultValue();
+                String valueType = "";
+                if (defaultValue instanceof Integer) {
+                    valueType = "Integer";
+                }
+                
+                if (defaultValue instanceof Double) {
+                    valueType = "Double";
+                }
+                
+                if (defaultValue instanceof Boolean) {
+                    valueType = "Boolean";
+                }
+                
+                algoParamsDTOs.add(new AlgorithmParameterDTO(param, paramDesc.getDescription(), defaultValue, valueType));
+            });
         }
 
         return algoParamsDTOs;

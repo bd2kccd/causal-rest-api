@@ -26,14 +26,18 @@ public class AlgorithmParameterDTO {
     
     @XmlElement
     private Serializable defaultValue;
+    
+    @XmlElement
+    private String valueType;
 
     public AlgorithmParameterDTO() {
     }
 
-    public AlgorithmParameterDTO(String name, String description, Serializable defaultValue) {
+    public AlgorithmParameterDTO(String name, String description, Serializable defaultValue, String valueType) {
         this.name = name;
         this.description = description;
         this.defaultValue = defaultValue;
+        this.valueType = valueType;
     }
 
     public String getName() {
@@ -58,6 +62,14 @@ public class AlgorithmParameterDTO {
 
     public void setDefaultValue(Serializable defaultValue) {
         this.defaultValue = defaultValue;
+    }
+
+    public String getValueType() {
+        return valueType;
+    }
+
+    public void setValueType(String valueType) {
+        this.valueType = valueType;
     }
     
     
