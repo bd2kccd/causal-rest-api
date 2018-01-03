@@ -10,6 +10,7 @@ import edu.cmu.tetrad.annotation.Score;
 import edu.cmu.tetrad.annotation.ScoreAnnotations;
 import edu.cmu.tetrad.data.DataType;
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.ScoreDTO;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import org.springframework.stereotype.Service;
@@ -25,7 +26,7 @@ public class ScoreEndpointService {
      *
      * @return A list of available scores
      */
-    public List<ScoreDTO> listScores() {
+    public List<ScoreDTO> listAllScores() {
         List<ScoreDTO> scores = new LinkedList<>();
 
         ScoreAnnotations scoreAnno = ScoreAnnotations.getInstance();
@@ -40,6 +41,35 @@ public class ScoreEndpointService {
             }
             // Use command name as ID
             scores.add(new ScoreDTO(score.command(), score.name(), supportedDataTypes));
+        });
+
+        return scores;
+    }
+    
+    /**
+     * List all the available scores based on the given data type
+     * 
+     * @param dataType
+     * @return 
+     */
+    public List<ScoreDTO> listScores(String dataType) {
+        List<ScoreDTO> scores = new LinkedList<>();
+
+        ScoreAnnotations scoreAnno = ScoreAnnotations.getInstance();
+        
+        List<AnnotatedClass<Score>> scoreAnnoList = scoreAnno.filterOutExperimental(scoreAnno.getAnnotatedClasses());
+
+        scoreAnnoList.stream().map((scoreAnnoClass) -> scoreAnnoClass.getAnnotation()).forEachOrdered((score) -> {
+            // Only return the tests that support the givien dataType
+            if (Arrays.asList(score.dataType()).contains(DataType.valueOf(dataType))) {
+                List<String> supportedDataTypes = new LinkedList<>();
+
+                for (DataType dt : score.dataType()) {
+                    supportedDataTypes.add(dt.name());
+                }
+                // Use command name as ID
+                scores.add(new ScoreDTO(score.command(), score.name(), supportedDataTypes));
+            }     
         });
 
         return scores;

@@ -14,6 +14,7 @@ import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.GenericEntity;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
@@ -38,7 +39,7 @@ public class IndependenceTestEndpoint {
     }
     
     /**
-     * List all the available scores
+     * List all the available tests
      *
      * @return 200 with a list of available scores
      * @throws IOException
@@ -48,7 +49,25 @@ public class IndependenceTestEndpoint {
     @Produces({APPLICATION_JSON, APPLICATION_XML})
     @RolesAllowed(Role.USER)
     public Response listAllIndependenceTests() throws IOException {
-        List<IndependenceTestDTO> independenceTestDTOs = independenceTestEndpointService.listIndependenceTests();
+        List<IndependenceTestDTO> independenceTestDTOs = independenceTestEndpointService.listAllIndependenceTests();
+        GenericEntity<List<IndependenceTestDTO>> entity = new GenericEntity<List<IndependenceTestDTO>>(independenceTestDTOs) {
+        };
+
+        return Response.ok(entity).build();
+    }
+    
+    /**
+     * List all the available tests that work with the given data type 
+     *
+     * @return 200 with a list of available scores
+     * @throws IOException
+     */
+    @GET
+    @Path("/tests/{dataType}")
+    @Produces({APPLICATION_JSON, APPLICATION_XML})
+    @RolesAllowed(Role.USER)
+    public Response listIndependenceTests(@PathParam("dataType") String dataType) throws IOException {
+        List<IndependenceTestDTO> independenceTestDTOs = independenceTestEndpointService.listIndependenceTests(dataType);
         GenericEntity<List<IndependenceTestDTO>> entity = new GenericEntity<List<IndependenceTestDTO>>(independenceTestDTOs) {
         };
 

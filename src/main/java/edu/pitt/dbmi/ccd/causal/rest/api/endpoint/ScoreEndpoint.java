@@ -14,6 +14,7 @@ import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.GenericEntity;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
@@ -48,11 +49,29 @@ public class ScoreEndpoint {
     @Produces({APPLICATION_JSON, APPLICATION_XML})
     @RolesAllowed(Role.USER)
     public Response listAllScores() throws IOException {
-        List<ScoreDTO> scoreDTOs = scoreEndpointService.listScores();
+        List<ScoreDTO> scoreDTOs = scoreEndpointService.listAllScores();
         GenericEntity<List<ScoreDTO>> entity = new GenericEntity<List<ScoreDTO>>(scoreDTOs) {
         };
 
         return Response.ok(entity).build();
     }
 
+    /**
+     * List all the available scores that work with the given data type 
+     * 
+     * @param dataType
+     * @return
+     * @throws IOException 
+     */
+    @GET
+    @Path("/scores/{dataType}")
+    @Produces({APPLICATION_JSON, APPLICATION_XML})
+    @RolesAllowed(Role.USER)
+    public Response listScores(@PathParam("dataType") String dataType) throws IOException {
+        List<ScoreDTO> scoreDTOs = scoreEndpointService.listScores(dataType);
+        GenericEntity<List<ScoreDTO>> entity = new GenericEntity<List<ScoreDTO>>(scoreDTOs) {
+        };
+
+        return Response.ok(entity).build();
+    }
 }

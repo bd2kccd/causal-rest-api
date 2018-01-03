@@ -10,6 +10,7 @@ import edu.cmu.tetrad.annotation.TestOfIndependence;
 import edu.cmu.tetrad.annotation.TestOfIndependenceAnnotations;
 import edu.cmu.tetrad.data.DataType;
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.IndependenceTestDTO;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import org.springframework.stereotype.Service;
@@ -25,7 +26,7 @@ public class IndependenceTestEndpointService {
      *
      * @return A list of available independence tests
      */
-    public List<IndependenceTestDTO> listIndependenceTests() {
+    public List<IndependenceTestDTO> listAllIndependenceTests() {
         List<IndependenceTestDTO> tests = new LinkedList<>();
 
         TestOfIndependenceAnnotations testAnno = TestOfIndependenceAnnotations.getInstance();
@@ -40,6 +41,35 @@ public class IndependenceTestEndpointService {
             }
             // Use command name as ID
             tests.add(new IndependenceTestDTO(test.command(), test.name(), supportedDataTypes));
+        });
+
+        return tests;
+    }
+    
+    /**
+     * List all the available independence tests based on the given data type
+     * 
+     * @param dataType
+     * @return 
+     */
+    public List<IndependenceTestDTO> listIndependenceTests(String dataType) {
+        List<IndependenceTestDTO> tests = new LinkedList<>();
+
+        TestOfIndependenceAnnotations testAnno = TestOfIndependenceAnnotations.getInstance();
+        
+        List<AnnotatedClass<TestOfIndependence>> testAnnoList = testAnno.filterOutExperimental(testAnno.getAnnotatedClasses());
+
+        testAnnoList.stream().map((testAnnoClass) -> testAnnoClass.getAnnotation()).forEachOrdered((test) -> {
+            // Only return the tests that support the givien dataType
+            if (Arrays.asList(test.dataType()).contains(DataType.valueOf(dataType))) {
+                List<String> supportedDataTypes = new LinkedList<>();
+
+                for (DataType dt : test.dataType()) {
+                    supportedDataTypes.add(dt.name());
+                }
+                // Use command name as ID
+                tests.add(new IndependenceTestDTO(test.command(), test.name(), supportedDataTypes));
+            }
         });
 
         return tests;
