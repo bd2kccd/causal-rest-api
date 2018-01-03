@@ -8,7 +8,6 @@ package edu.pitt.dbmi.ccd.causal.rest.api.endpoint;
 import edu.pitt.dbmi.ccd.causal.rest.api.Role;
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.IndependenceTestDTO;
 import edu.pitt.dbmi.ccd.causal.rest.api.service.IndependenceTestEndpointService;
-import java.io.IOException;
 import java.util.List;
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
@@ -42,13 +41,12 @@ public class IndependenceTestEndpoint {
      * List all the available tests
      *
      * @return 200 with a list of available scores
-     * @throws IOException
      */
     @GET
     @Path("/tests")
     @Produces({APPLICATION_JSON, APPLICATION_XML})
     @RolesAllowed(Role.USER)
-    public Response listAllIndependenceTests() throws IOException {
+    public Response listAllIndependenceTests() {
         List<IndependenceTestDTO> independenceTestDTOs = independenceTestEndpointService.listAllIndependenceTests();
         GenericEntity<List<IndependenceTestDTO>> entity = new GenericEntity<List<IndependenceTestDTO>>(independenceTestDTOs) {
         };
@@ -59,14 +57,14 @@ public class IndependenceTestEndpoint {
     /**
      * List all the available tests that work with the given data type 
      *
+     * @param dataType
      * @return 200 with a list of available scores
-     * @throws IOException
      */
     @GET
     @Path("/tests/{dataType}")
     @Produces({APPLICATION_JSON, APPLICATION_XML})
     @RolesAllowed(Role.USER)
-    public Response listIndependenceTests(@PathParam("dataType") String dataType) throws IOException {
+    public Response listIndependenceTests(@PathParam("dataType") String dataType) {
         List<IndependenceTestDTO> independenceTestDTOs = independenceTestEndpointService.listIndependenceTests(dataType);
         GenericEntity<List<IndependenceTestDTO>> entity = new GenericEntity<List<IndependenceTestDTO>>(independenceTestDTOs) {
         };

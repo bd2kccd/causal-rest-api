@@ -30,7 +30,6 @@ import edu.cmu.tetrad.util.ParamDescription;
 import edu.cmu.tetrad.util.ParamDescriptions;
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.AlgorithmDTO;
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.AlgorithmParameterDTO;
-import java.io.IOException;
 import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
@@ -52,9 +51,8 @@ public class AlgorithmEndpointService {
      * List all the available algorithms
      *
      * @return A list of available algorithms
-     * @throws IOException
      */
-    public List<AlgorithmDTO> listAlgorithms() throws IOException {
+    public List<AlgorithmDTO> listAlgorithms() {
         List<AlgorithmDTO> algorithms = new LinkedList<>();
 
         AlgorithmAnnotations algoAnno = AlgorithmAnnotations.getInstance();
