@@ -9,7 +9,11 @@ package edu.pitt.dbmi.ccd.causal.rest.api.util;
  *
  * @author Zhou Yuan <zhy19@pitt.edu>
  */
-public interface CmdOptions {
+public class CmdOptions {
+
+    private CmdOptions() {
+    }
+    
     public static final String DATASET = "--dataset";
     public static final String DATATYPE = "--data-type";
     public static final String INDEPENDENCE_TEST = "--test";
@@ -18,5 +22,4 @@ public interface CmdOptions {
     public static final String DELIMITER = "--delimiter";
     public static final String OUTPUT_PREFIX = "--prefix";
     public static final String SKIP_VALIDATION = "--skip-validation";
-    public static final String VERSION = "--version";
 }

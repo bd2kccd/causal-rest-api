@@ -158,6 +158,9 @@ public class JobQueueEndpointService {
         commands.add(CmdOptions.DELIMITER);
         commands.add(getFileDelimiter(newJob.getDatasetFileId()));
 
+        // Create tetrad graph json for HPC?
+        commands.add(CmdOptions.JSON);
+        
         // Algorithm parameters
         Set<AlgoParameter> algorithmParameters = newJob.getAlgoParameters();
         // Get key-value from algo parameters
@@ -182,9 +185,6 @@ public class JobQueueEndpointService {
         if (newJob.getSkipDataValidation()) {
             commands.add(CmdOptions.SKIP_VALIDATION);
         } 
-        
-        // Show version 
-        commands.add(CmdOptions.VERSION);
         
         // Then separate those commands with ; and store the whole string into database
         // ccd-job-queue will assemble the command line again at
