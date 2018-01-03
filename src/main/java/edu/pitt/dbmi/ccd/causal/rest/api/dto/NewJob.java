@@ -30,7 +30,13 @@ import org.hibernate.validator.constraints.Range;
 public abstract class NewJob {
 
     @NotNull
-    protected String AlgoId;
+    protected String algoId;
+    
+    @NotNull
+    protected String testId;
+    
+    @NotNull
+    protected String scoreId;
     
     @NotNull
     @Range(min = 1, max = Long.MAX_VALUE)
@@ -58,11 +64,27 @@ public abstract class NewJob {
     }
 
     public String getAlgoId() {
-        return AlgoId;
+        return algoId;
     }
 
-    public void setAlgoId(String AlgoId) {
-        this.AlgoId = AlgoId;
+    public void setAlgoId(String algoId) {
+        this.algoId = algoId;
+    }
+
+    public String getTestId() {
+        return testId;
+    }
+
+    public void setTestId(String testId) {
+        this.testId = testId;
+    }
+
+    public String getScoreId() {
+        return scoreId;
+    }
+
+    public void setScoreId(String scoreId) {
+        this.scoreId = scoreId;
     }
 
     public Long getDatasetFileId() {

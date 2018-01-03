@@ -136,6 +136,14 @@ public class JobQueueEndpointService {
         commands.add(CmdOptions.DATATYPE);
         commands.add(datasetFile.getDataFileInfo().getVariableType().getName());
         
+        // Test
+        commands.add(CmdOptions.INDEPENDENCE_TEST);
+        commands.add(newJob.getTestId());
+        
+        // Score
+        commands.add(CmdOptions.SCORE);
+        commands.add(newJob.getScoreId());
+        
         // Specify dataset file path
         Path datasetPath = Paths.get(map.get("dataDir"), datasetFile.getName());
 

@@ -20,6 +20,7 @@ public class CmdOptions {
     public static final String SCORE = "--score";
     public static final String KNOWLEDGE = "--knowledge"; 
     public static final String DELIMITER = "--delimiter";
+    public static final String JSON = "--json";
     public static final String OUTPUT_PREFIX = "--prefix";
     public static final String SKIP_VALIDATION = "--skip-validation";
 }
