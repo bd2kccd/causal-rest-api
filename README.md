@@ -323,7 +323,7 @@ Accept: application/json
 
 A `JSON` formatted list of all the input dataset files that are associated with user `22` will be returned.
 
-````javascript
+````json
 [
   {
     "id": 8,
@@ -451,7 +451,7 @@ Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL
 
 And the resulting response looks like this:
 
-````javascript
+````json
 {
   "id": 8,
   "name": "data_small.txt",
@@ -522,7 +522,7 @@ Content-Type: application/json
 
 This POST request will summarize the dataset file and generate a response (JSON or XML) like below:
 
-````javascript
+````json
 {
   "id": 10,
   "name": "large-data.txt",
@@ -558,7 +558,7 @@ Accept: application/json
 
 A `JSON` formatted list of all the input dataset files that are associated with user `22` will be returned.
 
-````javascript
+````json
 [
   {
     "id": 9,
@@ -597,7 +597,7 @@ Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL
 
 And the resulting response looks like this:
 
-````javascript
+````json
 {
   "id": 9,
   "name": "data_small.prior",
@@ -646,122 +646,482 @@ Host: ccd4.vm.bridges.psc.edu
 Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL2Nsb3VkLmNjZC5waXR0LmVkdS8iLCJuYW1lIjoiemh5MTkiLCJleHAiOjE0NzU4NTA2NzY4MDQsImlhdCI6MTQ3NTg0NzA3NjgwNH0.8azVEoNPfETczXb-vn7dfyDd98eRt7iiLBXehGpPGzY
 ````
 
-````javascript
+````json
 [
-  {
-    "id": 1,
-    "name": "FGESc",
-    "description": "FGES continuous"
-  },
-  {
-    "id": 2,
-    "name": "FGESd",
-    "description": "FGES discrete"
-  },
-  {
-    "id": 3,
-    "name": "GFCIc",
-    "description": "GFCI continuous"
-  },
-  {
-    "id": 4,
-    "name": "GFCId",
-    "description": "GFCI discrete"
-  }
+    {
+        "id": "gfci",
+        "name": "GFCI",
+        "description": "Greedy Fast Causal Inference Search (GFCI) is an implementation of the revised FCI algorithm.It uses FGES followed by PC adjacency removals. Uses conservative collider orientation. Gets sepsets for X---Y from among adjacents of X or of Y.\n\nFollowing an idea developed by Spirtes, now it uses more of the information in FGES, to calculating possible d-separation paths and to utilize unshielded colliders found by FGES.\n\nFor more detail about GFci implementation, please visit http://cmu-phil.github.io/tetrad/tetrad-lib-apidocs/edu/cmu/tetrad/search/GFci.html"
+    },
+    {
+        "id": "imgs_cont",
+        "name": "IMaGES Continuous",
+        "description": "Description: Adjusts the continuous variable score (SEM BIC) of FGES so allow for multiple datasets as input. The linear, Gaussian BIC scores for each data set are averaged at each step of the algorithm, producing a model for al data sets that assumes they have the same graphical structure across dataset.\n\nInput Assumptions: A set of continuous datasets with the same variables and sample sizes. \n\nOutput Format: A pattern, interpreted as a common model for all datasets.\n\nParameters: All of the parameters from FGES are available for IMaGES. Additionally:\n- The number of runs. The number of times the algorithm should select data sets and run the algorithm. Default 1.\n- The number of datasets that should be taken in each random sample. IMaGES will randomly select a set of datasets to run, so that on different runs one can be an estimate of the consistency of results. To use all variables, set this to the total number of datasets. Default 1.\n"
+    },
+    {
+        "id": "glasso",
+        "name": "GLASSO",
+        "description": "A translation of the Fortran code for GLASSO - Friedman, Hastie and Tibshirani (2007) \n\nLike MGM, this produces an undirected graph in which parents are always married.\nInput Assumptions: The data are continuous. \n\nOutput Format: A Markov random field. \n\nParameters:\n- MAXIT, IA, IS, ITR, IPEN, THR. These are parameters in the translated Fortan code. Defaults are given in the interface and are the same as for the Fortran code.\n"
+    },
+    {
+        "id": "r-skew-e",
+        "name": "RSkewE",
+        "description": "These are algorithms that orient edges X—Y for continuous variables pairwise based on non-Gaussian information. (If the variables are all Gaussian, one cannot orient these edges. That is, these rules will orient left or right randomly.) For EB, RSkew, RSkewE, Skew and SkewE, see Hyvarinen and Smith (2013). For R1, R2, R3 and R4, see Ramsey et al., 2014.\n\nThe principles governing these rules vary. R1 and R2 appeal directly to the Central Limit Theorem to judge which of various conditioning sets yields the greatest non-Gaussianity measure. (The measure for non-Gaussianity measure used is Anderson-Darling.) R4 does as well, but allows coefficients for relevant parameters to be adjusted to achieve maximum non-Gaussianity. EB works by appealing to entropy for the orientation. R3 uses the same rule as EB except using the Anderson-Darling score for a measure of non-Gaussianity. RSkew and Skew appeal to measures of skew for the variables and assume positive skewness for all variables. The rules for the two are different; please see Hyvarinen and Smith for details. SkewE and RSkewE adjust the signs of variables by the signs of their skewnesses to ensure that the assumption of positive skewness holds. \n\nA comparison of all of these methods is given in Ramsey et al., 2014. In general, for fMRI data, we find that the RSkew method works the best, followed by the R3 method. Cycles can be oriented using these methods, since each edge is oriented independently of the others.\n\nInput Assumptions: Continuous data in which the variables are non-Gaussian. Non-Gaussianity can be assessed using the Anderson-Darling score, which is available in the Data box.\n\nOutput Format: Orients all of the edges in the input graph using the selected score. \n\nParameters:\n- Cutoff for p-values (alpha). Conditional independence tests with p-values greater than this will be judged to be independent (H0).\n- Maximum size of conditioning set (depth). PC in the adjacency phase will consider conditioning sets for conditional independences of increasing size, up to this value. For instance, for depth 3, the maximum size of a conditioning set considered will be 3."
+    },
+    {
+        "id": "pc-all",
+        "name": "PC All",
+        "description": "PcAll presents a range of PC (\"Peter and Clark\") based algorithms. For the PC algorithm, see Spirtes, Glymour and Scheines, \ncausation, Prediction and Search. For the conservative version, see Ramsey et al. (2012). The adjacency search from PC-Stable is available; the reference for that is Colombo and Maathuis (2014). Three collider resolution rules are available. \"Priority\" overwrites previous colliders; \"Overwrite\" keeps previous orientation information while orienting new colliders; \"Bidirected\" allows bidirected edges to be oriented when orienting new colliders."
+    },
+    {
+        "id": "r-skew",
+        "name": "RSkew",
+        "description": "These are algorithms that orient edges X—Y for continuous variables pairwise based on non-Gaussian information. (If the variables are all Gaussian, one cannot orient these edges. That is, these rules will orient left or right randomly.) For EB, RSkew, RSkewE, Skew and SkewE, see Hyvarinen and Smith (2013). For R1, R2, R3 and R4, see Ramsey et al., 2014.\n\nThe principles governing these rules vary. R1 and R2 appeal directly to the Central Limit Theorem to judge which of various conditioning sets yields the greatest non-Gaussianity measure. (The measure for non-Gaussianity measure used is Anderson-Darling.) R4 does as well, but allows coefficients for relevant parameters to be adjusted to achieve maximum non-Gaussianity. EB works by appealing to entropy for the orientation. R3 uses the same rule as EB except using the Anderson-Darling score for a measure of non-Gaussianity. RSkew and Skew appeal to measures of skew for the variables and assume positive skewness for all variables. The rules for the two are different; please see Hyvarinen and Smith for details. SkewE and RSkewE adjust the signs of variables by the signs of their skewnesses to ensure that the assumption of positive skewness holds. \n\nA comparison of all of these methods is given in Ramsey et al., 2014. In general, for fMRI data, we find that the RSkew method works the best, followed by the R3 method. Cycles can be oriented using these methods, since each edge is oriented independently of the others.\n\nInput Assumptions: Continuous data in which the variables are non-Gaussian. Non-Gaussianity can be assessed using the Anderson-Darling score, which is available in the Data box.\n\nOutput Format: Orients all of the edges in the input graph using the selected score. \n\nParameters:\n- Cutoff for p-values (alpha). Conditional independence tests with p-values greater than this will be judged to be independent (H0).\n- Maximum size of conditioning set (depth). PC in the adjacency phase will consider conditioning sets for conditional independences of increasing size, up to this value. For instance, for depth 3, the maximum size of a conditioning set considered will be 3."
+    },
+    {
+        "id": "bpc",
+        "name": "Bpc",
+        "description": "BPC (Build Pure Clusters) searches for causal structure over latent variables, where the true models are Multiple Indicator Models (MIM’s). The idea is this. There is a set of latent (unmeasured) variables over which a directed acyclic model has been defined. Then for each of these latent L there are 3 (preferably 4) or more measures of that variable—that is, measured variables that are all children of L. Under these conditions, one may define tetrad constraints (see Spirtes et al., 2000). There is a theorem to the effect that if certain patterns of these tetrad constraints hold, there must be a latent common cause of all of them (the Tetrad Representation Theorem, see Spirtes, Glymour, and Scheines (1993), where the BPC (“Build Pure Clusters”) algorithm is defined and discussed.) Moreover, once one has such a “measurement model,” once can estimate a covariance matrix over the latent variables that are parents of the measures and use some algorithm such as PC or GES to estimate a pattern over the latents. The algorithm to run PC or GES on this covariance matrix is called MimBuild (“MIM” is the the graph, Multiple Indicator Model; “Build” means build). In this way, one may recover causal structure over the latents. The more measures one has for each latent, the better the result is, generally. The larger the sample size the better. One important issue is that the algorithm is sensitive to so-called “impurities”—that is, causal edges among the measured variables, or between measured variables and unintended latent. The algorithm will in effect remove one measure in each impure pair from consideration.\n\nInput Assumptions: Continuous data, a collection of measurements in the above sense, excluding the latent variables (which are to be learned).\n\nOutput Format: For BPC, a measurement model, in the above sense. This is represented as a clustering of variables; it may be inferred that there is a single latent for each output cluster. For MimBuild, a pattern over the latent variables, one for each cluster.\n\nParameters: \n- Cutoff for p-values (alpha). Conditional independence tests with p-values greater\nthan this will be judged to be independent (H0). Default 0.01.\n- Yes if the Wishart test should be used. No if the Delta test should be used. These are two tests of whether a set of four variables constitutes a pure tetrad—that is, if all tetrads for this set of four variables vanish. For the notion of a vanishing tetrad, see Spirtes et al., 2000. For the Delta test, see ??. Default No (Delta test)."
+    },
+    {
+        "id": "fges-mb",
+        "name": "FgesMb",
+        "description": "This is a restriction of the FGES algorithm to union of edges over the combined Markov blankets of a set of targets, including the targets. In the interface, just one target may be specified. See Ramsey et al., 2017 for details. In the general case, finding the graph over the Markov blanket variables of a target (including the target) is far faster than finding the pattern for all of the variables.\n\nInput Assumptions: The same as FGES\n\nOutput Format: A graph over a selected group of nodes that includes the target and each node in the Markov blanket of the target. This will be the same as if FGES were run and the result restricted to just these variables, so some edges may be oriented in the returned graph that may not have been oriented in a pattern over the selected nodes.\n\nParameters: Uses the parameters of FGES.\n- Target Name. The name of the target variables for the Markov blanket one wishes to construct. Default blank (that is, unspecified.) A variable must be specified here to run the algorithm."
+    },
+    {
+        "id": "imgs_disc",
+        "name": "IMaGES Discrete",
+        "description": "Adjusts the discrete BDeu variable score of FGES so allow for multiple datasets as input. The BDeu scores for each data set are averaged at each step of the algorithm, producing a model for al data sets that assumes they have the same graphical structure across dataset. Note that in order to use this algorithm in a nontrivial way, one needs to have loaded or simulated multiple dataset.\n\nInput Assumptions: A set of discrete datasets with the same variables and sample sizes. \n\nOutput Format: A pattern, interpreted as a common model for all datasets. \n\nParameters: All of the parameters from FGES are available for IMaGES. Additionally:\n- The number of runs. The number of times the algorithm should select data sets and 90 run the algorithm. Default 1.\n- The number of datasets that should be taken in each random sample. IMaGES will randomly select a set of datasets to run, so that on different runs one can be an estimate of the consistency of results. To use all variables, set this to the total number of datasets. Default 1.\n"
+    },
+    {
+        "id": "skew-e",
+        "name": "SkewE",
+        "description": "These are algorithms that orient edges X—Y for continuous variables pairwise based on non-Gaussian information. (If the variables are all Gaussian, one cannot orient these edges. That is, these rules will orient left or right randomly.) For EB, RSkew, RSkewE, Skew and SkewE, see Hyvarinen and Smith (2013). For R1, R2, R3 and R4, see Ramsey et al., 2014.\n\nThe principles governing these rules vary. R1 and R2 appeal directly to the Central Limit Theorem to judge which of various conditioning sets yields the greatest non-Gaussianity measure. (The measure for non-Gaussianity measure used is Anderson-Darling.) R4 does as well, but allows coefficients for relevant parameters to be adjusted to achieve maximum non-Gaussianity. EB works by appealing to entropy for the orientation. R3 uses the same rule as EB except using the Anderson-Darling score for a measure of non-Gaussianity. RSkew and Skew appeal to measures of skew for the variables and assume positive skewness for all variables. The rules for the two are different; please see Hyvarinen and Smith for details. SkewE and RSkewE adjust the signs of variables by the signs of their skewnesses to ensure that the assumption of positive skewness holds. \n\nA comparison of all of these methods is given in Ramsey et al., 2014. In general, for fMRI data, we find that the RSkew method works the best, followed by the R3 method. Cycles can be oriented using these methods, since each edge is oriented independently of the others.\n\nInput Assumptions: Continuous data in which the variables are non-Gaussian. Non-Gaussianity can be assessed using the Anderson-Darling score, which is available in the Data box.\n\nOutput Format: Orients all of the edges in the input graph using the selected score. \n\nParameters:\n- Cutoff for p-values (alpha). Conditional independence tests with p-values greater than this will be judged to be independent (H0).\n- Maximum size of conditioning set (depth). PC in the adjacency phase will consider conditioning sets for conditional independences of increasing size, up to this value. For instance, for depth 3, the maximum size of a conditioning set considered will be 3."
+    },
+    {
+        "id": "ftfc",
+        "name": "Ftfc",
+        "description": "FTFC (Find Two Factor Clusters) is similar to FOFC, but instead of each cluster having one latent that is the parent of all of the measure in the cluster, it instead has two such latents. So each measure has two latent parents; these are two “factors.” Similarly to FOFC, constraints are checked for, but in this case, the constraints must be sextad constraints, and more of them must be satisfied for each pure cluster (see Kummerfelt et al., 2014) Thus, the number of measures in each cluster, once impure edges have been taken into account, must be at least six, preferably more.\n\nInput Assumptions: Continuous data over the measures with at least six variable variables in each cluster once variables involve in impure edges have been removed.\n\nOutput Format: A clustering of measures. It may be assumed that each cluster has at least two factors and that the clusters are pure.\n\nParameters:\n- Cutoff for p-values (alpha). Conditional independence tests with p-values greater\nthan this will be judged to be independent (H0). Default 0.01.\n- Yes if the Wishart test should be used. No if the Delta test should be used. These are two tests of whether a set of four variables constitutes a pure tetrad—that is, if all tetrads for this set of four variables vanish. For the notion of a vanishing tetrad, see Spirtes et al., 2000. Default No (Delta test).\n- Yes if the GAP algorithm should be used. No if the SAG algorithm should be used (faster, less accurate)."
+    },
+    {
+        "id": "fask-concatenated",
+        "name": "FASK Concatenated",
+        "description": "Searches multiple continuous datasets for models with possible cycles and 2-cycles, assuming the variables are skewed. Latent common causes are not supported. Uses the Fast Adjacency Search (FAS, that is, the adjacency search of the PC algorithms) with the linear, Gaussian BIC score as a test of conditional independence. One may adjust sparsity of the graph by adjusting the 'penaltyDiscount' parameter. The orientation procedure assumes the variables are skewed. Sensitivity for detection of 2-cycles may be adjusted using the 2-cycle alpha parameter. Data from different datasets are centered and concatenated, then given to\" +\nFASK for search."
+    },
+    {
+        "id": "ts-imgs",
+        "name": "TsImages",
+        "description": "tsIMAGES is a version of tsGFCI which averages BIC scores across multiple data sets. Thus, it is used to search for a PAG (partial ancestral graph) from time series data from multiple units (subjects, countries, etc). tsIMAGES allows both for unmeasured (hidden, latent) variables and the possibility that different subjects have different causal parameters, though they share the same qualitative causal structure. As with IMAGES, the user can specify a “penalty score” to produce more sparse models. For the traditional definition of the BIC score, set the penalty to 1.0. See the documentation for IMAGES and tsGFCI.\n\nInput Assumptions: The (continuous) data has been generated by a time series. \n\nOutput Format: \n\nParameters: Uses the parameters of IMaGES (see)."
+    },
+    {
+        "id": "fges",
+        "name": "FGES",
+        "description": "Fast Greedy Equivalence Search (FGES) is an implementation of the revised GES algorithm. See Ramsey et al., 2017 for details. It works for both BayesNets and SEMs.\n\nSome code optimization could be done for the scoring part of the graph for discrete models (method scoreGraphChange). Some of Andrew Moore's approachesfor caching sufficient statistics, for instance.\n\n To speed things up, it has been assumed that variables X and Y with zero correlation do not correspond to edges in the graph. This is a restricted form of the faithfulness assumption, something FGES does not assume.\n\n For more detail about Fges implementation, please visit http://cmu-phil.github.io/tetrad/tetrad-lib-apidocs/edu/cmu/tetrad/search/Fgs.html"
+    },
+    {
+        "id": "ts-fci",
+        "name": "TsFCI",
+        "description": "The tsFCI algorithm is a version of GFCI for time series data. See the GFCI documentation for a description of the GFCI algorithm, which allows for unmeasured (hidden, latent) variables in the data-generating process and produces a PAG (partial ancestral graph). tsGFCI takes as input a “time lag data set,” i.e., a data set which includes time series observations of variables X1, X2, X3, ..., and their lags X1:1, X2:1, X3:1, ..., X1:2, X2:2,X3:2, ... and so on. X1:n is the nth-lag of the variable X1. To create a time lag data set from a standard tabular data set (i.e., a matrix of observations of X1, X2, X3, ...), use the “create time lag data” function in the data manipulation toolbox. The user will be prompted to specify the number of lags (n), and a new data set will be created with the above naming convention. The new sample size will be the old sample size minus n.\nInput Assumptions: The (continuous) data has been generated by a time series. Output Format: (Need to get this from Dan.)\n\nParameters:\n- Cutoff for p-values (alpha). Conditional independence tests with p-values greater than this will be judged to be independent (H0). Default 0.01."
+    },
+    {
+        "id": "eb",
+        "name": "EB",
+        "description": "These are algorithms that orient edges X—Y for continuous variables pairwise based on non-Gaussian information. (If the variables are all Gaussian, one cannot orient these edges. That is, these rules will orient left or right randomly.) For EB, RSkew, RSkewE, Skew and SkewE, see Hyvarinen and Smith (2013). For R1, R2, R3 and R4, see Ramsey et al., 2014.\n\nThe principles governing these rules vary. R1 and R2 appeal directly to the Central Limit Theorem to judge which of various conditioning sets yields the greatest non-Gaussianity measure. (The measure for non-Gaussianity measure used is Anderson-Darling.) R4 does as well, but allows coefficients for relevant parameters to be adjusted to achieve maximum non-Gaussianity. EB works by appealing to entropy for the orientation. R3 uses the same rule as EB except using the Anderson-Darling score for a measure of non-Gaussianity. RSkew and Skew appeal to measures of skew for the variables and assume positive skewness for all variables. The rules for the two are different; please see Hyvarinen and Smith for details. SkewE and RSkewE adjust the signs of variables by the signs of their skewnesses to ensure that the assumption of positive skewness holds. \n\nA comparison of all of these methods is given in Ramsey et al., 2014. In general, for fMRI data, we find that the RSkew method works the best, followed by the R3 method. Cycles can be oriented using these methods, since each edge is oriented independently of the others.\n\nInput Assumptions: Continuous data in which the variables are non-Gaussian. Non-Gaussianity can be assessed using the Anderson-Darling score, which is available in the Data box.\n\nOutput Format: Orients all of the edges in the input graph using the selected score. \n\nParameters:\n- Cutoff for p-values (alpha). Conditional independence tests with p-values greater than this will be judged to be independent (H0).\n- Maximum size of conditioning set (depth). PC in the adjacency phase will consider conditioning sets for conditional independences of increasing size, up to this value. For instance, for depth 3, the maximum size of a conditioning set considered will be 3."
+    },
+    {
+        "id": "rfci",
+        "name": "RFCI",
+        "description": "This method extends Fast Causal Inference algorithm from Spirtes, Glymour and Scheines, Causation Prediction and Search, with Jiji Zhang's Augmented FCI rules (found in sec. 4.1 of Zhang's 2006 PhD dissertation, \"Causal Inference and Reasoning in Causally Insufficient Systems\").\n\nThis class is based off a copy of Fci.java taken from the repository on 2008/12/16, revision 7306. The extension is done by extending doFinalOrientation() with methods for Zhang's rules R5-R10 which implements the augmented search. (By a remark of Zhang's, the rule applications can be staged in this way.)\n\nFor more detail about rfci implementation, please visit http://cmu-phil.github.io/tetrad/tetrad-lib-apidocs/edu/cmu/tetrad/search/Rfci.html"
+    },
+    {
+        "id": "r4",
+        "name": "R4",
+        "description": "These are algorithms that orient edges X—Y for continuous variables pairwise based on non-Gaussian information. (If the variables are all Gaussian, one cannot orient these edges. That is, these rules will orient left or right randomly.) For EB, RSkew, RSkewE, Skew and SkewE, see Hyvarinen and Smith (2013). For R1, R2, R3 and R4, see Ramsey et al., 2014.\n\nThe principles governing these rules vary. R1 and R2 appeal directly to the Central Limit Theorem to judge which of various conditioning sets yields the greatest non-Gaussianity measure. (The measure for non-Gaussianity measure used is Anderson-Darling.) R4 does as well, but allows coefficients for relevant parameters to be adjusted to achieve maximum non-Gaussianity. EB works by appealing to entropy for the orientation. R3 uses the same rule as EB except using the Anderson-Darling score for a measure of non-Gaussianity. RSkew and Skew appeal to measures of skew for the variables and assume positive skewness for all variables. The rules for the two are different; please see Hyvarinen and Smith for details. SkewE and RSkewE adjust the signs of variables by the signs of their skewnesses to ensure that the assumption of positive skewness holds. \n\nA comparison of all of these methods is given in Ramsey et al., 2014. In general, for fMRI data, we find that the RSkew method works the best, followed by the R3 method. Cycles can be oriented using these methods, since each edge is oriented independently of the others.\n\nInput Assumptions: Continuous data in which the variables are non-Gaussian. Non-Gaussianity can be assessed using the Anderson-Darling score, which is available in the Data box.\n\nOutput Format: Orients all of the edges in the input graph using the selected score. \n\nParameters:\n- Cutoff for p-values (alpha). Conditional independence tests with p-values greater than this will be judged to be independent (H0).\n- Maximum size of conditioning set (depth). PC in the adjacency phase will consider conditioning sets for conditional independences of increasing size, up to this value. For instance, for depth 3, the maximum size of a conditioning set considered will be 3."
+    },
+    {
+        "id": "r3",
+        "name": "R3",
+        "description": "These are algorithms that orient edges X—Y for continuous variables pairwise based on non-Gaussian information. (If the variables are all Gaussian, one cannot orient these edges. That is, these rules will orient left or right randomly.) For EB, RSkew, RSkewE, Skew and SkewE, see Hyvarinen and Smith (2013). For R1, R2, R3 and R4, see Ramsey et al., 2014.\n\nThe principles governing these rules vary. R1 and R2 appeal directly to the Central Limit Theorem to judge which of various conditioning sets yields the greatest non-Gaussianity measure. (The measure for non-Gaussianity measure used is Anderson-Darling.) R4 does as well, but allows coefficients for relevant parameters to be adjusted to achieve maximum non-Gaussianity. EB works by appealing to entropy for the orientation. R3 uses the same rule as EB except using the Anderson-Darling score for a measure of non-Gaussianity. RSkew and Skew appeal to measures of skew for the variables and assume positive skewness for all variables. The rules for the two are different; please see Hyvarinen and Smith for details. SkewE and RSkewE adjust the signs of variables by the signs of their skewnesses to ensure that the assumption of positive skewness holds. \n\nA comparison of all of these methods is given in Ramsey et al., 2014. In general, for fMRI data, we find that the RSkew method works the best, followed by the R3 method. Cycles can be oriented using these methods, since each edge is oriented independently of the others.\n\nInput Assumptions: Continuous data in which the variables are non-Gaussian. Non-Gaussianity can be assessed using the Anderson-Darling score, which is available in the Data box.\n\nOutput Format: Orients all of the edges in the input graph using the selected score. \n\nParameters:\n- Cutoff for p-values (alpha). Conditional independence tests with p-values greater than this will be judged to be independent (H0).\n- Maximum size of conditioning set (depth). PC in the adjacency phase will consider conditioning sets for conditional independences of increasing size, up to this value. For instance, for depth 3, the maximum size of a conditioning set considered will be 3."
+    },
+    {
+        "id": "mbfs",
+        "name": "MBFS",
+        "description": "Markov blanket fan search. Similar to FGES-MB but using PC as the basic search instead of FGES. The rules of the PC search are restricted to just the variables in the Markov blanket of a target T, including T; the result is a graph that is a pattern over these variables.\n\nInput Assumptions: Same as for PC\n\nOutput Format: A pattern over a selected group of nodes that includes the target and each node in the Markov blanket of the target. \n\nParameters: Uses the parameters of PC.\n- Target Name. The name of the target variables for the Markov blanket one wishes to construct. Default blank (that is, unspecified.) A variable must be specified here to run the algorithm."
+    },
+    {
+        "id": "ts-gfci",
+        "name": "TsGFCI",
+        "description": "tsGFCI uses a BIC score to search for a skeleton. Thus, the only user-specified parameter is an optional “penalty score” to bias the search in favor of more sparse models. See the description of the GES algorithm for discussion of the penalty score. For the traditional definition of the BIC score, set the penalty to 1.0. The orientation rules are the same as for FCI. As is the case with tsFCI, tsGFCI will automatically respect the time order of the variables and impose a repeating structure. Firstly, it puts lagged variables in appropriate tiers so, e.g., X3:2 can cause X3:1 and X3 but X3:1 cannot cause X3:2 and X3 cannot cause either X3:1 or X3:2. Also, it will assume that the causal structure is the same across time, so that if the edge between X1 and X2 is removed because this increases the BIC score, then also the edge between X1:1 and X2:1 is removed, and so on for additional lags if they exist. When some edge is removed as the result of a score increase, all similar (or “homologous”) edges are also removed.\n\nInput Assumptions: The (continuous) data has been generated by a time series. Output Format: (Need to get this from Dan.)\n\nParameters: Uses the parameters of FCI and FGES."
+    },
+    {
+        "id": "fask",
+        "name": "FASK",
+        "description": "Searches single continuous datasets for models with possible cycles and 2-cycles, assuming the variables are skewed. Latent common causes are not supported. Uses the Fast Adjacency Search (FAS, that is, the adjacency search of the PC algorithms) with the linear, Gaussian BIC score as a test of conditional independence. One may adjust sparsity of the graph by adjusting the 'penaltyDiscount' parameter. The orientation procedure assumes the variables are skewed. Sensitivity for detection of 2-cycles may be adjusted using the 2-cycle alpha parameter."
+    },
+    {
+        "id": "fci",
+        "name": "FCI",
+        "description": "This method extends the Fast Causal Inference algorithm given in Spirtes, Glymour and Scheines, Causation, Prediction and Search with Jiji Zhang's Augmented FCI rules (found in sec. 4.1 of Zhang's 2006 PhD dissertation, \"Causal Inference and Reasoning in Causally Insufficient Systems\").\n\nThis class is based off a copy of Fci.java taken from the repository on 2008/12/16, revision 7306. The extension is done by extending doFinalOrientation() with methods for Zhang's rules R5-R10 which implements the augmented search. (By a remark of Zhang's, the rule applications can be staged in this way.)\n\nFor more detail about fci implementation, please visit http://cmu-phil.github.io/tetrad/tetrad-lib-apidocs/edu/cmu/tetrad/search/Fci.html"
+    },
+    {
+        "id": "fofc",
+        "name": "Fofc",
+        "description": "The FOFC (Find One Factor Clusters) is an alternative method that achieves the same goal as BPC; in testing, it seems to scale better with somewhat better accuracy (Kummerfeld and Ramsey, 2016). The basic idea is to build up clusters one at a time by adding variables that keep them pure, in the sense that all relevant tetrad constraints still hold. There are different ways of going about this. One could try to build one cluster up as far as possible, then remove all of those variables from the set, and try to make a another cluster using the remaining variables (SAG, i.e., Seed and Grow). Or one can try in parallel to grow all possible clusters and then choose among the grown clusters using some criterion such as cluster size (GAP, Grow and Pick). In general, GAP is more accurate. The result is a clustering of variables. Similarly to BPC, MimBuild may be run on a covariance matrix estimated over the latents for the resulting clusters to find a pattern over the latents that represents the causal structure over the latents.\n\nInput Assumptions: Continuous data containing as many measures as are available.\n\nOutput Format: For FOFC, a clustering of variables. For MimBuild, a pattern over latents. \n\nParameters:\n- Cutoff for p-values (alpha). Conditional independence tests with p-values greater than this will be judged to be independent (H0). Default 0.01.\n- Yes if the Wishart test should be used. No if the Delta test should be used. These are two tests of whether a set of four variables constitutes a pure tetrad—that is, if all tetrads for this set of four variables vanish. For the notion of a vanishing tetrad, see Spirtes et al., 2000. For the Delta test, see ??. Default No (Delta test).\n- Yes if the GAP algorithm should be used. No if the SAG algorithm should be used."
+    },
+    {
+        "id": "skew",
+        "name": "Skew",
+        "description": "These are algorithms that orient edges X—Y for continuous variables pairwise based on non-Gaussian information. (If the variables are all Gaussian, one cannot orient these edges. That is, these rules will orient left or right randomly.) For EB, RSkew, RSkewE, Skew and SkewE, see Hyvarinen and Smith (2013). For R1, R2, R3 and R4, see Ramsey et al., 2014.\n\nThe principles governing these rules vary. R1 and R2 appeal directly to the Central Limit Theorem to judge which of various conditioning sets yields the greatest non-Gaussianity measure. (The measure for non-Gaussianity measure used is Anderson-Darling.) R4 does as well, but allows coefficients for relevant parameters to be adjusted to achieve maximum non-Gaussianity. EB works by appealing to entropy for the orientation. R3 uses the same rule as EB except using the Anderson-Darling score for a measure of non-Gaussianity. RSkew and Skew appeal to measures of skew for the variables and assume positive skewness for all variables. The rules for the two are different; please see Hyvarinen and Smith for details. SkewE and RSkewE adjust the signs of variables by the signs of their skewnesses to ensure that the assumption of positive skewness holds. \n\nA comparison of all of these methods is given in Ramsey et al., 2014. In general, for fMRI data, we find that the RSkew method works the best, followed by the R3 method. Cycles can be oriented using these methods, since each edge is oriented independently of the others.\n\nInput Assumptions: Continuous data in which the variables are non-Gaussian. Non-Gaussianity can be assessed using the Anderson-Darling score, which is available in the Data box.\n\nOutput Format: Orients all of the edges in the input graph using the selected score. \n\nParameters:\n- Cutoff for p-values (alpha). Conditional independence tests with p-values greater than this will be judged to be independent (H0).\n- Maximum size of conditioning set (depth). PC in the adjacency phase will consider conditioning sets for conditional independences of increasing size, up to this value. For instance, for depth 3, the maximum size of a conditioning set considered will be 3."
+    },
+    {
+        "id": "fas",
+        "name": "FAS",
+        "description": "FAS is the adjacency search of the PC algorithm, used as an adjacency search in many algorithms and sometimes useful in it own right as an undirected search that avoids marrying of parents. See Spirtes, Glymour and Scheines, Causation, Prediction and Search."
+    },
+    {
+        "id": "r2",
+        "name": "R2",
+        "description": "These are algorithms that orient edges X—Y for continuous variables pairwise based on non-Gaussian information. (If the variables are all Gaussian, one cannot orient these edges. That is, these rules will orient left or right randomly.) For EB, RSkew, RSkewE, Skew and SkewE, see Hyvarinen and Smith (2013). For R1, R2, R3 and R4, see Ramsey et al., 2014.\n\nThe principles governing these rules vary. R1 and R2 appeal directly to the Central Limit Theorem to judge which of various conditioning sets yields the greatest non-Gaussianity measure. (The measure for non-Gaussianity measure used is Anderson-Darling.) R4 does as well, but allows coefficients for relevant parameters to be adjusted to achieve maximum non-Gaussianity. EB works by appealing to entropy for the orientation. R3 uses the same rule as EB except using the Anderson-Darling score for a measure of non-Gaussianity. RSkew and Skew appeal to measures of skew for the variables and assume positive skewness for all variables. The rules for the two are different; please see Hyvarinen and Smith for details. SkewE and RSkewE adjust the signs of variables by the signs of their skewnesses to ensure that the assumption of positive skewness holds. \n\nA comparison of all of these methods is given in Ramsey et al., 2014. In general, for fMRI data, we find that the RSkew method works the best, followed by the R3 method. Cycles can be oriented using these methods, since each edge is oriented independently of the others.\n\nInput Assumptions: Continuous data in which the variables are non-Gaussian. Non-Gaussianity can be assessed using the Anderson-Darling score, which is available in the Data box.\n\nOutput Format: Orients all of the edges in the input graph using the selected score. \n\nParameters:\n- Cutoff for p-values (alpha). Conditional independence tests with p-values greater than this will be judged to be independent (H0).\n- Maximum size of conditioning set (depth). PC in the adjacency phase will consider conditioning sets for conditional independences of increasing size, up to this value. For instance, for depth 3, the maximum size of a conditioning set considered will be 3."
+    },
+    {
+        "id": "r1",
+        "name": "R1",
+        "description": "These are algorithms that orient edges X—Y for continuous variables pairwise based on non-Gaussian information. (If the variables are all Gaussian, one cannot orient these edges. That is, these rules will orient left or right randomly.) For EB, RSkew, RSkewE, Skew and SkewE, see Hyvarinen and Smith (2013). For R1, R2, R3 and R4, see Ramsey et al., 2014.\n\nThe principles governing these rules vary. R1 and R2 appeal directly to the Central Limit Theorem to judge which of various conditioning sets yields the greatest non-Gaussianity measure. (The measure for non-Gaussianity measure used is Anderson-Darling.) R4 does as well, but allows coefficients for relevant parameters to be adjusted to achieve maximum non-Gaussianity. EB works by appealing to entropy for the orientation. R3 uses the same rule as EB except using the Anderson-Darling score for a measure of non-Gaussianity. RSkew and Skew appeal to measures of skew for the variables and assume positive skewness for all variables. The rules for the two are different; please see Hyvarinen and Smith for details. SkewE and RSkewE adjust the signs of variables by the signs of their skewnesses to ensure that the assumption of positive skewness holds. \n\nA comparison of all of these methods is given in Ramsey et al., 2014. In general, for fMRI data, we find that the RSkew method works the best, followed by the R3 method. Cycles can be oriented using these methods, since each edge is oriented independently of the others.\n\nInput Assumptions: Continuous data in which the variables are non-Gaussian. Non-Gaussianity can be assessed using the Anderson-Darling score, which is available in the Data box.\n\nOutput Format: Orients all of the edges in the input graph using the selected score. \n\nParameters:\n- Cutoff for p-values (alpha). Conditional independence tests with p-values greater than this will be judged to be independent (H0).\n- Maximum size of conditioning set (depth). PC in the adjacency phase will consider conditioning sets for conditional independences of increasing size, up to this value. For instance, for depth 3, the maximum size of a conditioning set considered will be 3."
+    },
+    {
+        "id": "mgm",
+        "name": "MGM",
+        "description": "Finds a Markov random field (with parents married) for a dataset in which continuous and discrete variables are mixed together. For example, if X->Y<-Z, the output will be X—Y—Z with X—Z. The parents of Y will be joined by an undirected edge, morally, even though this edge does not occur in the true model.\n\nInput Assumptions: Data are mixed.\n\nOutput Format: A Markov random field for the data. \n\nParameters:\n- MGM Tuning Parameters #1, #2, #3. Defaults for these are 0.1, though they can be adjusted. "
+    }
 ]
 ````
 
-Currently we support "FGES continuous", "FGES discrete", "GFCI continuous", and "GFCI discrete". They also share a common JSON structure as of their input, for example:
+#### List all data types
 
-| Input JSON Fields | Description |
-| --- | --- |
-| `datasetFileId` | The dataset file ID, integer |
-| `priorKnowledgeFileId` | The optional prior knowledge file ID, integer |
-| `dataValidation` | Algorithm specific input data validation flags, JSON object |
-| `algorithmParameters` | Algorithm specific parameters, JSON object |
-| `jvmOptions` | Advanced Options For Java Virtual Machine (JVM), JSON object. Currently only support `maxHeapSize` (Gigabyte, max value is 100) |
-| `hpcParameters` | Parameters for High-Performance Computing, JSON array of key-value objects. Currently only support `wallTime` |
+API Endpoint URI pattern:
 
-Below are the data validation flags and parameters that you can use for each algorithm.
+````
+POST https://ccd4.vm.bridges.psc.edu/ccd-api/{userId}/datatypes
+````
 
-**FGES continuous** 
+Generated HTTP request code example:
 
-Data validation:
+````json
+[
+    {
+        "name": "Continuous"
+    },
+    {
+        "name": "Discrete"
+    },
+    {
+        "name": "Mixed"
+    },
+    {
+        "name": "Graph"
+    },
+    {
+        "name": "Covariance"
+    }
+]
+````
 
-| Parameters        | Description           | Default Value  |
-| ------------- | ------------- | ----- |
-| `skipNonzeroVariance`      | Skip check for zero variance variables | false |
-| `skipUniqueVarName`      | Skip check for unique variable names      |  false |
+#### List all independent tests
 
-Algorithm parameters:
+API Endpoint URI pattern:
 
-| Parameters        | Description           | Default Value  |
-| ------------- | ------------- | ----- |
-| `faithfulnessAssumed`      | Yes if (one edge) faithfulness should be assumed      |   true |
-| `maxDegree`      | The maximum degree of the output graph      |  100 |
-| `penaltyDiscount`      | Penalty discount      |   4.0 |
-| `verbose` | Print additional information      |    true |
+````
+POST https://ccd4.vm.bridges.psc.edu/ccd-api/{userId}/tests
+````
 
-**FGES discrete** 
+Generated HTTP request code example:
 
-Data validation:
+````json
+[
+    {
+        "id": "cond-correlation",
+        "name": "Conditional Correlation Test",
+        "supportedDataTypes": [
+            "Continuous"
+        ]
+    },
+    {
+        "id": "fisher-z",
+        "name": "Fisher Z Test",
+        "supportedDataTypes": [
+            "Continuous",
+            "Covariance"
+        ]
+    },
+    {
+        "id": "sem-bic",
+        "name": "SEM BIC Test",
+        "supportedDataTypes": [
+            "Continuous",
+            "Covariance"
+        ]
+    },
+    {
+        "id": "cond-gauss-lrt",
+        "name": "Conditional Gaussian Likelihood Ratio Test",
+        "supportedDataTypes": [
+            "Mixed"
+        ]
+    },
+    {
+        "id": "correlation-t",
+        "name": "Correlation T Test",
+        "supportedDataTypes": [
+            "Continuous"
+        ]
+    },
+    {
+        "id": "bdeu",
+        "name": "BDeu Test",
+        "supportedDataTypes": [
+            "Discrete"
+        ]
+    },
+    {
+        "id": "disc-bic",
+        "name": "Discrete BIC Test",
+        "supportedDataTypes": [
+            "Discrete"
+        ]
+    },
+    {
+        "id": "d-sep",
+        "name": "D-Separation Test",
+        "supportedDataTypes": [
+            "Graph"
+        ]
+    },
+    {
+        "id": "g-square",
+        "name": "G Square Test",
+        "supportedDataTypes": [
+            "Discrete"
+        ]
+    },
+    {
+        "id": "multinomial-logistic-regression-wald",
+        "name": "Multinomial Logistic Retression Wald Test",
+        "supportedDataTypes": [
+            "Mixed"
+        ]
+    },
+    {
+        "id": "chi-square",
+        "name": "Chi Square Test",
+        "supportedDataTypes": [
+            "Discrete"
+        ]
+    }
+]
+````
 
-| Parameters        | Description           | Default Value  |
-| ------------- | ------------- | ----- |
-| `skipUniqueVarName`      | Skip check for unique variable names       |  false |
-| `skipCategoryLimit`      | Skip 'limit number of categories' check  | false |
+#### List tests based on a given data type
 
+API Endpoint URI pattern:
 
-Algorithm parameters:
+````
+POST https://ccd4.vm.bridges.psc.edu/ccd-api/{userId}/tests/Continuous
+````
 
-| Parameters        | Description           | Default Value  |
-| ------------- | ------------- | ----- |
-| `structurePrior`      | Structure prior coefficient     | 1.0 |
-| `samplePrior` | Sample prior      | 1.0 |
-| `maxDegree`      | The maximum degree of the output graph      |  100 |
-| `faithfulnessAssumed`      | Yes if (one edge) faithfulness should be assumed      |   true |
-| `verbose` | Print additional information      |    true |
+Generated HTTP request code example:
 
-**GFCI continuous** 
+````json
+[
+    {
+        "id": "cond-correlation",
+        "name": "Conditional Correlation Test",
+        "supportedDataTypes": [
+            "Continuous"
+        ]
+    },
+    {
+        "id": "fisher-z",
+        "name": "Fisher Z Test",
+        "supportedDataTypes": [
+            "Continuous",
+            "Covariance"
+        ]
+    },
+    {
+        "id": "sem-bic",
+        "name": "SEM BIC Test",
+        "supportedDataTypes": [
+            "Continuous",
+            "Covariance"
+        ]
+    },
+    {
+        "id": "correlation-t",
+        "name": "Correlation T Test",
+        "supportedDataTypes": [
+            "Continuous"
+        ]
+    }
+]
+````
 
-Data validation:
+#### Liat all scores
 
-| Parameters        | Description           | Default Value  |
-| ------------- | ------------- | ----- |
-| `skipNonzeroVariance`      | Skip check for zero variance variables | false |
-| `skipUniqueVarName`      | Skip check for unique variable names     |  false |
+API Endpoint URI pattern:
 
-Algorithm parameters:
+````
+POST https://ccd4.vm.bridges.psc.edu/ccd-api/{userId}/scores
+````
 
-| Parameters        | Description           | Default Value  |
-| ------------- | ------------- | ----- |
-| `alpha`      | Cutoff for p values (alpha) |  0.01 | 
-| `penaltyDiscount`      | Penalty discount      |   4.0 |
-| `maxDegree`      | The maximum degree of the output graph      |  100 |
-| `faithfulnessAssumed`      | Yes if (one edge) faithfulness should be assumed      |  false |
-| `verbose` | Print additional information      |    true |
+Generated HTTP request code example:
 
-**GFCI discrete** 
+````json
+[
+    {
+        "id": "disc-bic",
+        "name": "Discrete BIC Score",
+        "supportedDataTypes": [
+            "Discrete"
+        ]
+    },
+    {
+        "id": "fisher-z",
+        "name": "Fisher Z Score",
+        "supportedDataTypes": [
+            "Continuous"
+        ]
+    },
+    {
+        "id": "sem-bic-deterministic",
+        "name": "Sem BIC Score Deterministic",
+        "supportedDataTypes": [
+            "Continuous",
+            "Covariance"
+        ]
+    },
+    {
+        "id": "d-separation",
+        "name": "D-separation Score",
+        "supportedDataTypes": [
+            "Graph"
+        ]
+    },
+    {
+        "id": "cond-gauss-bic",
+        "name": "Conditional Gaussian BIC Score",
+        "supportedDataTypes": [
+            "Mixed"
+        ]
+    },
+    {
+        "id": "sem-bic",
+        "name": "Sem BIC Score",
+        "supportedDataTypes": [
+            "Continuous",
+            "Covariance"
+        ]
+    },
+    {
+        "id": "bdeu",
+        "name": "BDeu Score",
+        "supportedDataTypes": [
+            "Discrete"
+        ]
+    }
+]
+````
 
-Data validation:
+#### List scores based on a given data type
 
-| Parameters        | Description           | Default Value  |
-| ------------- | ------------- | ----- |
-| `skipUniqueVarName`      | Skip check for unique variable names       |  false |
-| `skipCategoryLimit`      | Skip 'limit number of categories' check | false |
+API Endpoint URI pattern:
 
+````
+POST https://ccd4.vm.bridges.psc.edu/ccd-api/{userId}/scores/Discrete
+````
 
-Algorithm parameters:
+Generated HTTP request code example:
 
-| Parameters        | Description           | Default Value  |
-| ------------- | ------------- | ----- |
-| `alpha`      | Cutoff for p values (alpha) |  0.01 | 
-| `structurePrior`      | Structure prior coefficient     | 1.0 |
-| `samplePrior` | Sample prior      | 1.0 |
-| `maxDegree`      | The maximum degree of the output graph      |  100 |
-| `faithfulnessAssumed`      | Yes if (one edge) faithfulness should be assumed      |   false |
-| `verbose` | Print additional information      |    true |
+````json
+[
+    {
+        "id": "disc-bic",
+        "name": "Discrete BIC Score",
+        "supportedDataTypes": [
+            "Discrete"
+        ]
+    },
+    {
+        "id": "bdeu",
+        "name": "BDeu Score",
+        "supportedDataTypes": [
+            "Discrete"
+        ]
+    }
+]
+````
 
+#### List all algorithm parameters based on the provided test and score
+
+API Endpoint URI pattern:
+
+````
+POST https://ccd4.vm.bridges.psc.edu/ccd-api/algorithmParameters/{algoId}/{testId}/{scoreId}
+````
+
+Generated HTTP request code example:
+
+````json
+[
+    {
+        "name": "samplePrior",
+        "description": "Sample prior (min = 1.0)",
+        "valueType": "Double",
+        "defaultValue": 1
+    },
+    {
+        "name": "structurePrior",
+        "description": "Structure prior coefficient (min = 1.0)",
+        "valueType": "Double",
+        "defaultValue": 1
+    },
+    {
+        "name": "faithfulnessAssumed",
+        "description": "Yes if (one edge) faithfulness should be assumed",
+        "valueType": "Boolean",
+        "defaultValue": true
+    },
+    {
+        "name": "symmetricFirstStep",
+        "description": "Yes if the first step step for FGES should do scoring for both X->Y and Y->X",
+        "valueType": "Boolean",
+        "defaultValue": false
+    },
+    {
+        "name": "maxDegree",
+        "description": "The maximum degree of the graph (min = -1)",
+        "valueType": "Integer",
+        "defaultValue": 100
+    },
+    {
+        "name": "verbose",
+        "description": "Yes if verbose output should be printed or logged",
+        "valueType": "Boolean",
+        "defaultValue": false
+    },
+    {
+        "name": "bootstrapSampleSize",
+        "description": "The number of bootstraps (min = 0)",
+        "valueType": "Integer",
+        "defaultValue": 0
+    },
+    {
+        "name": "bootstrapEnsemble",
+        "description": "Ensemble method: Preserved (0), Highest (1), Majority (2)",
+        "valueType": "Integer",
+        "defaultValue": 1
+    }
+]
+````
 
 #### Add a new job to run the desired algorithm on a given data file
 
@@ -770,7 +1130,7 @@ This is a POST request and the algorithm details and data file id will need to b
 API Endpoint URI pattern:
 
 ````
-POST https://ccd4.vm.bridges.psc.edu/ccd-api/{userId}/jobs/FGESc
+POST https://ccd4.vm.bridges.psc.edu/ccd-api/{userId}/newjob
 ````
 
 Generated HTTP request code example:
