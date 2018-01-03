@@ -30,6 +30,9 @@ import org.hibernate.validator.constraints.Range;
 public abstract class NewJob {
 
     @NotNull
+    protected String AlgoId;
+    
+    @NotNull
     @Range(min = 1, max = Long.MAX_VALUE)
     protected Long datasetFileId;
 
@@ -52,6 +55,14 @@ public abstract class NewJob {
     protected Set<HpcParameter> hpcParameters;
 
     public NewJob() {
+    }
+
+    public String getAlgoId() {
+        return AlgoId;
+    }
+
+    public void setAlgoId(String AlgoId) {
+        this.AlgoId = AlgoId;
     }
 
     public Long getDatasetFileId() {

@@ -93,11 +93,14 @@ public class JobQueueEndpointService {
         this.jobQueueInfoService = jobQueueInfoService;
     }
     
-    public JobInfoDTO addNewJob(Long uid, String algoId, NewJob newJob) {
+    public JobInfoDTO addNewJob(Long uid, NewJob newJob) {
         // When we can get here vai AuthFilterSerice, it means the user exists
         // so no need to check if (userAccount == null) and throw UserNotFoundException(uid)
         UserAccount userAccount = userAccountService.findById(uid);
 
+        // Get algorithm ID string
+        String algoId = newJob.getAlgoId();
+                
         // algorithmJarPath, dataDir, tmpDir, resultDir
         // will be used in all algorithms
         Map<String, String> map = createSharedMapping(uid);

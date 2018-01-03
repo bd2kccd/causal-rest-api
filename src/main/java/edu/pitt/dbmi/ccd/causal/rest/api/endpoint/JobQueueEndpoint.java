@@ -58,22 +58,21 @@ public class JobQueueEndpoint {
         this.jobQueueEndpointService = jobQueueEndpointService;
     }
 
-    
+
     /**
      * Adding a new job and run a given algorithm with user provided parameters
      * 
      * @param uid
-     * @param algoId
      * @param newJob
-     * @return
+     * @return 
      */
     @POST
-    @Path("/jobs/{algoId}")
+    @Path("/newjob")
     @Consumes(APPLICATION_JSON)
     @Produces({APPLICATION_JSON, APPLICATION_XML})
     @RolesAllowed(Role.USER)
-    public Response addNewJob(@PathParam("uid") Long uid, @PathParam("algoId") String algoId, @Valid NewJob newJob) {
-        JobInfoDTO jobInfo = jobQueueEndpointService.addNewJob(uid, algoId, newJob);
+    public Response addNewJob(@PathParam("uid") Long uid, @Valid NewJob newJob) {
+        JobInfoDTO jobInfo = jobQueueEndpointService.addNewJob(uid, newJob);
         GenericEntity<JobInfoDTO> jobRequestEntity = new GenericEntity<JobInfoDTO>(jobInfo) {
         };
         // Return 201 Created status code and the job id in body
