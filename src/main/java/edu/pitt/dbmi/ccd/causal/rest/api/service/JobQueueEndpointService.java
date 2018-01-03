@@ -128,6 +128,12 @@ public class JobQueueEndpointService {
         if (datasetFile == null) {
             throw new NotFoundByIdException(datasetFileId);
         }
+        
+        // Specify data type
+        commands.add(CmdOptions.DATATYPE);
+        commands.add(datasetFile.getDataFileInfo().getVariableType().getName());
+        
+        // Specify dataset file path
         Path datasetPath = Paths.get(map.get("dataDir"), datasetFile.getName());
 
         commands.add(CmdOptions.DATASET);
