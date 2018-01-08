@@ -170,14 +170,14 @@ public class JobQueueEndpointService {
         commands.add(getFileDelimiter(newJob.getDatasetFileId()));
 
         // Create tetrad graph json for HPC?
-        commands.add(CmdOptions.JSON);
+        commands.add(CmdOptions.JSON_GRAPH);
         
         // Algorithm parameters
         Set<AlgoParameter> algorithmParameters = newJob.getAlgoParameters();
         // Get key-value from algo parameters
         algorithmParameters.forEach(param -> {
             commands.add("--" + param.getKey());
-            commands.add(param.getValue().toString());
+            commands.add(param.getValue());
         });
 
         long currentTime = System.currentTimeMillis();

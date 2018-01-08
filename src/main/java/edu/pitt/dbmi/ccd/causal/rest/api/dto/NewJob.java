@@ -27,7 +27,7 @@ import org.hibernate.validator.constraints.Range;
  *
  * @author Zhou Yuan (zhy19@pitt.edu)
  */
-public abstract class NewJob {
+public class NewJob {
 
     @NotNull
     protected String algoId;

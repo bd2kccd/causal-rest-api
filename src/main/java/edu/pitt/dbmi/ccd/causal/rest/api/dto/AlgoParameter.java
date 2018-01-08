@@ -5,8 +5,6 @@
  */
 package edu.pitt.dbmi.ccd.causal.rest.api.dto;
 
-import java.io.Serializable;
-
 /**
  *
  * @author Zhou Yuan <zhy19@pitt.edu>
@@ -14,7 +12,7 @@ import java.io.Serializable;
 public class AlgoParameter {
     private String key;
 
-    private Serializable value;
+    private String value;
 
     public String getKey() {
         return key;
@@ -24,11 +22,11 @@ public class AlgoParameter {
         this.key = key;
     }
 
-    public Serializable getValue() {
+    public String getValue() {
         return value;
     }
 
-    public void setValue(Serializable value) {
+    public void setValue(String value) {
         this.value = value;
     }
 }

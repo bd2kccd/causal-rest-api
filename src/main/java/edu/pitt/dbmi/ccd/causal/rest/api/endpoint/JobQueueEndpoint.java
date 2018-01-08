@@ -22,7 +22,6 @@ import edu.pitt.dbmi.ccd.causal.rest.api.Role;
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.JobInfoDTO;
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.NewJob;
 import edu.pitt.dbmi.ccd.causal.rest.api.service.JobQueueEndpointService;
-import java.io.IOException;
 import java.util.List;
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
@@ -84,13 +83,12 @@ public class JobQueueEndpoint {
      *
      * @param uid
      * @return
-     * @throws IOException
      */
     @GET
     @Path("/jobs")
     @Produces({APPLICATION_JSON, APPLICATION_XML})
     @RolesAllowed(Role.USER)
-    public Response listAllJobs(@PathParam("uid") Long uid) throws IOException {
+    public Response listAllJobs(@PathParam("uid") Long uid) {
         List<JobInfoDTO> jobInfoDTOs = jobQueueEndpointService.listAllJobs(uid);
         GenericEntity<List<JobInfoDTO>> entity = new GenericEntity<List<JobInfoDTO>>(jobInfoDTOs) {
         };
@@ -108,13 +106,12 @@ public class JobQueueEndpoint {
      * @param id
      * @return 200 OK status code with JobInfoDTO object or
      * ResourceNotFoundException
-     * @throws IOException
      */
     @GET
     @Path("/jobs/{id}")
     @Produces({APPLICATION_JSON, APPLICATION_XML})
     @RolesAllowed(Role.USER)
-    public Response jobStatus(@PathParam("uid") Long uid, @PathParam("id") Long id) throws IOException {
+    public Response jobStatus(@PathParam("uid") Long uid, @PathParam("id") Long id) {
         JobInfoDTO jobInfoDTO = jobQueueEndpointService.checkJobStatus(uid, id);
         GenericEntity<JobInfoDTO> entity = new GenericEntity<JobInfoDTO>(jobInfoDTO) {
         };
@@ -127,12 +124,11 @@ public class JobQueueEndpoint {
      * @param uid
      * @param id
      * @return
-     * @throws IOException
      */
     @DELETE
     @Path("/jobs/{id}")
     @RolesAllowed(Role.USER)
-    public Response cancelJob(@PathParam("uid") Long uid, @PathParam("id") Long id) throws IOException {
+    public Response cancelJob(@PathParam("uid") Long uid, @PathParam("id") Long id) {
         boolean canceled = jobQueueEndpointService.cancelJob(uid, id);
 
         if (canceled) {

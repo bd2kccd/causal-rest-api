@@ -1142,25 +1142,28 @@ Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL
 Content-Type: application/json
 
 {
-    "algoId": "fges",
-    "testId": "bdeu",
-    "scoreId": "bdeu",
-    "datasetFileId": 8,
-    "priorKnowledgeFileId": 9,
-    "skipdataValidation": true,
-    "algorithmParameters": {
-      "penaltyDiscount": 5.0,
-      "maxDegree": 100
+  "algoId": "fges",
+  "testId": "bdeu",
+  "scoreId": "bdeu",
+  "datasetFileId": 8,
+  "skipDataValidation": true,
+  "algoParameters": [
+    {
+      "key": "samplePrior",
+      "value": 2.1
     },
-    "jvmOptions": {
-      "maxHeapSize": 100
+    {
+      "key": "structurePrior",
+      "value": 5.7
     },
-    "hpcParameters": [
-       {
-       	"key":"wallTime",
-       	"value":1
-       }
-    ]
+    {
+      "key": "maxDegree",
+      "value": 10
+    }
+  ],
+  "jvmOptions": {
+    "maxHeapSize": 100
+  }
 }
 ````
 
