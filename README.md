@@ -1142,12 +1142,12 @@ Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL
 Content-Type: application/json
 
 {
+    "algoId": "fges",
+    "testId": "bdeu",
+    "scoreId": "bdeu",
     "datasetFileId": 8,
     "priorKnowledgeFileId": 9,
-    "dataValidation": {
-      "skipNonzeroVariance": true,
-      "skipUniqueVarName": true
-    },
+    "skipdataValidation": true,
     "algorithmParameters": {
       "penaltyDiscount": 5.0,
       "maxDegree": 100
@@ -1164,54 +1164,21 @@ Content-Type: application/json
 }
 ````
 
-In this example, we are running the "FGES continuous" algorithm on the file of ID 8. We also set the wallTime as 1 hour. And this call will return the job info with a 201 Created response status code.
+In this example, we are running the "FGES" algorithm with "BDeu Test" and "BDeu Score" on the file of ID 8. We also set the wallTime as 1 hour. And this call will return the job info with a 201 Created response status code.
 
 ````
 {
   "id": 5,
-  "algorithmName": "FGESc",
+  "algorithmName": "FGES",
   "status": 0,
   "addedTime": 1472742564355,
-  "resultFileName": "FGESc_data_small.txt_1472742564353.txt",
-  "errorResultFileName": "error_FGESc_data_small.txt_1472742564353.txt"
+  "resultFileName": "FGES_data_small.txt_1472742564353.txt",
+  "errorResultFileName": "error_FGES_data_small.txt_1472742564353.txt"
 }
 ````
 
-From this response we can tell that the job ID is 5, and the result file name will be `FGESc_data_small.txt_1472742564353.txt` if everything goes well. If something is wrong an error result file with name `error_FGEsc_data_small.txt_1472742564353.txt` will be created.
+From this response we can tell that the job ID is 5, and the result file name will be `FGES_data_small.txt_1472742564353.txt` if everything goes well. If something is wrong an error result file with name `error_FGES_data_small.txt_1472742564353.txt` will be created.
 
-When you need to run "FGES discrete", just send the request to a different endpont URI:
-
-API Endpoint URI pattern:
-
-````
-POST https://ccd4.vm.bridges.psc.edu/ccd-api/{userId}/jobs/FGESd
-````
-
-Generated HTTP request code example:
-
-````
-POST /ccd-api/22/jobs/FGESd HTTP/1.1
-Host: ccd4.vm.bridges.psc.edu
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL2Nsb3VkLmNjZC5waXR0LmVkdS8iLCJuYW1lIjoiemh5MTkiLCJleHAiOjE0NzU4NTA2NzY4MDQsImlhdCI6MTQ3NTg0NzA3NjgwNH0.8azVEoNPfETczXb-vn7dfyDd98eRt7iiLBXehGpPGzY
-Content-Type: application/json
-
-{
-    "datasetFileId": 10,
-    "priorKnowledgeFileId": 12,
-    "dataValidation": {
-      "skipUniqueVarName": true,
-      "skipCategoryLimit": true
-    },
-    "algorithmParameters": {
-      "structurePrior": 1.0,
-      "samplePrior": 1.0,
-      "maxDegree": 102
-    },
-    "jvmOptions": {
-      "maxHeapSize": 100
-    }
-}
-````
 
 #### List all running jobs
 
