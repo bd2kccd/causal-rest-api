@@ -198,14 +198,13 @@ public class JobQueueEndpointService {
         } 
         
         // Then separate those commands with ; and store the whole string into database
-        // ccd-job-queue will assemble the command line again at
-        // https://github.com/bd2kccd/ccd-job-queue/blob/master/src/main/java/edu/pitt/dbmi/ccd/queue/service/AlgorithmQueueService.java#L79
+        // ccd-job-queue will assemble the command line again
         String cmd = listToSeparatedValues(commands, ";");
 
         // Insert to database table `job_queue_info`
         JobQueueInfo jobQueueInfo = new JobQueueInfo();
         jobQueueInfo.setAddedTime(new Date(System.currentTimeMillis()));
-        jobQueueInfo.setAlgorName(algoId);
+        jobQueueInfo.setAlgorName(algoId); // use algoId as Algorithm Name in db, for now
         jobQueueInfo.setCommands(cmd);
         jobQueueInfo.setFileName(fileName);
         jobQueueInfo.setOutputDirectory(map.get("resultDir"));
@@ -238,7 +237,7 @@ public class JobQueueEndpointService {
         JobInfoDTO jobInfo = new JobInfoDTO();
         jobInfo.setStatus(0);
         jobInfo.setAddedTime(jobQueueInfo.getAddedTime());
-        jobInfo.setAlgorithmName(algoId);
+        jobInfo.setAlgoId(algoId);
         jobInfo.setResultFileName(fileName);
         jobInfo.setResultJsonFileName(resultJsonFileName);
         jobInfo.setErrorResultFileName(errorFileName);
@@ -310,7 +309,7 @@ public class JobQueueEndpointService {
 
             // Not listing data file name nor ID in response at this moment
             jobInfoDTO.setId(job.getId()); // Job ID
-            jobInfoDTO.setAlgorithmName(job.getAlgorName());
+            jobInfoDTO.setAlgoId(job.getAlgorName());
             jobInfoDTO.setStatus(job.getStatus());
             jobInfoDTO.setAddedTime(job.getAddedTime());
 
@@ -354,7 +353,7 @@ public class JobQueueEndpointService {
 
         // Not listing data file name nor ID in response at this moment
         jobInfoDTO.setId(job.getId()); // Job ID
-        jobInfoDTO.setAlgorithmName(job.getAlgorName());
+        jobInfoDTO.setAlgoId(job.getAlgorName());
         jobInfoDTO.setStatus(job.getStatus());
         jobInfoDTO.setAddedTime(job.getAddedTime());
 
