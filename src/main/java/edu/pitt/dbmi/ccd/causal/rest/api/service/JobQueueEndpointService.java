@@ -137,7 +137,7 @@ public class JobQueueEndpointService {
         commands.add(datasetFile.getDataFileInfo().getVariableType().getName());
         
         // Test
-        commands.add(CmdOptions.INDEPENDENCE_TEST);
+        commands.add(CmdOptions.TEST);
         commands.add(newJob.getTestId());
         
         // Score
@@ -189,7 +189,7 @@ public class JobQueueEndpointService {
         fileName = String.format("%s_%s_%d", algoId, df.getName(), currentTime);
 
         // Output file name prefix
-        commands.add(CmdOptions.OUTPUT_PREFIX);
+        commands.add(CmdOptions.FILE_PREFIX);
         commands.add(fileName);
 
         // Skip data validation?

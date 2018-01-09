@@ -14,13 +14,14 @@ public class CmdOptions {
     private CmdOptions() {
     }
     
+    public static final String ALGORITHM = "--algorithm";
     public static final String DATASET = "--dataset";
     public static final String DATATYPE = "--data-type";
-    public static final String INDEPENDENCE_TEST = "--test";
+    public static final String TEST = "--test";
     public static final String SCORE = "--score";
     public static final String KNOWLEDGE = "--knowledge"; 
     public static final String DELIMITER = "--delimiter";
     public static final String JSON_GRAPH = "--json-graph";
-    public static final String OUTPUT_PREFIX = "--prefix";
+    public static final String FILE_PREFIX = "--prefix";
     public static final String SKIP_VALIDATION = "--skip-validation";
 }

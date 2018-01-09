@@ -1144,7 +1144,7 @@ Content-Type: application/json
 {
   "algoId": "fges",
   "testId": "bdeu",
-  "scoreId": "bdeu",
+  "scoreId": "fisher-z",
   "datasetFileId": 8,
   "skipDataValidation": true,
   "algoParameters": [
