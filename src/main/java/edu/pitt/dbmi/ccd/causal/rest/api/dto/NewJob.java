@@ -31,22 +31,22 @@ public class NewJob {
 
     @NotNull
     protected String algoId;
-    
+
     @NotNull
     protected String testId;
-    
+
     @NotNull
     protected String scoreId;
     
     @NotNull
     @Range(min = 1, max = Long.MAX_VALUE)
-    protected Long datasetFileId;
+    protected long datasetFileId;
 
     @Range(min = 1, max = Long.MAX_VALUE)
-    protected Long priorKnowledgeFileId;
+    protected long priorKnowledgeFileId;
 
     @Valid
-    protected Boolean skipDataValidation;
+    protected boolean skipDataValidation;
     
     @Valid
     protected Set<AlgoParameter> algoParameters;
@@ -87,27 +87,27 @@ public class NewJob {
         this.scoreId = scoreId;
     }
 
-    public Long getDatasetFileId() {
+    public long getDatasetFileId() {
         return datasetFileId;
     }
 
-    public void setDatasetFileId(Long datasetFileId) {
+    public void setDatasetFileId(long datasetFileId) {
         this.datasetFileId = datasetFileId;
     }
 
-    public Long getPriorKnowledgeFileId() {
+    public long getPriorKnowledgeFileId() {
         return priorKnowledgeFileId;
     }
 
-    public void setPriorKnowledgeFileId(Long priorKnowledgeFileId) {
+    public void setPriorKnowledgeFileId(long priorKnowledgeFileId) {
         this.priorKnowledgeFileId = priorKnowledgeFileId;
     }
 
-    public Boolean getSkipDataValidation() {
+    public boolean isSkipDataValidation() {
         return skipDataValidation;
     }
 
-    public void setSkipDataValidation(Boolean skipDataValidation) {
+    public void setSkipDataValidation(boolean skipDataValidation) {
         this.skipDataValidation = skipDataValidation;
     }
 

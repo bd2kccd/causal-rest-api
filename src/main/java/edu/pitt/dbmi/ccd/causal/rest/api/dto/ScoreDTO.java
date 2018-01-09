@@ -60,7 +60,4 @@ public class ScoreDTO {
         this.supportedDataTypes = supportedDataTypes;
     }
 
-
-
-    
 }

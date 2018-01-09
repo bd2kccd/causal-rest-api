@@ -18,10 +18,14 @@
  */
 package edu.pitt.dbmi.ccd.causal.rest.api.service;
 
+import edu.cmu.tetrad.annotation.Algorithm;
+import edu.cmu.tetrad.annotation.AlgorithmAnnotations;
+import edu.cmu.tetrad.annotation.AnnotatedClass;
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.AlgoParameter;
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.JobInfoDTO;
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.JvmOptions;
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.NewJob;
+import edu.pitt.dbmi.ccd.causal.rest.api.exception.InternalErrorException;
 import edu.pitt.dbmi.ccd.causal.rest.api.exception.NotFoundByIdException;
 import edu.pitt.dbmi.ccd.causal.rest.api.exception.ResourceNotFoundException;
 import edu.pitt.dbmi.ccd.causal.rest.api.prop.CausalRestProperties;
@@ -45,6 +49,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -100,7 +105,19 @@ public class JobQueueEndpointService {
 
         // Get algorithm ID string
         String algoId = newJob.getAlgoId();
-                
+        
+        // Algo annotations for test, score, knowledge checks
+        Map<String, AnnotatedClass<Algorithm>> annotatedAlgoClasses = AlgorithmAnnotations.getInstance().getAnnotatedClasses().stream()
+                .collect(() -> new TreeMap<>(String.CASE_INSENSITIVE_ORDER),
+                        (m, e) -> m.put(e.getAnnotation().command(), e),
+                        (m, u) -> m.putAll(u));
+        
+        Class clazz = annotatedAlgoClasses.get(algoId).getClazz();
+
+        boolean algoRequireTest = AlgorithmAnnotations.getInstance().requireIndependenceTest(clazz);
+        boolean algoRequireScore = AlgorithmAnnotations.getInstance().requireScore(clazz);
+        boolean algoAcceptKnowledge = AlgorithmAnnotations.getInstance().acceptKnowledge(clazz);
+        
         // algorithmJarPath, dataDir, tmpDir, resultDir
         // will be used in all algorithms
         Map<String, String> map = createSharedMapping(uid);
@@ -122,7 +139,7 @@ public class JobQueueEndpointService {
         commands.add(map.get("algorithmJarPath"));
 
         // Add algorithm
-        commands.add("--algorithm");
+        commands.add(CmdOptions.ALGORITHM);
         commands.add(algoId);
 
         // Get dataset file name by file id
@@ -150,20 +167,23 @@ public class JobQueueEndpointService {
         commands.add(CmdOptions.DATASET);
         commands.add(datasetPath.toAbsolutePath().toString());
 
-        // Add prior knowloedge file (optional)
+        // Add prior knowloedge file if this algo accepts it and it's provided
         if (newJob.getPriorKnowledgeFileId() != null) {
-            // Get prior knowledge file name by file id
-            Long priorKnowledgeFileId = newJob.getPriorKnowledgeFileId();
-            DataFile priorKnowledgeFile = dataFileService.findByIdAndUserAccount(priorKnowledgeFileId, userAccount);
-            if (priorKnowledgeFile == null) {
-                throw new NotFoundByIdException(priorKnowledgeFileId);
+            if (algoAcceptKnowledge) {
+                // Get prior knowledge file name by file id
+                Long priorKnowledgeFileId = newJob.getPriorKnowledgeFileId();
+                DataFile priorKnowledgeFile = dataFileService.findByIdAndUserAccount(priorKnowledgeFileId, userAccount);
+                if (priorKnowledgeFile == null) {
+                    throw new NotFoundByIdException(priorKnowledgeFileId);
+                }
+                Path priorKnowledgePath = Paths.get(map.get("dataDir"), priorKnowledgeFile.getName());
+
+                commands.add(CmdOptions.KNOWLEDGE);
+                commands.add(priorKnowledgePath.toAbsolutePath().toString());
+            } else {
+                throw new InternalErrorException("Algorithm " + algoId + " doesn't accept knowledge file.");
             }
-            Path priorKnowledgePath = Paths.get(map.get("dataDir"), priorKnowledgeFile.getName());
-
-            commands.add(CmdOptions.KNOWLEDGE);
-            commands.add(priorKnowledgePath.toAbsolutePath().toString());
         }
-
         
         // Set delimiter
         commands.add(CmdOptions.DELIMITER);
@@ -174,6 +194,23 @@ public class JobQueueEndpointService {
         
         // Algorithm parameters
         Set<AlgoParameter> algorithmParameters = newJob.getAlgoParameters();
+        
+        if (algoRequireTest) {
+            algorithmParameters.forEach(param -> {
+                if (param.getKey().equals("testId") && param.getValue().isEmpty()) {
+                    throw new InternalErrorException("Algorithm " + algoId + " requires 'testId' to be specified.");
+                }
+            });    
+        }
+        
+        if (algoRequireScore) {
+            algorithmParameters.forEach(param -> {
+                if (param.getKey().equals("scoreId") && param.getValue().isEmpty()) {
+                    throw new InternalErrorException("Algorithm " + algoId + " requires 'scoreId' to be specified.");
+                }
+            });     
+        }
+        
         // Get key-value from algo parameters
         algorithmParameters.forEach(param -> {
             commands.add("--" + param.getKey());
@@ -193,7 +230,7 @@ public class JobQueueEndpointService {
         commands.add(fileName);
 
         // Skip data validation?
-        if (newJob.getSkipDataValidation()) {
+        if (newJob.isSkipDataValidation()) {
             commands.add(CmdOptions.SKIP_VALIDATION);
         } 
         
