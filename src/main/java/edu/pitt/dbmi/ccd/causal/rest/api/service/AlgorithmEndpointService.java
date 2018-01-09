@@ -47,6 +47,16 @@ public class AlgorithmEndpointService {
 
     private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(AlgorithmEndpointService.class);
     
+    private final Map<String, AnnotatedClass<Algorithm>> annotatedAlgoClasses;
+
+    private AlgorithmEndpointService() {
+        this.annotatedAlgoClasses = AlgorithmAnnotations.getInstance().getAnnotatedClasses().stream()
+                .collect(() -> new TreeMap<>(String.CASE_INSENSITIVE_ORDER),
+                        (m, e) -> m.put(e.getAnnotation().command(), e),
+                        (m, u) -> m.putAll(u));
+    
+    }
+
     /**
      * List all the available algorithms
      *
@@ -60,8 +70,15 @@ public class AlgorithmEndpointService {
         List<AnnotatedClass<Algorithm>> algoAnnoList = algoAnno.filterOutExperimental(algoAnno.getAnnotatedClasses());
 
         algoAnnoList.stream().map((algoAnnoClass) -> algoAnnoClass.getAnnotation()).forEachOrdered((algo) -> {
+        
+            Class annotatedClass = annotatedAlgoClasses.get(algo.command()).getClazz();
+            
+            boolean requireTest = requireIndependenceTest(annotatedClass);
+            boolean requireScore = requireScore(annotatedClass);
+            boolean acceptKnowledge = acceptKnowledge(annotatedClass);
+        
             // Use command name as ID
-            algorithms.add(new AlgorithmDTO(algo.command(), algo.name(), algo.description()));
+            algorithms.add(new AlgorithmDTO(algo.command(), algo.name(), algo.description(), requireTest, requireScore, acceptKnowledge));
         });
 
         return algorithms;
@@ -78,11 +95,6 @@ public class AlgorithmEndpointService {
     public List<AlgorithmParameterDTO> listAlgorithmParameters(String algoId, String testId, String scoreId) {
         List<AlgorithmParameterDTO> algoParamsDTOs = new LinkedList<>();
 
-        Map<String, AnnotatedClass<Algorithm>> annotatedAlgoClasses = AlgorithmAnnotations.getInstance().getAnnotatedClasses().stream()
-                .collect(() -> new TreeMap<>(String.CASE_INSENSITIVE_ORDER),
-                        (m, e) -> m.put(e.getAnnotation().command(), e),
-                        (m, u) -> m.putAll(u));
-        
         Map<String, AnnotatedClass<TestOfIndependence>> annotatedTestClasses = TestOfIndependenceAnnotations.getInstance().getAnnotatedClasses().stream()
                 .collect(() -> new TreeMap<>(String.CASE_INSENSITIVE_ORDER),
                         (m, e) -> m.put(e.getAnnotation().command(), e),
@@ -130,6 +142,18 @@ public class AlgorithmEndpointService {
         }
 
         return algoParamsDTOs;
+    }
+    
+    public boolean requireIndependenceTest(Class clazz) {
+        return AlgorithmAnnotations.getInstance().requireIndependenceTest(clazz);
+    }
+
+    public boolean requireScore(Class clazz) {
+        return AlgorithmAnnotations.getInstance().requireScore(clazz);
+    }
+
+    public boolean acceptKnowledge(Class clazz) {
+        return AlgorithmAnnotations.getInstance().acceptKnowledge(clazz);
     }
     
 }
