@@ -21,11 +21,13 @@ package edu.pitt.dbmi.ccd.causal.rest.api.service;
 import edu.cmu.tetrad.annotation.Algorithm;
 import edu.cmu.tetrad.annotation.AlgorithmAnnotations;
 import edu.cmu.tetrad.annotation.AnnotatedClass;
+import edu.cmu.tetrad.annotation.Score;
+import edu.cmu.tetrad.annotation.TestOfIndependence;
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.AlgoParameter;
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.JobInfoDTO;
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.JvmOptions;
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.NewJob;
-import edu.pitt.dbmi.ccd.causal.rest.api.exception.InternalErrorException;
+import edu.pitt.dbmi.ccd.causal.rest.api.exception.BadRequestException;
 import edu.pitt.dbmi.ccd.causal.rest.api.exception.NotFoundByIdException;
 import edu.pitt.dbmi.ccd.causal.rest.api.exception.ResourceNotFoundException;
 import edu.pitt.dbmi.ccd.causal.rest.api.prop.CausalRestProperties;
@@ -72,6 +74,10 @@ public class JobQueueEndpointService {
     private final UserAccountService userAccountService;
 
     private final DataFileService dataFileService;
+    
+    private final IndependenceTestEndpointService independenceTestEndpointService;
+    
+    private final ScoreEndpointService scoreEndpointService;
 
     private final JobQueueInfoService jobQueueInfoService;
 
@@ -91,10 +97,14 @@ public class JobQueueEndpointService {
             CausalRestProperties causalRestProperties,
             UserAccountService userAccountService,
             DataFileService dataFileService,
+            IndependenceTestEndpointService independenceTestEndpointService,
+            ScoreEndpointService scoreEndpointService,
             JobQueueInfoService jobQueueInfoService) {
         this.causalRestProperties = causalRestProperties;
         this.userAccountService = userAccountService;
         this.dataFileService = dataFileService;
+        this.independenceTestEndpointService = independenceTestEndpointService;
+        this.scoreEndpointService = scoreEndpointService;
         this.jobQueueInfoService = jobQueueInfoService;
     }
     
@@ -111,13 +121,13 @@ public class JobQueueEndpointService {
                 .collect(() -> new TreeMap<>(String.CASE_INSENSITIVE_ORDER),
                         (m, e) -> m.put(e.getAnnotation().command(), e),
                         (m, u) -> m.putAll(u));
-        
+
         Class clazz = annotatedAlgoClasses.get(algoId).getClazz();
 
         boolean algoRequireTest = AlgorithmAnnotations.getInstance().requireIndependenceTest(clazz);
         boolean algoRequireScore = AlgorithmAnnotations.getInstance().requireScore(clazz);
         boolean algoAcceptKnowledge = AlgorithmAnnotations.getInstance().acceptKnowledge(clazz);
-        
+
         // algorithmJarPath, dataDir, tmpDir, resultDir
         // will be used in all algorithms
         Map<String, String> map = createSharedMapping(uid);
@@ -152,24 +162,60 @@ public class JobQueueEndpointService {
             }
             
             // Specify data type
+            String dataType = datasetFile.getDataFileInfo().getVariableType().getName();
             commands.add(CmdOptions.DATATYPE);
-            commands.add(datasetFile.getDataFileInfo().getVariableType().getName());
+            commands.add(dataType);
             
             // Specify dataset file path
             Path datasetPath = Paths.get(map.get("dataDir"), datasetFile.getName());
 
             commands.add(CmdOptions.DATASET);
             commands.add(datasetPath.toAbsolutePath().toString());
-        }
-
-        // Test
-        commands.add(CmdOptions.TEST);
-        commands.add(newJob.getTestId());
         
-        // Score
-        commands.add(CmdOptions.SCORE);
-        commands.add(newJob.getScoreId()); 
 
+            // Test
+            if (algoRequireTest) {
+                if (newJob.getTestId() == null || newJob.getTestId().isEmpty()) {
+                    throw new BadRequestException("Algorithm " + algoId + " requires 'testId' to be specified.");   
+                } else {
+                    // Check if this provided test is one of the accepted tests
+                    List<TestOfIndependence> tests = independenceTestEndpointService.listIndependenceTestsByDataType(dataType);
+                    List<String> testIds = new LinkedList<>();
+                    tests.forEach((test) -> {
+                        testIds.add(test.command());
+                    });
+                    
+                    if (!testIds.contains(newJob.getTestId())) {
+                        throw new BadRequestException("Invalid 'testId' value: " + newJob.getTestId());
+                    }
+                }
+            }
+
+            commands.add(CmdOptions.TEST);
+            commands.add(newJob.getTestId());
+
+            // Score
+            if (algoRequireScore) {
+                if (newJob.getScoreId() == null || newJob.getScoreId().isEmpty()) {
+                    throw new BadRequestException("Algorithm " + algoId + " requires 'scoreId' to be specified.");     
+                } else {
+                    // Check if this provided score is one of the accepted scores
+                    List<Score> scores = scoreEndpointService.listScoresByDataType(dataType);
+                    List<String> scoreIds = new LinkedList<>();
+                    scores.forEach((score) -> {
+                        scoreIds.add(score.command());
+                    });
+                    
+                    if (!scoreIds.contains(newJob.getScoreId())) {
+                        throw new BadRequestException("Invalid 'scoreId' value: " + newJob.getScoreId());
+                    }
+                }
+            }
+
+            commands.add(CmdOptions.SCORE);
+            commands.add(newJob.getScoreId()); 
+        }
+        
         // Add prior knowloedge file if this algo accepts it and it's provided
         if (newJob.getPriorKnowledgeFileId() != null) {
             if (algoAcceptKnowledge) {
@@ -184,7 +230,7 @@ public class JobQueueEndpointService {
                 commands.add(CmdOptions.KNOWLEDGE);
                 commands.add(priorKnowledgePath.toAbsolutePath().toString());
             } else {
-                throw new InternalErrorException("Algorithm " + algoId + " doesn't accept knowledge file.");
+                throw new BadRequestException("Algorithm " + algoId + " doesn't accept knowledge file.");
             }
         }
         
@@ -197,23 +243,7 @@ public class JobQueueEndpointService {
         
         // Algorithm parameters
         Set<AlgoParameter> algorithmParameters = newJob.getAlgoParameters();
-        
-        if (algoRequireTest) {
-            algorithmParameters.forEach(param -> {
-                if (param.getKey().equals("testId") && param.getValue().isEmpty()) {
-                    throw new InternalErrorException("Algorithm " + algoId + " requires 'testId' to be specified.");
-                }
-            });    
-        }
-        
-        if (algoRequireScore) {
-            algorithmParameters.forEach(param -> {
-                if (param.getKey().equals("scoreId") && param.getValue().isEmpty()) {
-                    throw new InternalErrorException("Algorithm " + algoId + " requires 'scoreId' to be specified.");
-                }
-            });     
-        }
-        
+
         // Get key-value from algo parameters
         algorithmParameters.forEach(param -> {
             commands.add("--" + param.getKey());

@@ -53,25 +53,46 @@ public class ScoreEndpointService {
      * @return 
      */
     public List<ScoreDTO> listScores(String dataType) {
-        List<ScoreDTO> scores = new LinkedList<>();
+        List<ScoreDTO> scoreDTOs = new LinkedList<>();
 
-        ScoreAnnotations scoreAnno = ScoreAnnotations.getInstance();
+        List<Score> filteredScores = listScoresByDataType(dataType);
         
-        List<AnnotatedClass<Score>> scoreAnnoList = scoreAnno.filterOutExperimental(scoreAnno.getAnnotatedClasses());
+        filteredScores.forEach((score) -> {
+            List<String> supportedDataTypes = new LinkedList<>();
+
+            for (DataType dt : score.dataType()) {
+                supportedDataTypes.add(dt.name());
+            }
+            // Use command name as ID
+            scoreDTOs.add(new ScoreDTO(score.command(), score.name(), supportedDataTypes));
+        });
+        
+        return scoreDTOs;
+    }
+    
+    /**
+     * List all the available scores based on the given data type
+     * 
+     * @param dataType
+     * @return 
+     */
+    public List<Score> listScoresByDataType(String dataType) {
+        // Normalize dataType to match the Tetrad enum value
+        String dt = dataType.substring(0, 1).toUpperCase() + dataType.substring(1).toLowerCase();
+        
+        List<Score> filteredScores = new LinkedList<>();; 
+        
+        ScoreAnnotations testAnno = ScoreAnnotations.getInstance();
+        
+        List<AnnotatedClass<Score>> scoreAnnoList = testAnno.filterOutExperimental(testAnno.getAnnotatedClasses());
 
         scoreAnnoList.stream().map((scoreAnnoClass) -> scoreAnnoClass.getAnnotation()).forEachOrdered((score) -> {
             // Only return the tests that support the givien dataType
-            if (Arrays.asList(score.dataType()).contains(DataType.valueOf(dataType))) {
-                List<String> supportedDataTypes = new LinkedList<>();
-
-                for (DataType dt : score.dataType()) {
-                    supportedDataTypes.add(dt.name());
-                }
-                // Use command name as ID
-                scores.add(new ScoreDTO(score.command(), score.name(), supportedDataTypes));
-            }     
+            if (Arrays.asList(score.dataType()).contains(DataType.valueOf(dt))) {
+                filteredScores.add(score);
+            }
         });
 
-        return scores;
+        return filteredScores;
     }
 }

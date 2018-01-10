@@ -21,6 +21,7 @@ package edu.pitt.dbmi.ccd.causal.rest.api.dto;
 import java.util.Set;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import org.hibernate.validator.constraints.NotEmpty;
 import org.hibernate.validator.constraints.Range;
 
 /**
@@ -29,13 +30,13 @@ import org.hibernate.validator.constraints.Range;
  */
 public class NewJob {
 
-    @NotNull
+    @NotEmpty
     protected String algoId;
 
-    @NotNull
+    // Some algorithms don't require test
     protected String testId;
 
-    @NotNull
+    // Some algorithms don't require score
     protected String scoreId;
     
     @NotNull
