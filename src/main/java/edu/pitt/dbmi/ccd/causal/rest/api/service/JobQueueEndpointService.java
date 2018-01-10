@@ -144,28 +144,31 @@ public class JobQueueEndpointService {
 
         // Get dataset file name by file id
         Long datasetFileId = newJob.getDatasetFileId();
-        DataFile datasetFile = dataFileService.findByIdAndUserAccount(datasetFileId, userAccount);
-        if (datasetFile == null) {
-            throw new NotFoundByIdException(datasetFileId);
+        
+        if (datasetFileId != null) {
+            DataFile datasetFile = dataFileService.findByIdAndUserAccount(datasetFileId, userAccount);
+            if (datasetFile == null) {
+                throw new NotFoundByIdException(datasetFileId);
+            }
+            
+            // Specify data type
+            commands.add(CmdOptions.DATATYPE);
+            commands.add(datasetFile.getDataFileInfo().getVariableType().getName());
+            
+            // Specify dataset file path
+            Path datasetPath = Paths.get(map.get("dataDir"), datasetFile.getName());
+
+            commands.add(CmdOptions.DATASET);
+            commands.add(datasetPath.toAbsolutePath().toString());
         }
-        
-        // Specify data type
-        commands.add(CmdOptions.DATATYPE);
-        commands.add(datasetFile.getDataFileInfo().getVariableType().getName());
-        
+
         // Test
         commands.add(CmdOptions.TEST);
         commands.add(newJob.getTestId());
         
         // Score
         commands.add(CmdOptions.SCORE);
-        commands.add(newJob.getScoreId());
-        
-        // Specify dataset file path
-        Path datasetPath = Paths.get(map.get("dataDir"), datasetFile.getName());
-
-        commands.add(CmdOptions.DATASET);
-        commands.add(datasetPath.toAbsolutePath().toString());
+        commands.add(newJob.getScoreId()); 
 
         // Add prior knowloedge file if this algo accepts it and it's provided
         if (newJob.getPriorKnowledgeFileId() != null) {

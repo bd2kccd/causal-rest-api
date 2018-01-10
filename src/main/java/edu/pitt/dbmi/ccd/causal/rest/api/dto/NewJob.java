@@ -40,10 +40,10 @@ public class NewJob {
     
     @NotNull
     @Range(min = 1, max = Long.MAX_VALUE)
-    protected long datasetFileId;
+    protected Long datasetFileId;
 
     @Range(min = 1, max = Long.MAX_VALUE)
-    protected long priorKnowledgeFileId;
+    protected Long priorKnowledgeFileId;
 
     @Valid
     protected boolean skipDataValidation;
@@ -87,19 +87,19 @@ public class NewJob {
         this.scoreId = scoreId;
     }
 
-    public long getDatasetFileId() {
+    public Long getDatasetFileId() {
         return datasetFileId;
     }
 
-    public void setDatasetFileId(long datasetFileId) {
+    public void setDatasetFileId(Long datasetFileId) {
         this.datasetFileId = datasetFileId;
     }
 
-    public long getPriorKnowledgeFileId() {
+    public Long getPriorKnowledgeFileId() {
         return priorKnowledgeFileId;
     }
 
-    public void setPriorKnowledgeFileId(long priorKnowledgeFileId) {
+    public void setPriorKnowledgeFileId(Long priorKnowledgeFileId) {
         this.priorKnowledgeFileId = priorKnowledgeFileId;
     }
 
