@@ -28,8 +28,10 @@ import edu.cmu.tetrad.annotation.TestOfIndependence;
 import edu.cmu.tetrad.annotation.TestOfIndependenceAnnotations;
 import edu.cmu.tetrad.util.ParamDescription;
 import edu.cmu.tetrad.util.ParamDescriptions;
+import edu.pitt.dbmi.ccd.causal.rest.api.dto.AlgoInfo;
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.AlgorithmDTO;
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.AlgorithmParameterDTO;
+import edu.pitt.dbmi.ccd.causal.rest.api.exception.BadRequestException;
 import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
@@ -83,31 +85,63 @@ public class AlgorithmEndpointService {
 
         return algorithms;
     }
-    
+
     /**
-     * List all the parameters of a given algorithm
-     * 
-     * @param algoId
-     * @param testId
-     * @param scoreId
-     * @return A list of available parameters
+     * List all the parameters of a given algorithm, test, and score
+     * @param algoInfo
+     * @return 
      */
-    public List<AlgorithmParameterDTO> listAlgorithmParameters(String algoId, String testId, String scoreId) {
+    public List<AlgorithmParameterDTO> listAlgorithmParameters(AlgoInfo algoInfo) {
         List<AlgorithmParameterDTO> algoParamsDTOs = new LinkedList<>();
 
+        String algoId = algoInfo.getAlgoId();
+        String testId = algoInfo.getTestId();
+        String scoreId = algoInfo.getScoreId();
+        
+        if (!annotatedAlgoClasses.containsKey(algoId)) {
+            throw new BadRequestException("Invalid 'algoId' value: " + algoId);
+        }
+        
+        Class clazz = annotatedAlgoClasses.get(algoId).getClazz();
+
+        boolean algoRequireTest = AlgorithmAnnotations.getInstance().requireIndependenceTest(clazz);
+        boolean algoRequireScore = AlgorithmAnnotations.getInstance().requireScore(clazz);
+        
         Map<String, AnnotatedClass<TestOfIndependence>> annotatedTestClasses = TestOfIndependenceAnnotations.getInstance().getAnnotatedClasses().stream()
                 .collect(() -> new TreeMap<>(String.CASE_INSENSITIVE_ORDER),
                         (m, e) -> m.put(e.getAnnotation().command(), e),
                         (m, u) -> m.putAll(u));
+        
+        if (algoRequireTest) {
+            if (testId.isEmpty()) {
+                throw new BadRequestException("'testId' needs to be specified, it can't be empty.");   
+            } else {
+                if (!annotatedTestClasses.containsKey(testId)) {
+                    throw new BadRequestException("Invalid 'testId' value: " + testId);
+                }
+            }
+        }
+
         
         Map<String, AnnotatedClass<Score>> annotatedScoreClasses = ScoreAnnotations.getInstance().getAnnotatedClasses().stream()
                 .collect(() -> new TreeMap<>(String.CASE_INSENSITIVE_ORDER),
                         (m, e) -> m.put(e.getAnnotation().command(), e),
                         (m, u) -> m.putAll(u));
         
+        if (algoRequireScore) {
+            if (scoreId.isEmpty()) {
+                throw new BadRequestException("'scoreId' needs to be specified, it can't be empty.");   
+            } else {
+                if (!annotatedScoreClasses.containsKey(scoreId)) {
+                    throw new BadRequestException("Invalid 'scoreId' value: " + scoreId);
+                }
+            }
+        }
+ 
         Class algoClass = annotatedAlgoClasses.get(algoId).getClazz();
-        Class testClass = annotatedTestClasses.get(testId).getClazz();
-        Class scoreClass = annotatedScoreClasses.get(scoreId).getClazz();
+        // Test or Score can be empty, so the corresponding class can be null
+        Class testClass = (annotatedTestClasses.get(testId) == null) ? null : annotatedTestClasses.get(testId).getClazz();
+        Class scoreClass = (annotatedScoreClasses.get(scoreId) == null) ? null : annotatedScoreClasses.get(scoreId).getClazz();
         
         // This is Tetrad Algorithm
         edu.cmu.tetrad.algcomparison.algorithm.Algorithm algorithm = null;

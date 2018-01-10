@@ -1152,13 +1152,22 @@ Generated HTTP request code example:
 API Endpoint URI pattern:
 
 ````
-POST https://ccd4.vm.bridges.psc.edu/ccd-api/algorithmParameters/{algoId}/{testId}/{scoreId}
+POST https://ccd4.vm.bridges.psc.edu/ccd-api/algorithmParameters
 ````
 
 Generated HTTP request code example:
 
 ````
-POST https://ccd4.vm.bridges.psc.edu/ccd-api/algorithmParameters/fges/fisher-z/fisher-z
+POST /ccd-api/1/algorithmParameters/ HTTP/1.1
+Host: ccd4.vm.bridges.psc.edu
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0LyIsInVpZCI6MSwiZXhwIjoxNTE1NjIwNjQ4NTA2LCJpYXQiOjE1MTU2MTcwNDg1MDZ9.OvS1DNCRtgqNuOw0EX3TAxZxb998gvL84ZIRb3CykY0
+Content-Type: application/json
+
+{
+    "algoId": "fges",
+    "testId": "",
+    "scoreId": "fisher-z"
+}
 ````
 
 ````json

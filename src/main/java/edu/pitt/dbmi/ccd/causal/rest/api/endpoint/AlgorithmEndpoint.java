@@ -19,15 +19,17 @@
 package edu.pitt.dbmi.ccd.causal.rest.api.endpoint;
 
 import edu.pitt.dbmi.ccd.causal.rest.api.Role;
+import edu.pitt.dbmi.ccd.causal.rest.api.dto.AlgoInfo;
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.AlgorithmDTO;
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.AlgorithmParameterDTO;
 import edu.pitt.dbmi.ccd.causal.rest.api.service.AlgorithmEndpointService;
 import java.util.List;
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
+import javax.validation.Valid;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.GenericEntity;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
@@ -72,18 +74,15 @@ public class AlgorithmEndpoint {
     
     /**
      * List all parameters of a given algorithm, test, and score
-     *
-     * @param algoId
-     * @param testId
-     * @param scoreId
-     * @return 200 with a list of available algorithms
+     * @param algoInfo
+     * @return 
      */
-    @GET
-    @Path("/algorithmParameters/{algoId}/{testId}/{scoreId}")
+    @POST
+    @Path("/algorithmParameters")
     @Produces({APPLICATION_JSON, APPLICATION_XML})
     @RolesAllowed(Role.USER)
-    public Response listAlgorithmParameters(@PathParam("algoId") String algoId, @PathParam("testId") String testId, @PathParam("scoreId") String scoreId) {
-        List<AlgorithmParameterDTO> algoParamsDTOs = algorithmEndpointService.listAlgorithmParameters(algoId, testId, scoreId);
+    public Response listAlgorithmParameters(@Valid AlgoInfo algoInfo) {
+        List<AlgorithmParameterDTO> algoParamsDTOs = algorithmEndpointService.listAlgorithmParameters(algoInfo);
         GenericEntity<List<AlgorithmParameterDTO>> entity = new GenericEntity<List<AlgorithmParameterDTO>>(algoParamsDTOs) {
         };
 
