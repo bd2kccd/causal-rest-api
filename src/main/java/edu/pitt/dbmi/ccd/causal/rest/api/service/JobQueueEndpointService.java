@@ -33,8 +33,6 @@ import edu.pitt.dbmi.ccd.causal.rest.api.exception.ResourceNotFoundException;
 import edu.pitt.dbmi.ccd.causal.rest.api.prop.CausalRestProperties;
 import edu.pitt.dbmi.ccd.causal.rest.api.util.CmdOptions;
 import edu.pitt.dbmi.ccd.db.entity.DataFile;
-import edu.pitt.dbmi.ccd.db.entity.DataFileInfo;
-import edu.pitt.dbmi.ccd.db.entity.FileDelimiter;
 import edu.pitt.dbmi.ccd.db.entity.HpcParameter;
 import edu.pitt.dbmi.ccd.db.entity.JobQueueInfo;
 import edu.pitt.dbmi.ccd.db.entity.UserAccount;
@@ -122,6 +120,10 @@ public class JobQueueEndpointService {
                         (m, e) -> m.put(e.getAnnotation().command(), e),
                         (m, u) -> m.putAll(u));
 
+        if (!annotatedAlgoClasses.containsKey(algoId)) {
+            throw new BadRequestException("Invalid 'algoId' value: " + algoId);
+        }
+        
         Class clazz = annotatedAlgoClasses.get(algoId).getClazz();
 
         boolean algoRequireTest = AlgorithmAnnotations.getInstance().requireIndependenceTest(clazz);
@@ -172,6 +174,9 @@ public class JobQueueEndpointService {
             commands.add(CmdOptions.DATASET);
             commands.add(datasetPath.toAbsolutePath().toString());
         
+            // Set delimiter
+            commands.add(CmdOptions.DELIMITER);
+            commands.add(datasetFile.getDataFileInfo().getFileDelimiter().getName());
 
             // Test
             if (algoRequireTest) {
@@ -216,6 +221,9 @@ public class JobQueueEndpointService {
             commands.add(newJob.getScoreId()); 
         }
         
+        // Create tetrad graph json for HPC?
+        commands.add(CmdOptions.JSON_GRAPH);
+        
         // Add prior knowloedge file if this algo accepts it and it's provided
         if (newJob.getPriorKnowledgeFileId() != null) {
             if (algoAcceptKnowledge) {
@@ -233,14 +241,7 @@ public class JobQueueEndpointService {
                 throw new BadRequestException("Algorithm " + algoId + " doesn't accept knowledge file.");
             }
         }
-        
-        // Set delimiter
-        commands.add(CmdOptions.DELIMITER);
-        commands.add(getFileDelimiter(newJob.getDatasetFileId()));
 
-        // Create tetrad graph json for HPC?
-        commands.add(CmdOptions.JSON_GRAPH);
-        
         // Algorithm parameters
         Set<AlgoParameter> algorithmParameters = newJob.getAlgoParameters();
 
@@ -467,29 +468,6 @@ public class JobQueueEndpointService {
         LOGGER.info(String.format("Job canceled from queue. Job ID: %d", id));
 
         return true;
-    }
-
-    /**
-     * Get file delimiter for a given data file ID
-     *
-     * @param id
-     * @return
-     */
-    private String getFileDelimiter(Long id) {
-        String delimiter = null;
-
-        DataFile dataFile = dataFileService.findById(id);
-        if (dataFile != null) {
-            DataFileInfo dataFileInfo = dataFile.getDataFileInfo();
-            if (dataFileInfo != null) {
-                FileDelimiter fileDelimiter = dataFileInfo.getFileDelimiter();
-                if (fileDelimiter != null) {
-                    delimiter = fileDelimiter.getName();
-                }
-            }
-        }
-
-        return delimiter;
     }
 
     /**
