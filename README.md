@@ -1157,19 +1157,17 @@ POST https://ccd4.vm.bridges.psc.edu/ccd-api/algorithmParameters/{algoId}/{testI
 
 Generated HTTP request code example:
 
+````
+POST https://ccd4.vm.bridges.psc.edu/ccd-api/algorithmParameters/fges/fisher-z/fisher-z
+````
+
 ````json
 [
     {
-        "name": "samplePrior",
-        "description": "Sample prior (min = 1.0)",
+        "name": "alpha",
+        "description": "Cutoff for p values (alpha) (min = 0.0)",
         "valueType": "Double",
-        "defaultValue": 1
-    },
-    {
-        "name": "structurePrior",
-        "description": "Structure prior coefficient (min = 1.0)",
-        "valueType": "Double",
-        "defaultValue": 1
+        "defaultValue": 0.01
     },
     {
         "name": "faithfulnessAssumed",
@@ -1223,34 +1221,32 @@ POST https://ccd4.vm.bridges.psc.edu/ccd-api/{userId}/newjob
 Generated HTTP request code example:
 
 ````
-POST /ccd-api/22/jobs/FGESc HTTP/1.1
-Host: ccd4.vm.bridges.psc.edu
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL2Nsb3VkLmNjZC5waXR0LmVkdS8iLCJuYW1lIjoiemh5MTkiLCJleHAiOjE0NzU4NTA2NzY4MDQsImlhdCI6MTQ3NTg0NzA3NjgwNH0.8azVEoNPfETczXb-vn7dfyDd98eRt7iiLBXehGpPGzY
+POST /ccd-api/1/newjob HTTP/1.1
+Host: localhost:9000
+Authorization: Bearer faithfulnessAssumed
 Content-Type: application/json
 
 {
-  "algoId": "fges",
-  "testId": "bdeu",
-  "scoreId": "fisher-z",
-  "datasetFileId": 8,
-  "skipDataValidation": true,
-  "algoParameters": [
+    "algoId": "fges",
+    "scoreId": "fisher-z",
+    "datasetFileId": 1,
+    "algoParameters": [
     {
-      "key": "samplePrior",
-      "value": 2.1
+      "key": "alpha",
+      "value": 0.4
     },
     {
-      "key": "structurePrior",
-      "value": 5.7
+      "key": "faithfulnessAssumed",
+      "value": false
     },
     {
       "key": "maxDegree",
       "value": 10
     }
-  ],
-  "jvmOptions": {
-    "maxHeapSize": 100
-  }
+    ],
+    "jvmOptions": {
+      "maxHeapSize": 100
+    }
 }
 ````
 
@@ -1258,16 +1254,17 @@ In this example, we are running the "FGES" algorithm with "BDeu Test" and "BDeu 
 
 ````
 {
-  "id": 5,
-  "algorithmName": "FGES",
-  "status": 0,
-  "addedTime": 1472742564355,
-  "resultFileName": "FGES_data_small.txt_1472742564353.txt",
-  "errorResultFileName": "error_FGES_data_small.txt_1472742564353.txt"
+    "id": 25,
+    "algoId": "fges",
+    "status": 0,
+    "addedTime": 1515617400509,
+    "resultFileName": "fges_Retention.txt_1515617400499.txt",
+    "resultJsonFileName": "fges_Retention.txt_1515617400499.json",
+    "errorResultFileName": "error_fges_Retention.txt_1515617400499.txt"
 }
 ````
 
-From this response we can tell that the job ID is 5, and the result file name will be `FGES_data_small.txt_1472742564353.txt` if everything goes well. If something is wrong an error result file with name `error_FGES_data_small.txt_1472742564353.txt` will be created.
+From this response we can tell that the job ID is 25, and the result file name will be `fges_Retention.txt_1515617400499.txt` if everything goes well. If something is wrong an error result file with name `error_fges_Retention.txt_1515617400499.txt` will be created.
 
 
 #### List all running jobs

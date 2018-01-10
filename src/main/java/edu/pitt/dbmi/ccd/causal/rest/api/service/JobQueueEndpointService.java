@@ -193,11 +193,11 @@ public class JobQueueEndpointService {
                     if (!testIds.contains(newJob.getTestId())) {
                         throw new BadRequestException("Invalid 'testId' value: " + newJob.getTestId());
                     }
+                    
+                    commands.add(CmdOptions.TEST);
+                    commands.add(newJob.getTestId());
                 }
             }
-
-            commands.add(CmdOptions.TEST);
-            commands.add(newJob.getTestId());
 
             // Score
             if (algoRequireScore) {
@@ -214,11 +214,11 @@ public class JobQueueEndpointService {
                     if (!scoreIds.contains(newJob.getScoreId())) {
                         throw new BadRequestException("Invalid 'scoreId' value: " + newJob.getScoreId());
                     }
+                    
+                    commands.add(CmdOptions.SCORE);
+                    commands.add(newJob.getScoreId());
                 }
             }
-
-            commands.add(CmdOptions.SCORE);
-            commands.add(newJob.getScoreId()); 
         }
         
         // Create tetrad graph json for HPC?
