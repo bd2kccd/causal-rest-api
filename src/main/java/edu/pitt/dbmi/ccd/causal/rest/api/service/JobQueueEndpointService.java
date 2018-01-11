@@ -111,6 +111,36 @@ public class JobQueueEndpointService {
         // so no need to check if (userAccount == null) and throw UserNotFoundException(uid)
         UserAccount userAccount = userAccountService.findById(uid);
 
+        String username = userAccount.getUsername();
+
+        // Paths
+        Map<String, String> pathsMap = new HashMap<>();
+
+        String workspaceDir = causalRestProperties.getWorkspaceDir();
+        String libFolder = causalRestProperties.getLibFolder();
+        String tmpFolder = causalRestProperties.getTmpFolder();
+        String dataFolder = causalRestProperties.getDataFolder();
+        String resultsFolder = causalRestProperties.getResultsFolder();
+        String algorithmFolder = causalRestProperties.getAlgorithmFolder();
+        String algorithmJar = causalRestProperties.getAlgorithmJar();
+
+        Path algorithmJarPath = Paths.get(workspaceDir, libFolder, algorithmJar);
+        Path dataDir = Paths.get(workspaceDir, username, dataFolder);
+        Path tmpDir = Paths.get(workspaceDir, username, tmpFolder);
+        Path resultDir = Paths.get(workspaceDir, username, resultsFolder, algorithmFolder);
+
+        if (env.acceptsProfiles("slurm")) {
+            tmpDir = Paths.get(remoteworkspace, username, tmpFolder);
+            algorithmJarPath = Paths.get(remoteworkspace, libFolder, algorithmJar);
+            dataDir = Paths.get(remotedataspace, username, dataFolder);
+        }
+
+        // The following keys will be used when each search
+        pathsMap.put("algorithmJarPath", algorithmJarPath.toString());
+        pathsMap.put("dataDir", dataDir.toAbsolutePath().toString());
+        pathsMap.put("tmpDir", tmpDir.toAbsolutePath().toString());
+        pathsMap.put("resultDir", resultDir.toAbsolutePath().toString());
+ 
         // Get algorithm ID string
         String algoId = newJob.getAlgoId();
         
@@ -130,10 +160,6 @@ public class JobQueueEndpointService {
         boolean algoRequireScore = AlgorithmAnnotations.getInstance().requireScore(clazz);
         boolean algoAcceptKnowledge = AlgorithmAnnotations.getInstance().acceptKnowledge(clazz);
 
-        // algorithmJarPath, dataDir, tmpDir, resultDir
-        // will be used in all algorithms
-        Map<String, String> map = createSharedMapping(uid);
-
         // Building the command line
         List<String> commands = new LinkedList<>();
 
@@ -148,7 +174,7 @@ public class JobQueueEndpointService {
 
         // Add causal-cmd jar path
         commands.add("-jar");
-        commands.add(map.get("algorithmJarPath"));
+        commands.add(pathsMap.get("algorithmJarPath"));
 
         // Add algorithm
         commands.add(CmdOptions.ALGORITHM);
@@ -169,7 +195,7 @@ public class JobQueueEndpointService {
             commands.add(dataType);
             
             // Specify dataset file path
-            Path datasetPath = Paths.get(map.get("dataDir"), datasetFile.getName());
+            Path datasetPath = Paths.get(pathsMap.get("dataDir"), datasetFile.getName());
 
             commands.add(CmdOptions.DATASET);
             commands.add(datasetPath.toAbsolutePath().toString());
@@ -233,7 +259,7 @@ public class JobQueueEndpointService {
                 if (priorKnowledgeFile == null) {
                     throw new NotFoundByIdException(priorKnowledgeFileId);
                 }
-                Path priorKnowledgePath = Paths.get(map.get("dataDir"), priorKnowledgeFile.getName());
+                Path priorKnowledgePath = Paths.get(pathsMap.get("dataDir"), priorKnowledgeFile.getName());
 
                 commands.add(CmdOptions.KNOWLEDGE);
                 commands.add(priorKnowledgePath.toAbsolutePath().toString());
@@ -278,9 +304,9 @@ public class JobQueueEndpointService {
         jobQueueInfo.setAlgorName(algoId); // use algoId as Algorithm Name in db, for now
         jobQueueInfo.setCommands(cmd);
         jobQueueInfo.setFileName(fileName);
-        jobQueueInfo.setOutputDirectory(map.get("resultDir"));
+        jobQueueInfo.setOutputDirectory(pathsMap.get("resultDir"));
         jobQueueInfo.setStatus(0);
-        jobQueueInfo.setTmpDirectory(map.get("tmpDir"));
+        jobQueueInfo.setTmpDirectory(pathsMap.get("tmpDir"));
         jobQueueInfo.setUserAccounts(Collections.singleton(userAccount));
 
         // Hpc Parameters
@@ -315,50 +341,6 @@ public class JobQueueEndpointService {
         jobInfo.setId(jobQueueInfo.getId());
 
         return jobInfo;
-    }
-
-    /**
-     * Shared values to be used in both algorithms
-     *
-     * @param uid
-     * @return key-value mapping
-     */
-    private Map<String, String> createSharedMapping(Long uid) {
-        // When we can get here vai AuthFilterSerice, it means the user exists
-        // so no need to check if (userAccount == null) and throw UserNotFoundException(uid)
-        UserAccount userAccount = userAccountService.findById(uid);
-
-        // Get the username
-        String username = userAccount.getUsername();
-
-        Map<String, String> map = new HashMap<>();
-
-        String workspaceDir = causalRestProperties.getWorkspaceDir();
-        String libFolder = causalRestProperties.getLibFolder();
-        String tmpFolder = causalRestProperties.getTmpFolder();
-        String dataFolder = causalRestProperties.getDataFolder();
-        String resultsFolder = causalRestProperties.getResultsFolder();
-        String algorithmFolder = causalRestProperties.getAlgorithmFolder();
-        String algorithmJar = causalRestProperties.getAlgorithmJar();
-
-        Path algorithmJarPath = Paths.get(workspaceDir, libFolder, algorithmJar);
-        Path dataDir = Paths.get(workspaceDir, username, dataFolder);
-        Path tmpDir = Paths.get(workspaceDir, username, tmpFolder);
-        Path resultDir = Paths.get(workspaceDir, username, resultsFolder, algorithmFolder);
-
-        if (env.acceptsProfiles("slurm")) {
-            tmpDir = Paths.get(remoteworkspace, username, tmpFolder);
-            algorithmJarPath = Paths.get(remoteworkspace, libFolder, algorithmJar);
-            dataDir = Paths.get(remotedataspace, username, dataFolder);
-        }
-
-        // The following keys will be shared when running each algorithm
-        map.put("algorithmJarPath", algorithmJarPath.toString());
-        map.put("dataDir", dataDir.toAbsolutePath().toString());
-        map.put("tmpDir", tmpDir.toAbsolutePath().toString());
-        map.put("resultDir", resultDir.toAbsolutePath().toString());
-
-        return map;
     }
 
     /**
