@@ -5,7 +5,6 @@
  */
 package edu.pitt.dbmi.ccd.causal.rest.api.dto;
 
-import javax.validation.constraints.NotNull;
 import org.hibernate.validator.constraints.NotEmpty;
 
 /**
@@ -16,12 +15,10 @@ public class AlgoInfo {
     @NotEmpty
     protected String algoId;
 
-    @NotNull
     // Can be empty since some algorithms don't require test
     protected String testId;
 
-    @NotNull
-    // Can be empty since some algorithms don't require test
+    // Can be empty since some algorithms don't require score
     protected String scoreId;
 
     public AlgoInfo() {

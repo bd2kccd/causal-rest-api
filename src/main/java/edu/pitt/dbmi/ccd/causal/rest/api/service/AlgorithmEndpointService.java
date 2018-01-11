@@ -50,13 +50,26 @@ public class AlgorithmEndpointService {
     private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(AlgorithmEndpointService.class);
     
     private final Map<String, AnnotatedClass<Algorithm>> annotatedAlgoClasses;
+    
+    private final Map<String, AnnotatedClass<TestOfIndependence>> annotatedTestClasses;
+    
+    private final Map<String, AnnotatedClass<Score>> annotatedScoreClasses;
 
     private AlgorithmEndpointService() {
         this.annotatedAlgoClasses = AlgorithmAnnotations.getInstance().getAnnotatedClasses().stream()
                 .collect(() -> new TreeMap<>(String.CASE_INSENSITIVE_ORDER),
                         (m, e) -> m.put(e.getAnnotation().command(), e),
                         (m, u) -> m.putAll(u));
-    
+        
+        this.annotatedTestClasses = TestOfIndependenceAnnotations.getInstance().getAnnotatedClasses().stream()
+                .collect(() -> new TreeMap<>(String.CASE_INSENSITIVE_ORDER),
+                        (m, e) -> m.put(e.getAnnotation().command(), e),
+                        (m, u) -> m.putAll(u));
+        
+        this.annotatedScoreClasses = ScoreAnnotations.getInstance().getAnnotatedClasses().stream()
+                .collect(() -> new TreeMap<>(String.CASE_INSENSITIVE_ORDER),
+                        (m, e) -> m.put(e.getAnnotation().command(), e),
+                        (m, u) -> m.putAll(u));
     }
 
     /**
@@ -95,8 +108,8 @@ public class AlgorithmEndpointService {
         List<AlgorithmParameterDTO> algoParamsDTOs = new LinkedList<>();
 
         String algoId = algoInfo.getAlgoId();
-        String testId = algoInfo.getTestId();
-        String scoreId = algoInfo.getScoreId();
+        String testId = (algoInfo.getTestId() != null) ? algoInfo.getTestId() : null;
+        String scoreId = (algoInfo.getScoreId() != null) ? algoInfo.getScoreId() : null;
         
         if (!annotatedAlgoClasses.containsKey(algoId)) {
             throw new BadRequestException("Invalid 'algoId' value: " + algoId);
@@ -106,42 +119,82 @@ public class AlgorithmEndpointService {
 
         boolean algoRequireTest = AlgorithmAnnotations.getInstance().requireIndependenceTest(clazz);
         boolean algoRequireScore = AlgorithmAnnotations.getInstance().requireScore(clazz);
-        
-        Map<String, AnnotatedClass<TestOfIndependence>> annotatedTestClasses = TestOfIndependenceAnnotations.getInstance().getAnnotatedClasses().stream()
-                .collect(() -> new TreeMap<>(String.CASE_INSENSITIVE_ORDER),
-                        (m, e) -> m.put(e.getAnnotation().command(), e),
-                        (m, u) -> m.putAll(u));
-        
+       
         if (algoRequireTest) {
-            if (testId.isEmpty()) {
-                throw new BadRequestException("'testId' needs to be specified, it can't be empty.");   
+            if (testId == null) {
+                throw new BadRequestException("Missing 'testId', this algorithm requires an Indenpendent Test.");   
             } else {
-                if (!annotatedTestClasses.containsKey(testId)) {
-                    throw new BadRequestException("Invalid 'testId' value: " + testId);
+                if (testId.isEmpty()) {
+                    throw new BadRequestException("The value of 'testId' can't be empty.");   
+                } else {
+                    if (!annotatedTestClasses.containsKey(testId)) {
+                        throw new BadRequestException("Invalid 'testId' value: " + testId);
+                    }
                 }
+            }
+        } else {
+            if (testId != null) {
+                throw new BadRequestException("Unrecognized option 'testId', this algorithm doesn't use an Indenpendent Test.");   
             }
         }
 
-        
-        Map<String, AnnotatedClass<Score>> annotatedScoreClasses = ScoreAnnotations.getInstance().getAnnotatedClasses().stream()
-                .collect(() -> new TreeMap<>(String.CASE_INSENSITIVE_ORDER),
-                        (m, e) -> m.put(e.getAnnotation().command(), e),
-                        (m, u) -> m.putAll(u));
-        
         if (algoRequireScore) {
-            if (scoreId.isEmpty()) {
-                throw new BadRequestException("'scoreId' needs to be specified, it can't be empty.");   
+            if (scoreId == null) {
+                throw new BadRequestException("Missing 'scoreId', this algorithm requires a Score.");   
             } else {
-                if (!annotatedScoreClasses.containsKey(scoreId)) {
-                    throw new BadRequestException("Invalid 'scoreId' value: " + scoreId);
+                if (scoreId.isEmpty()) {
+                    throw new BadRequestException("The value of 'scoreId' can't be empty.");   
+                } else {
+                    if (!annotatedScoreClasses.containsKey(scoreId)) {
+                        throw new BadRequestException("Invalid 'scoreId' value: " + scoreId);
+                    }
                 }
             }
+        } else {
+            if (scoreId != null) {
+                throw new BadRequestException("Unrecognized option 'scoreId', this algorithm doesn't use a Score.");   
+            }
         }
- 
+
+        // Get the parameters
+        List<String> algoParams = getAlgoParameters(algoId, testId, scoreId);
+
+        algoParams.forEach((param) -> {
+            ParamDescription paramDesc = ParamDescriptions.getInstance().get(param);
+            Serializable defaultValue = paramDesc.getDefaultValue();
+            String valueType = "";
+            if (defaultValue instanceof Integer) {
+                valueType = "Integer";
+            }
+
+            if (defaultValue instanceof Double) {
+                valueType = "Double";
+            }
+
+            if (defaultValue instanceof Boolean) {
+                valueType = "Boolean";
+            }
+
+            algoParamsDTOs.add(new AlgorithmParameterDTO(param, paramDesc.getDescription(), valueType, defaultValue));
+        });
+
+
+        return algoParamsDTOs;
+    }
+    
+    /**
+     * Get a list of algorithm parameters based on the algoId, testId, and scoreID
+     * 
+     * @param algoId
+     * @param testId
+     * @param scoreId
+     * @return 
+     */
+    public List<String> getAlgoParameters(String algoId, String testId, String scoreId) {
         Class algoClass = annotatedAlgoClasses.get(algoId).getClazz();
         // Test or Score can be empty, so the corresponding class can be null
-        Class testClass = (annotatedTestClasses.get(testId) == null) ? null : annotatedTestClasses.get(testId).getClazz();
-        Class scoreClass = (annotatedScoreClasses.get(scoreId) == null) ? null : annotatedScoreClasses.get(scoreId).getClazz();
+        Class testClass = (testId == null) ? null : annotatedTestClasses.get(testId).getClazz();
+        Class scoreClass = (scoreId == null) ? null : annotatedScoreClasses.get(scoreId).getClazz();
         
         // This is Tetrad Algorithm
         edu.cmu.tetrad.algcomparison.algorithm.Algorithm algorithm = null;
@@ -152,30 +205,7 @@ public class AlgorithmEndpointService {
             LOGGER.error(String.format("Failed to create Algorithm instance for algoId='%s', testId='%s', scoreId='%s'.", algoId, testId, scoreId));
         }
         
-        if (algorithm != null) {
-            List<String> algoParams = algorithm.getParameters();
-            
-            algoParams.forEach((param) -> {
-                ParamDescription paramDesc = ParamDescriptions.getInstance().get(param);
-                Serializable defaultValue = paramDesc.getDefaultValue();
-                String valueType = "";
-                if (defaultValue instanceof Integer) {
-                    valueType = "Integer";
-                }
-                
-                if (defaultValue instanceof Double) {
-                    valueType = "Double";
-                }
-                
-                if (defaultValue instanceof Boolean) {
-                    valueType = "Boolean";
-                }
-                
-                algoParamsDTOs.add(new AlgorithmParameterDTO(param, paramDesc.getDescription(), valueType, defaultValue));
-            });
-        }
-
-        return algoParamsDTOs;
+        return (algorithm != null) ? algorithm.getParameters() : null;
     }
     
     public boolean requireIndependenceTest(Class clazz) {

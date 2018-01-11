@@ -73,10 +73,12 @@ public class JobQueueEndpointService {
 
     private final DataFileService dataFileService;
     
-    private final IndependenceTestEndpointService independenceTestEndpointService;
+    private final AlgorithmEndpointService algorithmEndpointService;
     
     private final ScoreEndpointService scoreEndpointService;
-
+    
+    private final IndependenceTestEndpointService independenceTestEndpointService;
+    
     private final JobQueueInfoService jobQueueInfoService;
 
     @Autowired
@@ -95,12 +97,14 @@ public class JobQueueEndpointService {
             CausalRestProperties causalRestProperties,
             UserAccountService userAccountService,
             DataFileService dataFileService,
+            AlgorithmEndpointService algorithmEndpointService,
             IndependenceTestEndpointService independenceTestEndpointService,
             ScoreEndpointService scoreEndpointService,
             JobQueueInfoService jobQueueInfoService) {
         this.causalRestProperties = causalRestProperties;
         this.userAccountService = userAccountService;
         this.dataFileService = dataFileService;
+        this.algorithmEndpointService = algorithmEndpointService;
         this.independenceTestEndpointService = independenceTestEndpointService;
         this.scoreEndpointService = scoreEndpointService;
         this.jobQueueInfoService = jobQueueInfoService;
@@ -141,8 +145,10 @@ public class JobQueueEndpointService {
         pathsMap.put("tmpDir", tmpDir.toAbsolutePath().toString());
         pathsMap.put("resultDir", resultDir.toAbsolutePath().toString());
  
-        // Get algorithm ID string
+        // Get algoId, testId, scoreId
         String algoId = newJob.getAlgoId();
+        String testId = (newJob.getTestId() == null) ? null : newJob.getTestId();
+        String scoreId = (newJob.getScoreId() == null) ? null : newJob.getScoreId();
         
         // Algo annotations for test, score, knowledge checks
         Map<String, AnnotatedClass<Algorithm>> annotatedAlgoClasses = AlgorithmAnnotations.getInstance().getAnnotatedClasses().stream()
@@ -206,43 +212,59 @@ public class JobQueueEndpointService {
 
             // Test
             if (algoRequireTest) {
-                if (newJob.getTestId() == null || newJob.getTestId().isEmpty()) {
-                    throw new BadRequestException("Algorithm " + algoId + " requires 'testId' to be specified.");   
+                if (testId == null) {
+                    throw new BadRequestException("Missing 'testId', this algorithm requires an Indenpendent Test.");   
                 } else {
-                    // Check if this provided test is one of the accepted tests
-                    List<TestOfIndependence> tests = independenceTestEndpointService.listIndependenceTestsByDataType(dataType);
-                    List<String> testIds = new LinkedList<>();
-                    tests.forEach((test) -> {
-                        testIds.add(test.command());
-                    });
-                    
-                    if (!testIds.contains(newJob.getTestId())) {
-                        throw new BadRequestException("Invalid 'testId' value: " + newJob.getTestId());
+                    if (testId.isEmpty()) {
+                        throw new BadRequestException("The value of 'testId' can't be empty.");   
+                    } else {
+                        // Check if this provided test is one of the accepted tests
+                        List<TestOfIndependence> tests = independenceTestEndpointService.listIndependenceTestsByDataType(dataType);
+                        List<String> testIds = new LinkedList<>();
+                        tests.forEach((test) -> {
+                            testIds.add(test.command());
+                        });
+
+                        if (!testIds.contains(newJob.getTestId())) {
+                            throw new BadRequestException("Invalid 'testId' value: " + newJob.getTestId());
+                        }
+
+                        commands.add(CmdOptions.TEST);
+                        commands.add(newJob.getTestId());
                     }
-                    
-                    commands.add(CmdOptions.TEST);
-                    commands.add(newJob.getTestId());
+                }
+            } else {
+                if (testId != null) {
+                    throw new BadRequestException("Unrecognized option 'testId', this algorithm doesn't use an Indenpendent Test.");   
                 }
             }
 
             // Score
             if (algoRequireScore) {
-                if (newJob.getScoreId() == null || newJob.getScoreId().isEmpty()) {
-                    throw new BadRequestException("Algorithm " + algoId + " requires 'scoreId' to be specified.");     
+                if (scoreId == null) {
+                    throw new BadRequestException("Missing 'scoreId', this algorithm requires a Score.");   
                 } else {
-                    // Check if this provided score is one of the accepted scores
-                    List<Score> scores = scoreEndpointService.listScoresByDataType(dataType);
-                    List<String> scoreIds = new LinkedList<>();
-                    scores.forEach((score) -> {
-                        scoreIds.add(score.command());
-                    });
-                    
-                    if (!scoreIds.contains(newJob.getScoreId())) {
-                        throw new BadRequestException("Invalid 'scoreId' value: " + newJob.getScoreId());
+                    if (scoreId.isEmpty()) {
+                        throw new BadRequestException("The value of 'scoreId' can't be empty.");   
+                    } else {
+                        // Check if this provided score is one of the accepted scores
+                        List<Score> scores = scoreEndpointService.listScoresByDataType(dataType);
+                        List<String> scoreIds = new LinkedList<>();
+                        scores.forEach((score) -> {
+                            scoreIds.add(score.command());
+                        });
+
+                        if (!scoreIds.contains(newJob.getScoreId())) {
+                            throw new BadRequestException("Invalid 'scoreId' value: " + newJob.getScoreId());
+                        }
+                        
+                        commands.add(CmdOptions.SCORE);
+                        commands.add(newJob.getScoreId());
                     }
-                    
-                    commands.add(CmdOptions.SCORE);
-                    commands.add(newJob.getScoreId());
+                }
+            } else {
+                if (scoreId != null) {
+                    throw new BadRequestException("Unrecognized option 'scoreId', this algorithm doesn't use a Score.");   
                 }
             }
         }
@@ -268,14 +290,23 @@ public class JobQueueEndpointService {
             }
         }
 
-        // Algorithm parameters
+        // Algorithm parameters from user request
         Set<AlgoParameter> algorithmParameters = newJob.getAlgoParameters();
 
-        // Get key-value from algo parameters
-        algorithmParameters.forEach(param -> {
-            commands.add("--" + param.getKey());
-            commands.add(param.getValue());
-        });
+        // Full list of parameters
+        List<String> algoParametersAll = algorithmEndpointService.getAlgoParameters(algoId, testId, scoreId);
+        
+        if (algoParametersAll != null) {
+            // Get key-value from algo parameters
+            algorithmParameters.forEach(param -> {
+                if (!algoParametersAll.contains(param.getKey())) {
+                    throw new BadRequestException("Unrecognized algorithm parameter: " + param.getKey());
+                }
+
+                commands.add("--" + param.getKey());
+                commands.add(param.getValue());
+            });
+        }
 
         long currentTime = System.currentTimeMillis();
         // Algorithm result file name
