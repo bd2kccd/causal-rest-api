@@ -30,6 +30,7 @@ import javax.validation.Valid;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.GenericEntity;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
@@ -67,6 +68,24 @@ public class AlgorithmEndpoint {
     public Response listAllAlgorithms() {
         List<AlgorithmDTO> algorithmDTOs = algorithmEndpointService.listAlgorithms();
         GenericEntity<List<AlgorithmDTO>> entity = new GenericEntity<List<AlgorithmDTO>>(algorithmDTOs) {
+        };
+
+        return Response.ok(entity).build();
+    }
+    
+    /**
+     * List all the available algorithms
+     *
+     * @param algoId
+     * @return 200 with a list of available algorithms
+     */
+    @GET
+    @Path("/algorithms/{algoId}")
+    @Produces({APPLICATION_JSON, APPLICATION_XML})
+    @RolesAllowed(Role.USER)
+    public Response getAlgorithmDetail(@PathParam("algoId") String algoId) {
+        AlgorithmDTO algorithmDTO = algorithmEndpointService.getAlgorithmDetail(algoId);
+        GenericEntity<AlgorithmDTO> entity = new GenericEntity<AlgorithmDTO>(algorithmDTO) {
         };
 
         return Response.ok(entity).build();

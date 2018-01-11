@@ -883,6 +883,17 @@ Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL
 ]
 ````
 
+#### List details of given algorithm by ID
+
+You can also just query the details of a specific algorithm:
+
+API Endpoint URI pattern:
+
+````
+GET https://ccd4.vm.bridges.psc.edu/ccd-api/{userId}/algorithms/{algoId}
+````
+
+
 #### List all data types
 
 API Endpoint URI pattern:

@@ -100,6 +100,29 @@ public class AlgorithmEndpointService {
     }
 
     /**
+     * Get details of a given algorithm by ID
+     * 
+     * @param algoId
+     * @return 
+     */
+    public AlgorithmDTO getAlgorithmDetail(String algoId) {
+        AnnotatedClass<Algorithm> algoAnnoClass = annotatedAlgoClasses.get(algoId);
+        
+        Algorithm algo = algoAnnoClass.getAnnotation();
+        
+        Class annotatedClass = algoAnnoClass.getClazz();
+        
+        boolean requireTest = requireIndependenceTest(annotatedClass);
+        boolean requireScore = requireScore(annotatedClass);
+        boolean acceptKnowledge = acceptKnowledge(annotatedClass);
+
+        // Use command name as ID
+        AlgorithmDTO algoDTO = new AlgorithmDTO(algoId, algo.name(), algo.description(), requireTest, requireScore, acceptKnowledge);
+        
+        return algoDTO;
+    }
+    
+    /**
      * List all the parameters of a given algorithm, test, and score
      * @param algoInfo
      * @return 
@@ -148,7 +171,7 @@ public class AlgorithmEndpointService {
 
         return algoParamsDTOs;
     }
-    
+
     /**
      * Get a list of algorithm parameters based on the algoId, testId, and scoreID
      * 
