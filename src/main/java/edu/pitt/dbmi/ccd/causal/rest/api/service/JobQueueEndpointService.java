@@ -18,11 +18,7 @@
  */
 package edu.pitt.dbmi.ccd.causal.rest.api.service;
 
-import edu.cmu.tetrad.annotation.Algorithm;
 import edu.cmu.tetrad.annotation.AlgorithmAnnotations;
-import edu.cmu.tetrad.annotation.AnnotatedClass;
-import edu.cmu.tetrad.annotation.Score;
-import edu.cmu.tetrad.annotation.TestOfIndependence;
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.AlgoParameter;
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.JobInfoDTO;
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.JvmOptions;
@@ -49,7 +45,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -150,17 +145,10 @@ public class JobQueueEndpointService {
         String testId = (newJob.getTestId() == null) ? null : newJob.getTestId();
         String scoreId = (newJob.getScoreId() == null) ? null : newJob.getScoreId();
         
-        // Algo annotations for test, score, knowledge checks
-        Map<String, AnnotatedClass<Algorithm>> annotatedAlgoClasses = AlgorithmAnnotations.getInstance().getAnnotatedClasses().stream()
-                .collect(() -> new TreeMap<>(String.CASE_INSENSITIVE_ORDER),
-                        (m, e) -> m.put(e.getAnnotation().command(), e),
-                        (m, u) -> m.putAll(u));
-
-        if (!annotatedAlgoClasses.containsKey(algoId)) {
-            throw new BadRequestException("Invalid 'algoId' value: " + algoId);
-        }
+        // Make sure this algoId is valid
+        algorithmEndpointService.validateUserProvidedAlgorithm(algoId);
         
-        Class clazz = annotatedAlgoClasses.get(algoId).getClazz();
+        Class clazz = algorithmEndpointService.getAlgorithmClass(algoId);
 
         boolean algoRequireTest = AlgorithmAnnotations.getInstance().requireIndependenceTest(clazz);
         boolean algoRequireScore = AlgorithmAnnotations.getInstance().requireScore(clazz);
@@ -209,66 +197,22 @@ public class JobQueueEndpointService {
             // Set delimiter
             commands.add(CmdOptions.DELIMITER);
             commands.add(datasetFile.getDataFileInfo().getFileDelimiter().getName());
-
-            // Test
-            if (algoRequireTest) {
-                if (testId == null) {
-                    throw new BadRequestException("Missing 'testId', this algorithm requires an Indenpendent Test.");   
-                } else {
-                    if (testId.isEmpty()) {
-                        throw new BadRequestException("The value of 'testId' can't be empty.");   
-                    } else {
-                        // Check if this provided test is one of the accepted tests
-                        List<TestOfIndependence> tests = independenceTestEndpointService.listIndependenceTestsByDataType(dataType);
-                        List<String> testIds = new LinkedList<>();
-                        tests.forEach((test) -> {
-                            testIds.add(test.command());
-                        });
-
-                        if (!testIds.contains(newJob.getTestId())) {
-                            throw new BadRequestException("Invalid 'testId' value: " + newJob.getTestId());
-                        }
-
-                        commands.add(CmdOptions.TEST);
-                        commands.add(newJob.getTestId());
-                    }
-                }
-            } else {
-                if (testId != null) {
-                    throw new BadRequestException("Unrecognized option 'testId', this algorithm doesn't use an Indenpendent Test.");   
-                }
-            }
-
-            // Score
-            if (algoRequireScore) {
-                if (scoreId == null) {
-                    throw new BadRequestException("Missing 'scoreId', this algorithm requires a Score.");   
-                } else {
-                    if (scoreId.isEmpty()) {
-                        throw new BadRequestException("The value of 'scoreId' can't be empty.");   
-                    } else {
-                        // Check if this provided score is one of the accepted scores
-                        List<Score> scores = scoreEndpointService.listScoresByDataType(dataType);
-                        List<String> scoreIds = new LinkedList<>();
-                        scores.forEach((score) -> {
-                            scoreIds.add(score.command());
-                        });
-
-                        if (!scoreIds.contains(newJob.getScoreId())) {
-                            throw new BadRequestException("Invalid 'scoreId' value: " + newJob.getScoreId());
-                        }
-                        
-                        commands.add(CmdOptions.SCORE);
-                        commands.add(newJob.getScoreId());
-                    }
-                }
-            } else {
-                if (scoreId != null) {
-                    throw new BadRequestException("Unrecognized option 'scoreId', this algorithm doesn't use a Score.");   
-                }
-            }
         }
         
+        // Validate user provided test/score and throws exception if invalid
+        algorithmEndpointService.validateUserProvidedTest(algoRequireTest, testId);
+        algorithmEndpointService.validateUserProvidedScore(algoRequireScore, scoreId);
+
+        if (algoRequireTest) {
+            commands.add(CmdOptions.TEST);
+            commands.add(testId);
+        }
+
+        if (algoRequireScore) {
+            commands.add(CmdOptions.SCORE);
+            commands.add(scoreId);
+        }
+
         // Create tetrad graph json for HPC?
         commands.add(CmdOptions.JSON_GRAPH);
         

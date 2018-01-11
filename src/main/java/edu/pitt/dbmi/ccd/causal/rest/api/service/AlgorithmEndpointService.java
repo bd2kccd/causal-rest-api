@@ -91,7 +91,7 @@ public class AlgorithmEndpointService {
             boolean requireTest = requireIndependenceTest(annotatedClass);
             boolean requireScore = requireScore(annotatedClass);
             boolean acceptKnowledge = acceptKnowledge(annotatedClass);
-        
+
             // Use command name as ID
             algorithms.add(new AlgorithmDTO(algo.command(), algo.name(), algo.description(), requireTest, requireScore, acceptKnowledge));
         });
@@ -111,50 +111,17 @@ public class AlgorithmEndpointService {
         String testId = (algoInfo.getTestId() != null) ? algoInfo.getTestId() : null;
         String scoreId = (algoInfo.getScoreId() != null) ? algoInfo.getScoreId() : null;
         
-        if (!annotatedAlgoClasses.containsKey(algoId)) {
-            throw new BadRequestException("Invalid 'algoId' value: " + algoId);
-        }
+        // Validate the algoId
+        validateUserProvidedAlgorithm(algoId);
         
-        Class clazz = annotatedAlgoClasses.get(algoId).getClazz();
+        Class clazz = getAlgorithmClass(algoId);
 
         boolean algoRequireTest = AlgorithmAnnotations.getInstance().requireIndependenceTest(clazz);
         boolean algoRequireScore = AlgorithmAnnotations.getInstance().requireScore(clazz);
        
-        if (algoRequireTest) {
-            if (testId == null) {
-                throw new BadRequestException("Missing 'testId', this algorithm requires an Indenpendent Test.");   
-            } else {
-                if (testId.isEmpty()) {
-                    throw new BadRequestException("The value of 'testId' can't be empty.");   
-                } else {
-                    if (!annotatedTestClasses.containsKey(testId)) {
-                        throw new BadRequestException("Invalid 'testId' value: " + testId);
-                    }
-                }
-            }
-        } else {
-            if (testId != null) {
-                throw new BadRequestException("Unrecognized option 'testId', this algorithm doesn't use an Indenpendent Test.");   
-            }
-        }
-
-        if (algoRequireScore) {
-            if (scoreId == null) {
-                throw new BadRequestException("Missing 'scoreId', this algorithm requires a Score.");   
-            } else {
-                if (scoreId.isEmpty()) {
-                    throw new BadRequestException("The value of 'scoreId' can't be empty.");   
-                } else {
-                    if (!annotatedScoreClasses.containsKey(scoreId)) {
-                        throw new BadRequestException("Invalid 'scoreId' value: " + scoreId);
-                    }
-                }
-            }
-        } else {
-            if (scoreId != null) {
-                throw new BadRequestException("Unrecognized option 'scoreId', this algorithm doesn't use a Score.");   
-            }
-        }
+        // Validate and throws exception
+        validateUserProvidedTest(algoRequireTest, testId);
+        validateUserProvidedScore(algoRequireScore, scoreId);
 
         // Get the parameters
         List<String> algoParams = getAlgoParameters(algoId, testId, scoreId);
@@ -208,6 +175,56 @@ public class AlgorithmEndpointService {
         return (algorithm != null) ? algorithm.getParameters() : null;
     }
     
+    public void validateUserProvidedAlgorithm(String algoId) {
+        if (!annotatedAlgoClasses.containsKey(algoId)) {
+            throw new BadRequestException("Invalid 'algoId' value: " + algoId);
+        }
+    }
+    
+    public void validateUserProvidedTest(boolean algoRequireTest, String testId) {
+        if (algoRequireTest) {
+            if (testId == null) {
+                throw new BadRequestException("Missing 'testId', this algorithm requires an Indenpendent Test.");   
+            } else {
+                if (testId.isEmpty()) {
+                    throw new BadRequestException("The value of 'testId' can't be empty.");   
+                } else {
+                    if (!annotatedTestClasses.containsKey(testId)) {
+                        throw new BadRequestException("Invalid 'testId' value: " + testId);
+                    }
+                }
+            }
+        } else {
+            if (testId != null) {
+                throw new BadRequestException("Unrecognized option 'testId', this algorithm doesn't use an Indenpendent Test.");   
+            }
+        }
+    }
+    
+    public void validateUserProvidedScore(boolean algoRequireScore, String scoreId) {
+        if (algoRequireScore) {
+            if (scoreId == null) {
+                throw new BadRequestException("Missing 'scoreId', this algorithm requires a Score.");   
+            } else {
+                if (scoreId.isEmpty()) {
+                    throw new BadRequestException("The value of 'scoreId' can't be empty.");   
+                } else {
+                    if (!annotatedScoreClasses.containsKey(scoreId)) {
+                        throw new BadRequestException("Invalid 'scoreId' value: " + scoreId);
+                    }
+                }
+            }
+        } else {
+            if (scoreId != null) {
+                throw new BadRequestException("Unrecognized option 'scoreId', this algorithm doesn't use a Score.");   
+            }
+        }
+    }
+    
+    public Class getAlgorithmClass(String algoId) {
+        return annotatedAlgoClasses.get(algoId).getClazz();
+    }
+    
     public boolean requireIndependenceTest(Class clazz) {
         return AlgorithmAnnotations.getInstance().requireIndependenceTest(clazz);
     }
@@ -219,5 +236,5 @@ public class AlgorithmEndpointService {
     public boolean acceptKnowledge(Class clazz) {
         return AlgorithmAnnotations.getInstance().acceptKnowledge(clazz);
     }
-    
+
 }
