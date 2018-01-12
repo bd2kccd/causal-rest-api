@@ -460,9 +460,9 @@ Before we can go ahead to run the desired algorithm with the newly uploaded data
 
 | Required Fields | Description |
 | --- | --- |
-| id | The data file ID |
-| variableType | discrete or continuous |
-| fileDelimiter | tab or comma |
+| `id` | The data file ID |
+| `variableType` | continuous, discrete, mixed |
+| `fileDelimiter` | tab or comma |
 
 API Endpoint URI pattern:
 
@@ -1242,12 +1242,12 @@ Then you'll see the information of all jobs that are currently running:
 [
   {
     "id": 32,
-    "algorithmName": "FGESc",
+    "algoId": "fges",
     "addedTime": 1468436085000
   },
   {
     "id": 33,
-    "algorithmName": "FGESd",
+    "algoId": "gfci",
     "addedTime": 1468436087000
   }
 ]
@@ -1316,13 +1316,13 @@ The response to this request will look like this:
 ````javascript
 [
   {
-    "name": "FGESc_sim_data_20vars_100cases.csv_1466171729046.txt",
+    "name": "fges_sim_data_20vars_100cases.csv_1466171729046.txt",
     "creationTime": 1466171732000,
     "lastModifiedTime": 1466171732000,
     "fileSize": 1660
   },
   {
-    "name": "FGESc_data_small.txt_1466172140585.txt",
+    "name": "fges_data_small.txt_1466172140585.txt",
     "creationTime": 1466172145000,
     "lastModifiedTime": 1466172145000,
     "fileSize": 39559
@@ -1341,7 +1341,7 @@ GET https://ccd4.vm.bridges.psc.edu/ccd-api/{userId}/results/{result_file_name}
 Generated HTTP request code example:
 
 ````
-GET /ccd-api/22/results/FGESc_data_small.txt_1466172140585.txt HTTP/1.1
+GET /ccd-api/22/results/fges_data_small.txt_1466172140585.txt HTTP/1.1
 Host: ccd4.vm.bridges.psc.edu
 Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL2Nsb3VkLmNjZC5waXR0LmVkdS8iLCJuYW1lIjoiemh5MTkiLCJleHAiOjE0NzU4NTA2NzY4MDQsImlhdCI6MTQ3NTg0NzA3NjgwNH0.8azVEoNPfETczXb-vn7dfyDd98eRt7iiLBXehGpPGzY
 ````
@@ -1355,7 +1355,7 @@ The response to this request will look like this:
   "status": 404,
   "error": "Not Found",
   "message": "Resource not found.",
-  "path": "/22/results/FGESc_data_small.txt_146172140585.txt"
+  "path": "/22/results/fges_data_small.txt_146172140585.txt"
 }
 ````
 
@@ -1389,7 +1389,7 @@ Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL
 When you specify multiple file names, use the `!!` as a delimiter. This request will generate a result comparison file with the following content (shortened version):
 
 ````
-FGESc_sim_data_20vars_100cases.csv_1466171729046.txt	FGESc_data_small.txt_1467305104859.txt
+fges_sim_data_20vars_100cases.csv_1466171729046.txt	fges_data_small.txt_1467305104859.txt
 Edges	In All	Same End Point
 NR4A2,FOS	0	0
 X5,X17	0	0
@@ -1464,10 +1464,10 @@ Host: ccd4.vm.bridges.psc.edu
 Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL2Nsb3VkLmNjZC5waXR0LmVkdS8iLCJuYW1lIjoiemh5MTkiLCJleHAiOjE0NzU4NTA2NzY4MDQsImlhdCI6MTQ3NTg0NzA3NjgwNH0.8azVEoNPfETczXb-vn7dfyDd98eRt7iiLBXehGpPGzY
 ````
 
-Then it returns the content of that comparison file (shorted version):
+Then it returns the content of that comparison file (shortened version):
 
 ````
-FGESc_sim_data_20vars_100cases.csv_1466171729046.txt	FGESc_data_small.txt_1467305104859.txt
+fges_sim_data_20vars_100cases.csv_1466171729046.txt	fges_data_small.txt_1467305104859.txt
 Edges	In All	Same End Point
 NR4A2,FOS	0	0
 X5,X17	0	0
