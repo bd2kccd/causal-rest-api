@@ -1078,9 +1078,9 @@ POST https://ccd4.vm.bridges.psc.edu/ccd-api/algorithmParameters
 
 | Field | Description |
 | --- | --- |
-| algoId | The target algorithm ID string, required |
-| testId | The ID of indenpendence test, not all algorithms require a test |
-| scoreId | The ID of score method, not all algorithms require a score |
+| `algoId` | The target algorithm ID string, required |
+| `testId` | The ID of indenpendence test, not all algorithms require a test |
+| `scoreId` | The ID of score method, not all algorithms require a score |
 
 Generated HTTP request code example:
 
@@ -1148,6 +1148,20 @@ Because `fges` requires a score but donesn't require a test, the above request b
 #### Add a new job to run the desired algorithm on a given data file
 
 This is a POST request and the algorithm details and data file id will need to be specified in the POST body as a JSON when you make the request.
+
+They also share a common JSON structure as of their input, for example:
+
+| Input JSON Fields | Description |
+| --- | --- |
+| `algoId` | The target algorithm ID string, required |
+| `testId` | The ID of indenpendence test, not all algorithms require a test |
+| `scoreId` | The ID of score method, not all algorithms require a score |
+| `datasetFileId` | The dataset file ID, integer |
+| `priorKnowledgeFileId` | The optional prior knowledge file ID, integer |
+| `algorithmParameters` | Algorithm specific parameters, JSON object |
+| `jvmOptions` | Advanced Options For Java Virtual Machine (JVM), JSON object. Currently only support `maxHeapSize` (Gigabyte, max value is 100) |
+| `hpcParameters` | Parameters for High-Performance Computing, JSON array of key-value objects. Currently only support `wallTime` |
+
 
 API Endpoint URI pattern:
 
