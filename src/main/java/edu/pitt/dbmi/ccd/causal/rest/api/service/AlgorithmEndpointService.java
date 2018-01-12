@@ -66,16 +66,22 @@ public class AlgorithmEndpointService {
                         (m, e) -> m.put(e.getAnnotation().command(), e),
                         (m, u) -> m.putAll(u));
         
-        // Exclude tests that only support Graph data type
+        // Exclude tests that only support Graph or Covariance data type
         this.annotatedTestClasses = TestOfIndependenceAnnotations.getInstance().getAnnotatedClasses().stream()
+                // If a test supports graph, then it doesn't support other data types
                 .filter(e -> !Arrays.asList(e.getAnnotation().dataType()).contains(DataType.Graph))
+                // Different from graph, if a test supports covariance data, it may also support continuous or discrete data at the same time
+                .filter(e -> !((Arrays.asList(e.getAnnotation().dataType()).size() == 1) && Arrays.asList(e.getAnnotation().dataType()).contains(DataType.Covariance)))
                 .collect(() -> new TreeMap<>(String.CASE_INSENSITIVE_ORDER),
                         (m, e) -> m.put(e.getAnnotation().command(), e),
                         (m, u) -> m.putAll(u));
 
-        // Exclude scores that only support Graph data type
+        // Exclude tests that only support Graph or Covariance data type
         this.annotatedScoreClasses = ScoreAnnotations.getInstance().getAnnotatedClasses().stream()
+                // If a score supports graph, then it doesn't support other data types
                 .filter(e -> !Arrays.asList(e.getAnnotation().dataType()).contains(DataType.Graph))
+                // Different from graph, if a score supports covariance data, it may also support continuous or discrete data at the same time
+                .filter(e -> !((Arrays.asList(e.getAnnotation().dataType()).size() == 1) && Arrays.asList(e.getAnnotation().dataType()).contains(DataType.Covariance)))
                 .collect(() -> new TreeMap<>(String.CASE_INSENSITIVE_ORDER),
                         (m, e) -> m.put(e.getAnnotation().command(), e),
                         (m, u) -> m.putAll(u));
@@ -89,10 +95,10 @@ public class AlgorithmEndpointService {
     public List<AlgorithmDTO> listAlgorithms() {
         List<AlgorithmDTO> algorithms = new LinkedList<>();
 
-        annotatedAlgoClasses.forEach((k, v) -> {
-            Class annotatedClass = v.getClazz();
+        annotatedAlgoClasses.values().forEach(annoClass -> {
+            Class annotatedClass = annoClass.getClazz();
             
-            Algorithm algoAnno = v.getAnnotation();
+            Algorithm algoAnno = annoClass.getAnnotation();
             
             boolean requireTest = requireIndependenceTest(annotatedClass);
             boolean requireScore = requireScore(annotatedClass);

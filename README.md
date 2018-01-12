@@ -801,8 +801,7 @@ Generated HTTP request code example:
 [
     "continuous",
     "discrete",
-    "mixed",
-    "covariance"
+    "mixed"
 ]
 ````
 
@@ -864,8 +863,7 @@ Generated HTTP request code example:
         "id": "fisher-z",
         "name": "Fisher Z Test",
         "supportedDataTypes": [
-            "continuous",
-            "covariance"
+            "continuous"
         ]
     },
     {
@@ -900,8 +898,7 @@ Generated HTTP request code example:
         "id": "sem-bic",
         "name": "SEM BIC Test",
         "supportedDataTypes": [
-            "continuous",
-            "covariance"
+            "continuous"
         ]
     }
 ]
@@ -937,16 +934,14 @@ Generated HTTP request code example:
         "id": "fisher-z",
         "name": "Fisher Z Test",
         "supportedDataTypes": [
-            "continuous",
-            "covariance"
+            "continuous"
         ]
     },
     {
         "id": "sem-bic",
         "name": "SEM BIC Test",
         "supportedDataTypes": [
-            "continuous",
-            "covariance"
+            "continuous"
         ]
     }
 ]
@@ -1024,16 +1019,14 @@ Generated HTTP request code example:
         "id": "sem-bic",
         "name": "Sem BIC Score",
         "supportedDataTypes": [
-            "continuous",
-            "covariance"
+            "continuous"
         ]
     },
     {
         "id": "sem-bic-deterministic",
         "name": "Sem BIC Score Deterministic",
         "supportedDataTypes": [
-            "continuous",
-            "covariance"
+            "continuous"
         ]
     }
 ]

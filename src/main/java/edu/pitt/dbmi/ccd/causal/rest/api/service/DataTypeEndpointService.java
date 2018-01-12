@@ -27,9 +27,9 @@ public class DataTypeEndpointService {
         // Convert Tetrad's DataType enum to a list of strings
         List<DataType> dt = new LinkedList<>(Arrays.asList(DataType.values()));
         
-        // Exclude Graph
+        // Exclude Graph and Covariance
         dt.forEach((dataType) -> {
-            if (dataType != DataType.Graph) {
+            if (dataType != DataType.Graph && dataType != DataType.Covariance) {
                 dataTypes.add(dataType.name().toLowerCase());
             }
         });
