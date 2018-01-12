@@ -6,9 +6,7 @@
 package edu.pitt.dbmi.ccd.causal.rest.api.endpoint;
 
 import edu.pitt.dbmi.ccd.causal.rest.api.Role;
-import edu.pitt.dbmi.ccd.causal.rest.api.dto.DataTypeDTO;
 import edu.pitt.dbmi.ccd.causal.rest.api.service.DataTypeEndpointService;
-import java.io.IOException;
 import java.util.List;
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
@@ -41,15 +39,14 @@ public class DataTypeEndpoint {
      * List all the supported data types
      *
      * @return 200 with a list of available algorithms
-     * @throws IOException
      */
     @GET
     @Path("/datatypes")
     @Produces({APPLICATION_JSON, APPLICATION_XML})
     @RolesAllowed(Role.USER)
-    public Response listAllDataTypes() throws IOException {
-        List<DataTypeDTO> dataTypeDTOs = dataTypeEndpointService.listDataTypes();
-        GenericEntity<List<DataTypeDTO>> entity = new GenericEntity<List<DataTypeDTO>>(dataTypeDTOs) {
+    public Response listAllDataTypes() {
+        List<String> dataTypes = dataTypeEndpointService.listDataTypes();
+        GenericEntity<List<String>> entity = new GenericEntity<List<String>>(dataTypes) {
         };
 
         return Response.ok(entity).build();

@@ -19,6 +19,7 @@
 package edu.pitt.dbmi.ccd.causal.rest.api.service;
 
 import edu.cmu.tetrad.algcomparison.algorithm.AlgorithmFactory;
+import edu.cmu.tetrad.annotation.AlgType;
 import edu.cmu.tetrad.annotation.Algorithm;
 import edu.cmu.tetrad.annotation.AlgorithmAnnotations;
 import edu.cmu.tetrad.annotation.AnnotatedClass;
@@ -26,6 +27,7 @@ import edu.cmu.tetrad.annotation.Score;
 import edu.cmu.tetrad.annotation.ScoreAnnotations;
 import edu.cmu.tetrad.annotation.TestOfIndependence;
 import edu.cmu.tetrad.annotation.TestOfIndependenceAnnotations;
+import edu.cmu.tetrad.data.DataType;
 import edu.cmu.tetrad.util.ParamDescription;
 import edu.cmu.tetrad.util.ParamDescriptions;
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.AlgoInfo;
@@ -33,6 +35,7 @@ import edu.pitt.dbmi.ccd.causal.rest.api.dto.AlgorithmDTO;
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.AlgorithmParameterDTO;
 import edu.pitt.dbmi.ccd.causal.rest.api.exception.BadRequestException;
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -56,17 +59,23 @@ public class AlgorithmEndpointService {
     private final Map<String, AnnotatedClass<Score>> annotatedScoreClasses;
 
     private AlgorithmEndpointService() {
+        // Exclude pairwise algorithms since they take Graph as input
         this.annotatedAlgoClasses = AlgorithmAnnotations.getInstance().getAnnotatedClasses().stream()
+                .filter(e -> (e.getAnnotation().algoType() != AlgType.orient_pairwise))
                 .collect(() -> new TreeMap<>(String.CASE_INSENSITIVE_ORDER),
                         (m, e) -> m.put(e.getAnnotation().command(), e),
                         (m, u) -> m.putAll(u));
         
+        // Exclude tests that only support Graph data type
         this.annotatedTestClasses = TestOfIndependenceAnnotations.getInstance().getAnnotatedClasses().stream()
+                .filter(e -> !Arrays.asList(e.getAnnotation().dataType()).contains(DataType.Graph))
                 .collect(() -> new TreeMap<>(String.CASE_INSENSITIVE_ORDER),
                         (m, e) -> m.put(e.getAnnotation().command(), e),
                         (m, u) -> m.putAll(u));
-        
+
+        // Exclude scores that only support Graph data type
         this.annotatedScoreClasses = ScoreAnnotations.getInstance().getAnnotatedClasses().stream()
+                .filter(e -> !Arrays.asList(e.getAnnotation().dataType()).contains(DataType.Graph))
                 .collect(() -> new TreeMap<>(String.CASE_INSENSITIVE_ORDER),
                         (m, e) -> m.put(e.getAnnotation().command(), e),
                         (m, u) -> m.putAll(u));
@@ -80,22 +89,19 @@ public class AlgorithmEndpointService {
     public List<AlgorithmDTO> listAlgorithms() {
         List<AlgorithmDTO> algorithms = new LinkedList<>();
 
-        AlgorithmAnnotations algoAnno = AlgorithmAnnotations.getInstance();
-        
-        List<AnnotatedClass<Algorithm>> algoAnnoList = algoAnno.filterOutExperimental(algoAnno.getAnnotatedClasses());
-
-        algoAnnoList.stream().map((algoAnnoClass) -> algoAnnoClass.getAnnotation()).forEachOrdered((algo) -> {
-        
-            Class annotatedClass = annotatedAlgoClasses.get(algo.command()).getClazz();
+        annotatedAlgoClasses.forEach((k, v) -> {
+            Class annotatedClass = v.getClazz();
+            
+            Algorithm algoAnno = v.getAnnotation();
             
             boolean requireTest = requireIndependenceTest(annotatedClass);
             boolean requireScore = requireScore(annotatedClass);
             boolean acceptKnowledge = acceptKnowledge(annotatedClass);
 
             // Use command name as ID
-            algorithms.add(new AlgorithmDTO(algo.command(), algo.name(), algo.description(), requireTest, requireScore, acceptKnowledge));
+            algorithms.add(new AlgorithmDTO(algoAnno.command(), algoAnno.name(), algoAnno.description(), requireTest, requireScore, acceptKnowledge));
         });
-
+  
         return algorithms;
     }
 
@@ -108,7 +114,7 @@ public class AlgorithmEndpointService {
     public AlgorithmDTO getAlgorithmDetail(String algoId) {
         AnnotatedClass<Algorithm> algoAnnoClass = annotatedAlgoClasses.get(algoId);
         
-        Algorithm algo = algoAnnoClass.getAnnotation();
+        Algorithm algoAnno = algoAnnoClass.getAnnotation();
         
         Class annotatedClass = algoAnnoClass.getClazz();
         
@@ -117,7 +123,7 @@ public class AlgorithmEndpointService {
         boolean acceptKnowledge = acceptKnowledge(annotatedClass);
 
         // Use command name as ID
-        AlgorithmDTO algoDTO = new AlgorithmDTO(algoId, algo.name(), algo.description(), requireTest, requireScore, acceptKnowledge);
+        AlgorithmDTO algoDTO = new AlgorithmDTO(algoId, algoAnno.name(), algoAnno.description(), requireTest, requireScore, acceptKnowledge);
         
         return algoDTO;
     }

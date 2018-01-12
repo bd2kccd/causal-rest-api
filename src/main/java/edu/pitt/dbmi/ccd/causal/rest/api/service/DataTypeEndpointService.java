@@ -6,8 +6,6 @@
 package edu.pitt.dbmi.ccd.causal.rest.api.service;
 
 import edu.cmu.tetrad.data.DataType;
-import edu.pitt.dbmi.ccd.causal.rest.api.dto.DataTypeDTO;
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -23,16 +21,18 @@ public class DataTypeEndpointService {
      * List all the available algorithms: Continuous, Discrete, Mixed, Graph, Covariance
      *
      * @return A list of available algorithms
-     * @throws IOException
      */
-    public List<DataTypeDTO> listDataTypes() {
-        List<DataTypeDTO> dataTypes = new LinkedList<>();
+    public List<String> listDataTypes() {
+        List<String> dataTypes = new LinkedList<>();
         // Convert Tetrad's DataType enum to a list of strings
-        List<DataType> dt = new LinkedList<DataType>(Arrays.asList(DataType.values()));
+        List<DataType> dt = new LinkedList<>(Arrays.asList(DataType.values()));
         
-        for (DataType dataType : dt) {
-            dataTypes.add(new DataTypeDTO(dataType.name()));
-        }
+        // Exclude Graph
+        dt.forEach((dataType) -> {
+            if (dataType != DataType.Graph) {
+                dataTypes.add(dataType.name().toLowerCase());
+            }
+        });
 
         return dataTypes;
     }

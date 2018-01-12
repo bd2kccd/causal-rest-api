@@ -13,6 +13,8 @@ import edu.pitt.dbmi.ccd.causal.rest.api.dto.IndependenceTestDTO;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 import org.springframework.stereotype.Service;
 
 /**
@@ -21,29 +23,37 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class IndependenceTestEndpointService {
+    private final Map<String, AnnotatedClass<TestOfIndependence>> annotatedClasses;
+
+    public IndependenceTestEndpointService() {
+        // Exclude tests that only support Graph data type
+        this.annotatedClasses = TestOfIndependenceAnnotations.getInstance().getAnnotatedClasses().stream()
+                .filter(e -> !Arrays.asList(e.getAnnotation().dataType()).contains(DataType.Graph))
+                .collect(() -> new TreeMap<>(String.CASE_INSENSITIVE_ORDER),
+                        (m, e) -> m.put(e.getAnnotation().command(), e),
+                        (m, u) -> m.putAll(u));
+    }
+    
     /**
      * List all the available independence tests
      *
      * @return A list of available independence tests
      */
     public List<IndependenceTestDTO> listAllIndependenceTests() {
-        List<IndependenceTestDTO> tests = new LinkedList<>();
+        List<IndependenceTestDTO> testDTOs = new LinkedList<>();
 
-        TestOfIndependenceAnnotations testAnno = TestOfIndependenceAnnotations.getInstance();
-        
-        List<AnnotatedClass<TestOfIndependence>> testAnnoList = testAnno.filterOutExperimental(testAnno.getAnnotatedClasses());
-
-        testAnnoList.stream().map((testAnnoClass) -> testAnnoClass.getAnnotation()).forEachOrdered((test) -> {
+        annotatedClasses.values().forEach((annoClass) -> {
             List<String> supportedDataTypes = new LinkedList<>();
             
-            for (DataType dataType : test.dataType()) {
-                supportedDataTypes.add(dataType.name());
+            for (DataType dataType : annoClass.getAnnotation().dataType()) {
+                supportedDataTypes.add(dataType.name().toLowerCase());
             }
             // Use command name as ID
-            tests.add(new IndependenceTestDTO(test.command(), test.name(), supportedDataTypes));
+            testDTOs.add(new IndependenceTestDTO(annoClass.getAnnotation().command(), annoClass.getAnnotation().name(), supportedDataTypes));
         });
 
-        return tests;
+
+        return testDTOs;
     }
     
     /**
@@ -55,44 +65,23 @@ public class IndependenceTestEndpointService {
     public List<IndependenceTestDTO> listIndependenceTests(String dataType) {
         List<IndependenceTestDTO> testDTOs = new LinkedList<>();
 
-        List<TestOfIndependence> filteredTests = listIndependenceTestsByDataType(dataType);
-        
-        filteredTests.forEach((test) -> {
+        annotatedClasses.values().forEach((annoClass) -> {
             List<String> supportedDataTypes = new LinkedList<>();
-
-            for (DataType dt : test.dataType()) {
-                supportedDataTypes.add(dt.name());
+            
+            // Normalize dataType to match the Tetrad enum value
+            String normalizedDataType = dataType.substring(0, 1).toUpperCase() + dataType.substring(1).toLowerCase();
+            
+            // Only return the tests that support the givien dataType
+            if (Arrays.asList(annoClass.getAnnotation().dataType()).contains(DataType.valueOf(normalizedDataType))) {
+                for (DataType dt : annoClass.getAnnotation().dataType()) {
+                    supportedDataTypes.add(dt.name().toLowerCase());
+                }
+                // Use command name as ID
+                testDTOs.add(new IndependenceTestDTO(annoClass.getAnnotation().command(), annoClass.getAnnotation().name(), supportedDataTypes));
             }
-            // Use command name as ID
-            testDTOs.add(new IndependenceTestDTO(test.command(), test.name(), supportedDataTypes));
-        });
-        
+        }); 
+
         return testDTOs;
     }
     
-    /**
-     * List all the available independence tests based on the given data type
-     * 
-     * @param dataType
-     * @return 
-     */
-    public List<TestOfIndependence> listIndependenceTestsByDataType(String dataType) {
-        // Normalize dataType to match the Tetrad enum value
-        String dt = dataType.substring(0, 1).toUpperCase() + dataType.substring(1).toLowerCase();
-        
-        List<TestOfIndependence> filteredTests = new LinkedList<>();; 
-        
-        TestOfIndependenceAnnotations testAnno = TestOfIndependenceAnnotations.getInstance();
-        
-        List<AnnotatedClass<TestOfIndependence>> testAnnoList = testAnno.filterOutExperimental(testAnno.getAnnotatedClasses());
-
-        testAnnoList.stream().map((testAnnoClass) -> testAnnoClass.getAnnotation()).forEachOrdered((test) -> {
-            // Only return the tests that support the givien dataType
-            if (Arrays.asList(test.dataType()).contains(DataType.valueOf(dt))) {
-                filteredTests.add(test);
-            }
-        });
-
-        return filteredTests;
-    }
 }
