@@ -37,7 +37,7 @@ public class JobInfoDTO {
     private Long id;
 
     @XmlElement
-    private String algorithmName;
+    private String algoId;
 
     @XmlElement
     private int status;
@@ -65,12 +65,12 @@ public class JobInfoDTO {
         this.id = id;
     }
 
-    public String getAlgorithmName() {
-        return algorithmName;
+    public String getAlgoId() {
+        return algoId;
     }
 
-    public void setAlgorithmName(String algorithmName) {
-        this.algorithmName = algorithmName;
+    public void setAlgoId(String algoId) {
+        this.algoId = algoId;
     }
 
     public int getStatus() {

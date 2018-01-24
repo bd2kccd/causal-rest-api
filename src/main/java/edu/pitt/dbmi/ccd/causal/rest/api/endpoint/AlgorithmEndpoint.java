@@ -19,14 +19,18 @@
 package edu.pitt.dbmi.ccd.causal.rest.api.endpoint;
 
 import edu.pitt.dbmi.ccd.causal.rest.api.Role;
+import edu.pitt.dbmi.ccd.causal.rest.api.dto.AlgoInfo;
 import edu.pitt.dbmi.ccd.causal.rest.api.dto.AlgorithmDTO;
+import edu.pitt.dbmi.ccd.causal.rest.api.dto.AlgorithmParameterDTO;
 import edu.pitt.dbmi.ccd.causal.rest.api.service.AlgorithmEndpointService;
-import java.io.IOException;
 import java.util.List;
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
+import javax.validation.Valid;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.GenericEntity;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
@@ -56,15 +60,49 @@ public class AlgorithmEndpoint {
      * List all the available algorithms
      *
      * @return 200 with a list of available algorithms
-     * @throws IOException
      */
     @GET
     @Path("/algorithms")
     @Produces({APPLICATION_JSON, APPLICATION_XML})
     @RolesAllowed(Role.USER)
-    public Response listAlgorithmResultFiles() throws IOException {
+    public Response listAllAlgorithms() {
         List<AlgorithmDTO> algorithmDTOs = algorithmEndpointService.listAlgorithms();
         GenericEntity<List<AlgorithmDTO>> entity = new GenericEntity<List<AlgorithmDTO>>(algorithmDTOs) {
+        };
+
+        return Response.ok(entity).build();
+    }
+    
+    /**
+     * List all the available algorithms
+     *
+     * @param algoId
+     * @return 200 with a list of available algorithms
+     */
+    @GET
+    @Path("/algorithms/{algoId}")
+    @Produces({APPLICATION_JSON, APPLICATION_XML})
+    @RolesAllowed(Role.USER)
+    public Response getAlgorithmDetail(@PathParam("algoId") String algoId) {
+        AlgorithmDTO algorithmDTO = algorithmEndpointService.getAlgorithmDetail(algoId);
+        GenericEntity<AlgorithmDTO> entity = new GenericEntity<AlgorithmDTO>(algorithmDTO) {
+        };
+
+        return Response.ok(entity).build();
+    }
+    
+    /**
+     * List all parameters of a given algorithm, test, and score
+     * @param algoInfo
+     * @return 
+     */
+    @POST
+    @Path("/algorithmParameters")
+    @Produces({APPLICATION_JSON, APPLICATION_XML})
+    @RolesAllowed(Role.USER)
+    public Response listAlgorithmParameters(@Valid AlgoInfo algoInfo) {
+        List<AlgorithmParameterDTO> algoParamsDTOs = algorithmEndpointService.listAlgorithmParameters(algoInfo);
+        GenericEntity<List<AlgorithmParameterDTO>> entity = new GenericEntity<List<AlgorithmParameterDTO>>(algoParamsDTOs) {
         };
 
         return Response.ok(entity).build();

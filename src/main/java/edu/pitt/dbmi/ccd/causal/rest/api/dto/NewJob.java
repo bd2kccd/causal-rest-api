@@ -21,14 +21,24 @@ package edu.pitt.dbmi.ccd.causal.rest.api.dto;
 import java.util.Set;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import org.hibernate.validator.constraints.NotEmpty;
 import org.hibernate.validator.constraints.Range;
 
 /**
  *
  * @author Zhou Yuan (zhy19@pitt.edu)
  */
-public abstract class NewJob {
+public class NewJob {
 
+    @NotEmpty
+    protected String algoId;
+
+    // Some algorithms don't require test
+    protected String testId;
+
+    // Some algorithms don't require score
+    protected String scoreId;
+    
     @NotNull
     @Range(min = 1, max = Long.MAX_VALUE)
     protected Long datasetFileId;
@@ -36,6 +46,12 @@ public abstract class NewJob {
     @Range(min = 1, max = Long.MAX_VALUE)
     protected Long priorKnowledgeFileId;
 
+    @Valid
+    protected boolean skipDataValidation;
+    
+    @Valid
+    protected Set<AlgoParameter> algoParameters;
+    
     // We must ues @Valid annoation here again to enable the bean validation in JvmOptions,
     // because the @Valid annoation used in endpopint only works on this NewJob bean,
     // the validation won't populate to the nested bean without this @Valid here
@@ -46,6 +62,30 @@ public abstract class NewJob {
     protected Set<HpcParameter> hpcParameters;
 
     public NewJob() {
+    }
+
+    public String getAlgoId() {
+        return algoId;
+    }
+
+    public void setAlgoId(String algoId) {
+        this.algoId = algoId;
+    }
+
+    public String getTestId() {
+        return testId;
+    }
+
+    public void setTestId(String testId) {
+        this.testId = testId;
+    }
+
+    public String getScoreId() {
+        return scoreId;
+    }
+
+    public void setScoreId(String scoreId) {
+        this.scoreId = scoreId;
     }
 
     public Long getDatasetFileId() {
@@ -62,6 +102,22 @@ public abstract class NewJob {
 
     public void setPriorKnowledgeFileId(Long priorKnowledgeFileId) {
         this.priorKnowledgeFileId = priorKnowledgeFileId;
+    }
+
+    public boolean isSkipDataValidation() {
+        return skipDataValidation;
+    }
+
+    public void setSkipDataValidation(boolean skipDataValidation) {
+        this.skipDataValidation = skipDataValidation;
+    }
+
+    public Set<AlgoParameter> getAlgoParameters() {
+        return algoParameters;
+    }
+
+    public void setAlgoParameters(Set<AlgoParameter> algoParameters) {
+        this.algoParameters = algoParameters;
     }
 
     public JvmOptions getJvmOptions() {

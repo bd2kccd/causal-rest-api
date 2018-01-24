@@ -32,28 +32,40 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class AlgorithmDTO {
 
     @XmlElement
-    private int id;
+    private String id;
 
     @XmlElement
     private String name;
 
     @XmlElement
     private String description;
+    
+    @XmlElement
+    private boolean requireTest;
+    
+    @XmlElement
+    private boolean requireScore;
+    
+    @XmlElement
+    private boolean acceptKnowledge;
 
     public AlgorithmDTO() {
     }
 
-    public AlgorithmDTO(int id, String name, String description) {
+    public AlgorithmDTO(String id, String name, String description, boolean requireTest, boolean requireScore, boolean acceptKnowledge) {
         this.id = id;
         this.name = name;
         this.description = description;
+        this.requireTest = requireTest;
+        this.requireScore = requireScore;
+        this.acceptKnowledge = acceptKnowledge;
     }
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -71,6 +83,30 @@ public class AlgorithmDTO {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public boolean isRequireTest() {
+        return requireTest;
+    }
+
+    public void setRequireTest(boolean requireTest) {
+        this.requireTest = requireTest;
+    }
+
+    public boolean isRequireScore() {
+        return requireScore;
+    }
+
+    public void setRequireScore(boolean requireScore) {
+        this.requireScore = requireScore;
+    }
+
+    public boolean isAcceptKnowledge() {
+        return acceptKnowledge;
+    }
+
+    public void setAcceptKnowledge(boolean acceptKnowledge) {
+        this.acceptKnowledge = acceptKnowledge;
     }
 
 }

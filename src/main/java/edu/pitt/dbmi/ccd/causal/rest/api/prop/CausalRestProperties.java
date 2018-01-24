@@ -32,20 +32,8 @@ import org.springframework.stereotype.Component;
 @PropertySource("classpath:causal.properties")
 public class CausalRestProperties {
 
-    @Value("${ccd.jar.algorithm}")
+    @Value("${ccd.cmd.jar}")
     private String algorithmJar;
-
-    @Value("${ccd.algorithm.fges.cont:FGESc}")
-    private String algoFgesCont;
-
-    @Value("${ccd.algorithm.fges.disc:FGESd}")
-    private String algoFgesDisc;
-
-    @Value("${ccd.algorithm.gfci.cont:GFCIc}")
-    private String algoGfciCont;
-
-    @Value("${ccd.algorithm.gfci.disc:GFCId}")
-    private String algoGfciDisc;
 
     @Value("${ccd.server.workspace:}")
     private String workspaceDir;
@@ -86,38 +74,6 @@ public class CausalRestProperties {
 
     public void setAlgorithmJar(String algorithmJar) {
         this.algorithmJar = algorithmJar;
-    }
-
-    public String getAlgoFgesCont() {
-        return algoFgesCont;
-    }
-
-    public void setAlgoFgesCont(String algoFgesCont) {
-        this.algoFgesCont = algoFgesCont;
-    }
-
-    public String getAlgoFgesDisc() {
-        return algoFgesDisc;
-    }
-
-    public void setAlgoFgesDisc(String algoFgesDisc) {
-        this.algoFgesDisc = algoFgesDisc;
-    }
-
-    public String getAlgoGfciCont() {
-        return algoGfciCont;
-    }
-
-    public void setAlgoGfciCont(String algoGfciCont) {
-        this.algoGfciCont = algoGfciCont;
-    }
-
-    public String getAlgoGfciDisc() {
-        return algoGfciDisc;
-    }
-
-    public void setAlgoGfciDisc(String algoGfciDisc) {
-        this.algoGfciDisc = algoGfciDisc;
     }
 
     public String getWorkspaceDir() {
