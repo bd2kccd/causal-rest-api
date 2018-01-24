@@ -1164,7 +1164,7 @@ Generated HTTP request code example:
 ````
 POST /ccd-api/1/newjob HTTP/1.1
 Host: localhost:9000
-Authorization: Bearer faithfulnessAssumed
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0LyIsInVpZCI6MSwiZXhwIjoxNTE1NjIwNjQ4NTA2LCJpYXQiOjE1MTU2MTcwNDg1MDZ9.OvS1DNCRtgqNuOw0EX3TAxZxb998gvL84ZIRb3CykY0
 Content-Type: application/json
 
 {
