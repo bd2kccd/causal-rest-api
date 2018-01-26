@@ -1148,7 +1148,8 @@ They also share a common JSON structure as of their input, for example:
 | `scoreId` | The ID of score method, not all algorithms require a score |
 | `datasetFileId` | The dataset file ID, integer |
 | `priorKnowledgeFileId` | The optional prior knowledge file ID, integer |
-| `algorithmParameters` | Algorithm specific parameters, JSON object |
+| `algoParameters` | Algorithm specific parameters, JSON object |
+| `skipDataValidation` | If to skip the data validation, boolean |
 | `jvmOptions` | Advanced Options For Java Virtual Machine (JVM), JSON object. Currently only support `maxHeapSize` (Gigabyte, max value is 100) |
 | `hpcParameters` | Parameters for High-Performance Computing, JSON array of key-value objects. Currently only support `wallTime` |
 
