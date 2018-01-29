@@ -1063,7 +1063,7 @@ Generated HTTP request code example:
 API Endpoint URI pattern:
 
 ````
-POST https://ccd4.vm.bridges.psc.edu/ccd-api/algorithmParameters
+POST https://ccd4.vm.bridges.psc.edu/ccd-api/{userId}/algorithmParameters
 ````
 
 | Field | Description |
