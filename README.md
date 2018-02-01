@@ -612,7 +612,7 @@ Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL
 [
     {
         "id": "bpc",
-        "name": "Bpc",
+        "name": "BPC",
         "description": "",
         "requireTest": false,
         "requireScore": false,
@@ -660,7 +660,7 @@ Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL
     },
     {
         "id": "fges-mb",
-        "name": "FgesMb",
+        "name": "FGES-MB",
         "description": "",
         "requireTest": false,
         "requireScore": true,
@@ -668,7 +668,7 @@ Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL
     },
     {
         "id": "fofc",
-        "name": "Fofc",
+        "name": "FOFC",
         "description": "",
         "requireTest": false,
         "requireScore": false,
@@ -676,7 +676,7 @@ Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL
     },
     {
         "id": "ftfc",
-        "name": "Ftfc",
+        "name": "FTFC",
         "description": "",
         "requireTest": false,
         "requireScore": false,
@@ -731,6 +731,14 @@ Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL
         "acceptKnowledge": false
     },
     {
+        "id": "mimbuild",
+        "name": "MIMBuild",
+        "description": "",
+        "requireTest": false,
+        "requireScore": false,
+        "acceptKnowledge": false
+    },
+    {
         "id": "pc-all",
         "name": "PC All",
         "description": "",
@@ -764,7 +772,7 @@ Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL
     },
     {
         "id": "ts-imgs",
-        "name": "TsImages",
+        "name": "TsIMaGES",
         "description": "",
         "requireTest": false,
         "requireScore": true,
