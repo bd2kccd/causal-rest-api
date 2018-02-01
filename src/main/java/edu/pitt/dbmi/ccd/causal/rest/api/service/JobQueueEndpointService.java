@@ -302,7 +302,8 @@ public class JobQueueEndpointService {
 
         LOGGER.info(String.format("New job submitted. Job ID: %d", newJobId));
 
-        String resultJsonFileName = fileName + ".json";
+        // This needs to be consistent with Causal CMD generated graph JSON filename
+        String resultJsonFileName = fileName + "_graph.json";
         fileName = fileName + ".txt";
         String errorFileName = String.format("error_%s", fileName);
 
